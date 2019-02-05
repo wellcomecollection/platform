@@ -5,6 +5,7 @@ import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.bag.ArchiveItemJobCreator
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.ArchiveCompletion
 import uk.ac.wellcome.platform.archive.archivist.models.errors.ArchiveJobError
 import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveDigestItemJob,
@@ -16,15 +17,15 @@ import uk.ac.wellcome.platform.archive.common.flows.{
 }
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 import uk.ac.wellcome.platform.archive.common.models.{
-  ArchiveComplete,
-  IngestBagRequest
+  IngestBagRequest,
+  ReplicationRequest
 }
 
 object ArchiveJobDigestItemsFlow extends Logging {
   def apply(parallelism: Int, ingestBagRequest: IngestBagRequest)(
     implicit s3Client: AmazonS3)
     : Flow[ArchiveJob,
-           Either[ArchiveError[ArchiveJob], ArchiveComplete],
+           ArchiveCompletion,
            NotUsed] =
     Flow[ArchiveJob]
       .log("creating archive item jobs")
@@ -33,13 +34,13 @@ object ArchiveJobDigestItemsFlow extends Logging {
         FoldEitherFlow[
           ArchiveError[ArchiveJob],
           List[ArchiveDigestItemJob],
-          Either[ArchiveError[ArchiveJob], ArchiveComplete]](OnErrorFlow())(
+          ArchiveCompletion](OnErrorFlow())(
           mapReduceArchiveItemJobs(parallelism, ingestBagRequest)))
 
   private def mapReduceArchiveItemJobs(parallelism: Int,
                                        ingestBagRequest: IngestBagRequest)(
     implicit s3Client: AmazonS3): Flow[List[ArchiveDigestItemJob],
-                                       Either[ArchiveJobError, ArchiveComplete],
+                                       ArchiveCompletion,
                                        NotUsed] =
     Flow[List[ArchiveDigestItemJob]]
       .mapConcat(identity)
@@ -66,9 +67,9 @@ object ArchiveJobDigestItemsFlow extends Logging {
       .map {
         case (Nil, archiveJob) =>
           Right(
-            ArchiveComplete(
+            ReplicationRequest(
               archiveRequestId = ingestBagRequest.id,
-              bagLocation = archiveJob.bagLocation
+              srcBagLocation = archiveJob.bagLocation
             ))
         case (errors, archiveJob) => Left(ArchiveJobError(archiveJob, errors))
       }
