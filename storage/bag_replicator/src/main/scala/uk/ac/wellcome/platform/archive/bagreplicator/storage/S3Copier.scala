@@ -6,7 +6,7 @@ import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class S3Copier(implicit s3Client: AmazonS3) extends Logging {
+class S3Copier(s3Client: AmazonS3) extends Logging {
 
   import com.amazonaws.services.s3.transfer.TransferManagerBuilder
 
@@ -30,11 +30,5 @@ class S3Copier(implicit s3Client: AmazonS3) extends Logging {
     )
 
     copyTransfer.waitForCopyResult()
-  }
-}
-
-object S3Copier {
-  def apply()(implicit s3Client: AmazonS3) = {
-    new S3Copier()
   }
 }

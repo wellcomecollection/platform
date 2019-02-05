@@ -36,7 +36,7 @@ class BagStorageTest
         ) { bagLocation: BagLocation =>
           // TODO: Move these implicits to the top level
           implicit val _s3Client = s3Client
-          implicit val _s3Copier = S3Copier()
+          implicit val _s3Copier = new S3Copier(s3Client)
 
           val destinationLocation = ReplicatorDestinationConfig(
             namespace = destinationBucket.name,
@@ -62,7 +62,6 @@ class BagStorageTest
 
   describe("when other bags have the same prefix") {
     it("should duplicate a bag into a given location") {
-
       withLocalS3Bucket { sourceBucket =>
         withLocalS3Bucket { destinationBucket =>
           withBag(
@@ -78,7 +77,7 @@ class BagStorageTest
               )
             ) { _ =>
               implicit val _s3Client = s3Client
-              implicit val _s3Copier = S3Copier()
+              implicit val _s3Copier = new S3Copier(s3Client)
 
               val destinationLocation = ReplicatorDestinationConfig(
                 namespace = destinationBucket.name,

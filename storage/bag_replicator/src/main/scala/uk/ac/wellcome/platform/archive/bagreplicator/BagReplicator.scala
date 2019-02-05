@@ -57,7 +57,7 @@ class BagReplicator(
     implicit val s3client: AmazonS3 = s3Client
     implicit val amazonSNS: AmazonSNS = snsClient
     implicit val ex: ExecutionContext = actorSystem.dispatcher
-    implicit val s3Copier: S3Copier = new S3Copier()
+    implicit val s3Copier: S3Copier = new S3Copier(s3client)
 
     val flow = Flow[NotificationMessage]
       .log("received notification message")
