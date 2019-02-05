@@ -10,7 +10,12 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class S3CopierTest extends FunSpec with Matchers with ScalaFutures with RandomThings with S3 {
+class S3CopierTest
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with RandomThings
+    with S3 {
   it("copies a file inside a bucket") {
     withLocalS3Bucket { bucket =>
       val src = ObjectLocation(
@@ -79,6 +84,7 @@ class S3CopierTest extends FunSpec with Matchers with ScalaFutures with RandomTh
       randomAlphanumeric()
     )
 
-  private def assertEqualObjects(x: ObjectLocation, y: ObjectLocation): Assertion =
+  private def assertEqualObjects(x: ObjectLocation,
+                                 y: ObjectLocation): Assertion =
     getContentFromS3(x) shouldBe getContentFromS3(y)
 }

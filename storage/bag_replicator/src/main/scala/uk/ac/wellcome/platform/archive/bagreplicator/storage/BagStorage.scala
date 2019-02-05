@@ -13,7 +13,8 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logging {
+class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext)
+    extends Logging {
 
   val s3Copier = new S3Copier(s3Client)
 
@@ -37,15 +38,16 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
     } yield dstBagLocation
   }
 
-  private def listObjects(bagLocation: BagLocation): Future[ObjectListing] = Future {
-    val absolutePathInStorage = bagLocation.completePath
-      .replaceAll("(.*[^/]+)/*", "$1/")
+  private def listObjects(bagLocation: BagLocation): Future[ObjectListing] =
+    Future {
+      val absolutePathInStorage = bagLocation.completePath
+        .replaceAll("(.*[^/]+)/*", "$1/")
 
-    s3Client.listObjects(
-      bagLocation.storageNamespace,
-      absolutePathInStorage
-    )
-  }
+      s3Client.listObjects(
+        bagLocation.storageNamespace,
+        absolutePathInStorage
+      )
+    }
 
   private def getItemInPath(
     summary: S3ObjectSummary,
@@ -102,7 +104,9 @@ class BagStorage(s3Client: AmazonS3)(implicit ec: ExecutionContext) extends Logg
           dst = dstBagItemLocation.objectLocation
         )
 
-        future.map { _ => dstBagItemLocation }
+        future.map { _ =>
+          dstBagItemLocation
+        }
       }
     )
   }

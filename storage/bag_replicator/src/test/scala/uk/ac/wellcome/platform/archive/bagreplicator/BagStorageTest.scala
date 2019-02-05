@@ -123,7 +123,8 @@ class BagStorageTest
     destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
   }
 
-  private def getObjectSummaries(bagLocation: BagLocation): List[S3ObjectSummary] =
+  private def getObjectSummaries(
+    bagLocation: BagLocation): List[S3ObjectSummary] =
     s3Client
       .listObjects(bagLocation.storageNamespace, bagLocation.completePath)
       .getObjectSummaries
