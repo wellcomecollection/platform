@@ -8,8 +8,8 @@ import uk.ac.wellcome.display.models.ApiVersions
 class ApiContextTest extends ApiWorksTestBase {
   it("returns a context for all versions") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApi(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+      withHttpServer(version) {
+        case (apiPrefix, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/context.json",
             andExpect = Status.Ok,
