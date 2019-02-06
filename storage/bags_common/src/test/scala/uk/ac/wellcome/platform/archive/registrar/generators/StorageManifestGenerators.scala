@@ -21,8 +21,8 @@ trait StorageManifestGenerators extends RandomThings {
     space: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo,
     checksumAlgorithm: String = "sha256",
-    bucket: String = "bukkit",
-    path: String = "path"
+    accessLocation: ObjectLocation = ObjectLocation("bucket", "path"),
+    archiveLocations: List[ObjectLocation] = List.empty
   ): StorageManifest =
     StorageManifest(
       space = space,
@@ -35,7 +35,8 @@ trait StorageManifestGenerators extends RandomThings {
         checksumAlgorithm = ChecksumAlgorithm(checksumAlgorithm),
         files = List(BagDigestFile("a", BagItemPath("bag-info.txt")))
       ),
-      StorageLocation(StandardStorageProvider, ObjectLocation(bucket, path)),
+      StorageLocation(StandardStorageProvider, accessLocation),
+      archiveLocations.map(StorageLocation(StandardStorageProvider, _)),
       Instant.now
     )
 

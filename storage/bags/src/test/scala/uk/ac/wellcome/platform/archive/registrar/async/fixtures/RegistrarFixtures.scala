@@ -39,19 +39,24 @@ trait RegistrarFixtures
     archiveRequestId: UUID = randomUUID,
     storageSpace: StorageSpace = randomStorageSpace,
     bagInfo: BagInfo = randomBagInfo
-  )(testWith: TestWith[BagLocation, R]): R =
-    withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
-      bagLocation =>
-        val archiveComplete = ArchiveComplete(
-          archiveRequestId = archiveRequestId,
-          bagLocation = bagLocation
-        )
+  )(testWith: TestWith[(BagLocation, BagLocation), R]): R =
+    withBag(
+      storageBucket,
+      bagInfo = bagInfo,
+      storageSpace = storageSpace,
+      storagePrefix = "archive") { srcBagLocation =>
+      val dstBagLocation = srcBagLocation.copy(storagePrefix = "access")
+      val replicationResult = ReplicationResult(
+        archiveRequestId = archiveRequestId,
+        srcBagLocation = srcBagLocation,
+        dstBagLocation = dstBagLocation
+      )
 
-        sendNotificationToSQS(
-          queuePair.queue,
-          archiveComplete
-        )
-        testWith(bagLocation)
+      sendNotificationToSQS(
+        queuePair.queue,
+        replicationResult
+      )
+      testWith((srcBagLocation, dstBagLocation))
     }
 
   override def createTable(table: Table) = {

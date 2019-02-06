@@ -1,13 +1,13 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.models.errors
 
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.ReplicationRequest
 
 trait ErrorMessage {
   val errorMessage: String
 }
 
-trait BagReplicationContext {
-  val context: ArchiveComplete
+trait BagReplicationErrorContext {
+  val context: ReplicationRequest
 }
 
 abstract class BagReplicationError extends ErrorMessage
@@ -15,10 +15,10 @@ abstract class BagReplicationError extends ErrorMessage
 case class NotificationParsingFailed(errorMessage: String)
     extends BagReplicationError
 
-case class DuplicationFailed(errorMessage: String, context: ArchiveComplete)
+case class DuplicationFailed(errorMessage: String, context: ReplicationRequest)
     extends BagReplicationError
-    with BagReplicationContext
+    with BagReplicationErrorContext
 
-case class NotificationFailed(errorMessage: String, context: ArchiveComplete)
+case class NotificationFailed(errorMessage: String, context: ReplicationRequest)
     extends BagReplicationError
-    with BagReplicationContext
+    with BagReplicationErrorContext

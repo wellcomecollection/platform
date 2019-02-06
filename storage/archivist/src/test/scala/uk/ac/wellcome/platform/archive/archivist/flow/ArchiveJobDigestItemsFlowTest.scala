@@ -43,9 +43,9 @@ class ArchiveJobDigestItemsFlowTest
           whenReady(eventualArchiveJobs) { archiveJobs =>
             archiveJobs shouldBe List(
               Right(
-                ArchiveComplete(
+                ReplicationRequest(
                   archiveRequestId = ingestRequest.id,
-                  bagLocation = archiveJob.bagLocation
+                  srcBagLocation = archiveJob.bagLocation
                 )
               )
             )

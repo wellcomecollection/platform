@@ -19,6 +19,7 @@ import uk.ac.wellcome.platform.archive.display.{
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
 import uk.ac.wellcome.platform.archive.registrar.http.models._
+import uk.ac.wellcome.storage.ObjectLocation
 
 class RegistrarHttpFeatureTest
     extends FunSpec
@@ -45,12 +46,15 @@ class RegistrarHttpFeatureTest
             val checksumAlgorithm = "sha256"
             val path = "path"
             val bucket = "bucket"
+            val archiveBucket = "archive-bucket"
+            val archivePath = "archive-path"
             val storageManifest = createStorageManifestWith(
               space = space,
               bagInfo = bagInfo,
               checksumAlgorithm = checksumAlgorithm,
-              bucket = bucket,
-              path = path
+              accessLocation = ObjectLocation(namespace = bucket, key = path),
+              archiveLocations =
+                List(ObjectLocation(archiveBucket, archivePath))
             )
             val future = storeSingleManifest(vhs, storageManifest)
             whenReady(future) { _ =>
@@ -87,6 +91,12 @@ class RegistrarHttpFeatureTest
                           actualBucket,
                           actualPath,
                           "Location"),
+                        List(
+                          DisplayLocation(
+                            StandardDisplayProvider,
+                            archiveBucket,
+                            archivePath,
+                            "Location")),
                         createdDateString,
                         "Bag") =>
                       actualContextUrl shouldBe "http://api.wellcomecollection.org/storage/v1/context.json"
@@ -100,8 +110,12 @@ class RegistrarHttpFeatureTest
 
                       actualDataManifestChecksumAlgorithm shouldBe checksumAlgorithm
                       actualTagManifestChecksumAlgorithm shouldBe checksumAlgorithm
+
                       actualBucket shouldBe bucket
                       actualPath shouldBe path
+
+                      archiveBucket shouldBe archiveBucket
+                      archivePath shouldBe archivePath
 
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }

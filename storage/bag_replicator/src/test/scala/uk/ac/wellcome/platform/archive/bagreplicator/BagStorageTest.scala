@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.archive.bagreplicator
 
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archive.bagreplicator.config.ReplicatorDestinationConfig
 import uk.ac.wellcome.platform.archive.bagreplicator.fixtures.BagReplicatorFixtures
 import uk.ac.wellcome.platform.archive.bagreplicator.storage.BagStorage
@@ -12,7 +11,6 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
   ExternalIdentifier
 }
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -112,22 +110,4 @@ class BagStorageTest
       }
     }
   }
-
-  def verifyBagCopied(src: BagLocation, dst: BagLocation): Assertion = {
-    val sourceItems = getObjectSummaries(src)
-    val sourceKeyEtags = sourceItems.map { _.getETag }
-
-    val destinationItems = getObjectSummaries(dst)
-    val destinationKeyEtags = destinationItems.map { _.getETag }
-
-    destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
-  }
-
-  private def getObjectSummaries(
-    bagLocation: BagLocation): List[S3ObjectSummary] =
-    s3Client
-      .listObjects(bagLocation.storageNamespace, bagLocation.completePath)
-      .getObjectSummaries
-      .asScala
-      .toList
 }

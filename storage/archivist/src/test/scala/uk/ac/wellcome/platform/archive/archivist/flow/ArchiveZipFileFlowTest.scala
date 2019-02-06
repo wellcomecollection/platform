@@ -15,7 +15,10 @@ import uk.ac.wellcome.platform.archive.archivist.models.{
   ArchiveJob,
   FileDownloadComplete
 }
-import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{
+  ArchiveCompletion,
+  BagDownload
+}
 import uk.ac.wellcome.platform.archive.archivist.models.errors.{
   ArchiveJobError,
   ChecksumNotMatchedOnUploadError,
@@ -23,10 +26,7 @@ import uk.ac.wellcome.platform.archive.archivist.models.errors.{
 }
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.{
-  ArchiveError,
-  InvalidBagManifestError
-}
+import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagLocation,
@@ -74,9 +74,9 @@ class ArchiveZipFileFlowTest
 
               whenReady(verification) { result =>
                 listKeysInBucket(storageBucket) should have size 5
-                result shouldBe List(Right(ArchiveComplete(
+                result shouldBe List(Right(ReplicationRequest(
                   archiveRequestId = ingestContext.id,
-                  bagLocation = BagLocation(
+                  srcBagLocation = BagLocation(
                     storageNamespace = storageBucket.name,
                     storagePrefix = "archive",
                     storageSpace = ingestContext.storageSpace,
@@ -261,9 +261,7 @@ class ArchiveZipFileFlowTest
   }
 
   private def withArchiveZipFileFlow[R](bucket: Bucket, topic: Topic)(
-    testWith: TestWith[
-      Flow[BagDownload, Either[ArchiveError[_], ArchiveComplete], NotUsed],
-      R]): R = {
+    testWith: TestWith[Flow[BagDownload, ArchiveCompletion, NotUsed], R]): R = {
     val bagUploaderConfig = createBagUploaderConfigWith(bucket)
     val flow = ArchiveZipFileFlow(
       config = bagUploaderConfig,

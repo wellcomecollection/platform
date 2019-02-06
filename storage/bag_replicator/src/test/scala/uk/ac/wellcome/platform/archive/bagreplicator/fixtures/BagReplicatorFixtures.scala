@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.archive.bagreplicator.fixtures
 
 import java.util.UUID
 
+import com.amazonaws.services.s3.model.S3ObjectSummary
+import org.scalatest.Assertion
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
@@ -25,6 +27,7 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import scala.collection.JavaConverters._
 
 trait BagReplicatorFixtures
     extends S3
@@ -43,14 +46,14 @@ trait BagReplicatorFixtures
   )(testWith: TestWith[BagLocation, R]): R =
     withBag(storageBucket, bagInfo = bagInfo, storageSpace = storageSpace) {
       bagLocation =>
-        val archiveComplete = ArchiveComplete(
+        val replicationRequest = ReplicationRequest(
           archiveRequestId = archiveRequestId,
-          bagLocation = bagLocation
+          srcBagLocation = bagLocation
         )
 
         sendNotificationToSQS(
           queuePair.queue,
-          archiveComplete
+          replicationRequest
         )
 
         testWith(bagLocation)
@@ -60,7 +63,8 @@ trait BagReplicatorFixtures
     queuePair: QueuePair,
     progressTopic: Topic,
     outgoingTopic: Topic,
-    destinationBucket: Bucket)(testWith: TestWith[BagReplicator, R]): R =
+    dstBucket: Bucket,
+    dstRootPath: String)(testWith: TestWith[BagReplicator, R]): R =
     withActorSystem { implicit actorSystem =>
       withArchiveMessageStream[NotificationMessage, Unit, R](queuePair.queue) {
         messageStream =>
@@ -70,9 +74,7 @@ trait BagReplicatorFixtures
             messageStream = messageStream,
             bagReplicatorConfig = BagReplicatorConfig(
               parallelism = 10,
-              ReplicatorDestinationConfig(
-                destinationBucket.name,
-                "storage-root")),
+              ReplicatorDestinationConfig(dstBucket.name, dstRootPath)),
             progressSnsConfig = createSNSConfigWith(progressTopic),
             outgoingSnsConfig = createSNSConfigWith(outgoingTopic)
           )
@@ -84,29 +86,52 @@ trait BagReplicatorFixtures
     }
 
   def withApp[R](
-    testWith: TestWith[(Bucket, QueuePair, Bucket, Topic, Topic), R]): R = {
+    testWith: TestWith[(Bucket, QueuePair, Bucket, String, Topic, Topic), R])
+    : R = {
     withLocalSqsQueueAndDlqAndTimeout(15) { queuePair =>
       withLocalSnsTopic { progressTopic =>
         withLocalSnsTopic { outgoingTopic =>
           withLocalS3Bucket { sourceBucket =>
             withLocalS3Bucket { destinationBucket =>
+              val dstRootPath = "storage-root"
               withBagReplicator(
                 queuePair,
                 progressTopic,
                 outgoingTopic,
-                destinationBucket) { _ =>
+                destinationBucket,
+                dstRootPath)({ _ =>
                 testWith(
                   (
                     sourceBucket,
                     queuePair,
                     destinationBucket,
+                    dstRootPath,
                     progressTopic,
                     outgoingTopic))
-              }
+              })
             }
           }
         }
       }
     }
   }
+
+  def verifyBagCopied(src: BagLocation, dst: BagLocation): Assertion = {
+    val sourceItems = getObjectSummaries(src)
+    val sourceKeyEtags = sourceItems.map { _.getETag }
+
+    val destinationItems = getObjectSummaries(dst)
+    val destinationKeyEtags = destinationItems.map { _.getETag }
+
+    destinationKeyEtags should contain theSameElementsAs sourceKeyEtags
+  }
+
+  private def getObjectSummaries(
+    bagLocation: BagLocation): List[S3ObjectSummary] =
+    s3Client
+      .listObjects(bagLocation.storageNamespace, bagLocation.completePath)
+      .getObjectSummaries
+      .asScala
+      .toList
+
 }

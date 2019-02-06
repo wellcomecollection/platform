@@ -4,7 +4,14 @@ import java.util.UUID
 
 import uk.ac.wellcome.platform.archive.common.models.bagit.BagLocation
 
-case class ArchiveComplete(
+// TODO: Agree upon these names
+case class ReplicationRequest(
   archiveRequestId: UUID,
-  bagLocation: BagLocation
+  srcBagLocation: BagLocation
+)
+
+case class ReplicationResult(
+  archiveRequestId: UUID,
+  srcBagLocation: BagLocation,
+  dstBagLocation: BagLocation
 )

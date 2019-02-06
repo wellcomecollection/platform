@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.BagDownload
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.ReplicationRequest
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 object ArchiveAndNotifyNextFlow {
@@ -29,7 +29,7 @@ object ArchiveAndNotifyNextFlow {
       .via(
         FoldEitherFlow[
           ArchiveError[_],
-          ArchiveComplete,
+          ReplicationRequest,
           Unit
         ](
           ifLeft = unitFlow

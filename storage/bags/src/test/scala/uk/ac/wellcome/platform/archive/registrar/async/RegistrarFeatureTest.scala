@@ -16,8 +16,11 @@ import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, BagLocation}
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
-import uk.ac.wellcome.platform.archive.common.progress.models.Progress
-import uk.ac.wellcome.platform.archive.registrar.async.fixtures.StorageManifestAssertions
+import uk.ac.wellcome.platform.archive.common.progress.models.{
+  InfrequentAccessStorageProvider,
+  Progress,
+  StorageLocation
+}
 import uk.ac.wellcome.platform.archive.registrar.async.fixtures.RegistrarFixtures
 import uk.ac.wellcome.storage.dynamo._
 
@@ -31,7 +34,6 @@ class RegistrarFeatureTest
     with Inside
     with RandomThings
     with ProgressUpdateAssertions
-    with StorageManifestAssertions
     with PatienceConfiguration {
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(
@@ -41,8 +43,7 @@ class RegistrarFeatureTest
 
   implicit val _ = s3Client
 
-  it(
-    "registers an archived BagIt bag from S3 and notifies the progress tracker") {
+  it("registers an access BagIt bag from S3 and notifies the progress tracker") {
     withRegistrar {
       case (storageBucket, queuePair, progressTopic, vhs) =>
         val requestId = randomUUID
@@ -55,39 +56,48 @@ class RegistrarFeatureTest
           storageBucket,
           requestId,
           storageSpace,
-          bagInfo = bagInfo) { bagLocation =>
-          val bagId = BagId(
-            space = storageSpace,
-            externalIdentifier = bagInfo.externalIdentifier
-          )
+          bagInfo = bagInfo) {
+          case (archiveBagLocation, accessBagLocation) =>
+            val bagId = BagId(
+              space = storageSpace,
+              externalIdentifier = bagInfo.externalIdentifier
+            )
 
-          eventually {
-            val futureMaybeManifest = vhs.getRecord(bagId.toString)
+            eventually {
+              val futureMaybeManifest = vhs.getRecord(bagId.toString)
 
-            whenReady(futureMaybeManifest) { maybeStorageManifest =>
-              maybeStorageManifest shouldBe defined
+              whenReady(futureMaybeManifest) { maybeStorageManifest =>
+                maybeStorageManifest shouldBe defined
 
-              val storageManifest = maybeStorageManifest.get
+                val storageManifest = maybeStorageManifest.get
 
-              assertStorageManifest(storageManifest)(
-                expectedStorageSpace = bagId.space,
-                expectedBagInfo = bagInfo,
-                expectedNamespace = storageBucket.name,
-                expectedPath = bagLocation.completePath,
-                filesNumber = 1,
-                createdDateAfter = createdAfterDate
-              )
+                storageManifest.space shouldBe bagId.space
+                storageManifest.info shouldBe bagInfo
+                storageManifest.manifest.files should have size 1
 
-              assertTopicReceivesProgressStatusUpdate(
-                requestId,
-                progressTopic,
-                Progress.Completed,
-                expectedBag = Some(bagId)) { events =>
-                events should have size 1
-                events.head.description shouldBe "Bag registered successfully"
+                storageManifest.accessLocation shouldBe StorageLocation(
+                  provider = InfrequentAccessStorageProvider,
+                  location = accessBagLocation.objectLocation
+                )
+                storageManifest.archiveLocations shouldBe List(
+                  StorageLocation(
+                    provider = InfrequentAccessStorageProvider,
+                    location = archiveBagLocation.objectLocation
+                  )
+                )
+
+                storageManifest.createdDate.isAfter(createdAfterDate) shouldBe true
+
+                assertTopicReceivesProgressStatusUpdate(
+                  requestId,
+                  progressTopic,
+                  Progress.Completed,
+                  expectedBag = Some(bagId)) { events =>
+                  events.size should be >= 1
+                  events.head.description shouldBe "Bag registered successfully"
+                }
               }
             }
-          }
         }
     }
   }
@@ -98,16 +108,24 @@ class RegistrarFeatureTest
         val requestId = randomUUID
         val bagId = randomBagId
 
-        val bagLocation = BagLocation(
+        val srcBagLocation = BagLocation(
           storageNamespace = storageBucket.name,
           storagePrefix = "archive",
           storageSpace = bagId.space,
           bagPath = randomBagPath
         )
 
+        val dstBagLocation = srcBagLocation.copy(
+          storagePrefix = "access"
+        )
+
         sendNotificationToSQS(
           queuePair.queue,
-          ArchiveComplete(requestId, bagLocation)
+          ReplicationResult(
+            archiveRequestId = requestId,
+            srcBagLocation = srcBagLocation,
+            dstBagLocation = dstBagLocation
+          )
         )
 
         eventually {

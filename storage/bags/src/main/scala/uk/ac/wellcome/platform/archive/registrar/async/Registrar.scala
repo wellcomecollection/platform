@@ -22,12 +22,13 @@ import uk.ac.wellcome.platform.archive.common.messaging.{
   NotificationParsingFlow
 }
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
-import uk.ac.wellcome.platform.archive.common.models.ArchiveComplete
+import uk.ac.wellcome.platform.archive.common.models.ReplicationResult
 import uk.ac.wellcome.platform.archive.registrar.async.factories.StorageManifestFactory
 import uk.ac.wellcome.platform.archive.registrar.async.flows.{
   NotifyFailureFlow,
   UpdateStoredManifestFlow
 }
+import uk.ac.wellcome.platform.archive.registrar.async.models.BagManifestUpdate
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -65,17 +66,24 @@ class Registrar(
 
     val flow = Flow[NotificationMessage]
       .log("notification message")
-      .via(NotificationParsingFlow[ArchiveComplete])
+      .via(NotificationParsingFlow[ReplicationResult])
+      .map { result: ReplicationResult =>
+        BagManifestUpdate(
+          archiveRequestId = result.archiveRequestId,
+          archiveBagLocation = result.srcBagLocation,
+          accessBagLocation = result.dstBagLocation
+        )
+      }
       .map(createStorageManifest)
       .withAttributes(ActorAttributes.dispatcher(
         "akka.stream.materializer.blocking-io-dispatcher"))
       .log("created storage manifest")
       .via(
         FoldEitherFlow[
-          ArchiveError[ArchiveComplete],
-          (StorageManifest, ArchiveComplete),
+          ArchiveError[BagManifestUpdate],
+          (StorageManifest, BagManifestUpdate),
           Unit](
-          ifLeft = NotifyFailureFlow[ArchiveComplete](
+          ifLeft = NotifyFailureFlow[BagManifestUpdate](
             "registrar_failure",
             progressSnsConfig)(_.archiveRequestId).map(_ => ()))(
           ifRight = UpdateStoredManifestFlow(dataStore, progressSnsConfig)))
@@ -83,11 +91,11 @@ class Registrar(
     messageStream.run("registrar", flow)
   }
 
-  private def createStorageManifest(archiveComplete: ArchiveComplete)(
-    implicit s3Client: AmazonS3): Either[ArchiveError[ArchiveComplete],
-                                         (StorageManifest, ArchiveComplete)] =
+  private def createStorageManifest(bagManifestUpdate: BagManifestUpdate)(
+    implicit s3Client: AmazonS3): Either[ArchiveError[BagManifestUpdate],
+                                         (StorageManifest, BagManifestUpdate)] =
     StorageManifestFactory
-      .create(archiveComplete)
-      .map(manifest => (manifest, archiveComplete))
+      .create(bagManifestUpdate)
+      .map(manifest => (manifest, bagManifestUpdate))
 
 }
