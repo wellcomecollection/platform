@@ -7,5 +7,5 @@ import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 trait ApiV1WorksTestBase
     extends ApiWorksTestBase
     with DisplayV1SerialisationTestBase {
-  val apiVersion: ApiVersions.Value = ApiVersions.v1
+  val apiPrefix: String = getApiPrefix(ApiVersions.v1)
 }

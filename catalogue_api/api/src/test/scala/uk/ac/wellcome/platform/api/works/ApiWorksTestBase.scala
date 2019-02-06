@@ -46,12 +46,15 @@ trait ApiWorksTestBase
 
   val apiName = "catalogue/"
 
+  def getApiPrefix(apiVersion: ApiVersions.Value = ApiVersions.default): String =
+    apiName + apiVersion
+
   def withApi[R](apiVersion: ApiVersions.Value)(
     testWith: TestWith[(String, Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>
-          testWith((apiName + apiVersion, indexV1, indexV2, server))
+          testWith((getApiPrefix(apiVersion), indexV1, indexV2, server))
         }
       }
     }
@@ -60,7 +63,7 @@ trait ApiWorksTestBase
     testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withServer(indexV1, Index("index-v2")) { server =>
-        testWith((apiName + ApiVersions.v1, indexV1, server))
+        testWith((getApiPrefix(ApiVersions.v1), indexV1, server))
       }
     }
 
@@ -68,14 +71,13 @@ trait ApiWorksTestBase
     testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV2 =>
       withServer(Index("index-v1"), indexV2) { server =>
-        testWith((apiName + ApiVersions.v2, indexV2, server))
+        testWith((getApiPrefix(ApiVersions.v2), indexV2, server))
       }
     }
 
-  def withHttpServer[R](apiVersion: ApiVersions.Value = ApiVersions.default)(
-    testWith: TestWith[(String, EmbeddedHttpServer), R]): R =
+  def withHttpServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =
     withServer(Index("index-v1"), Index("index-v2")) { server =>
-      testWith((apiName + apiVersion, server))
+      testWith(server)
     }
 
   def emptyJsonResult(apiPrefix: String): String = s"""

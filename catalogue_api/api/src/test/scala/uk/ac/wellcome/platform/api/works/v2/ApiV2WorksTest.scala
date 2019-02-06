@@ -151,7 +151,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("ignores parameters that are unused when making an API request") {
-    withHttpServer(ApiVersions.v2) { case (apiPrefix, server: EmbeddedHttpServer) =>
+    withHttpServer { server: EmbeddedHttpServer =>
       server.httpGet(
         path = s"/$apiPrefix/works?foo=bar",
         andExpect = Status.Ok,
