@@ -44,8 +44,9 @@ trait ApiWorksTestBase
     }
   }
 
-  def withApiFixtures[R](apiVersion: ApiVersions.Value,
-                         apiName: String = "catalogue/")(
+  val apiName = "catalogue/"
+
+  def withApiFixtures[R](apiVersion: ApiVersions.Value)(
     testWith: TestWith[(String, Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
@@ -53,6 +54,28 @@ trait ApiWorksTestBase
           testWith((apiName + apiVersion, indexV1, indexV2, server))
         }
       }
+    }
+
+  def withV1ApiFixtures[R](
+    testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
+    withLocalWorksIndex { indexV1 =>
+      withServer(indexV1, Index("index-v2")) { server =>
+        testWith((apiName + ApiVersions.v1, indexV1, server))
+      }
+    }
+
+  def withV2ApiFixtures[R](
+    testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
+    withLocalWorksIndex { indexV2 =>
+      withServer(Index("index-v1"), indexV2) { server =>
+        testWith((apiName + ApiVersions.v2, indexV2, server))
+      }
+    }
+
+  def withHttpServer[R](apiVersion: ApiVersions.Value)(
+    testWith: TestWith[(String, EmbeddedHttpServer), R]): R =
+    withServer(Index("index-v1"), Index("index-v2")) { server =>
+      testWith((apiName + apiVersion, server))
     }
 
   def emptyJsonResult(apiPrefix: String): String = s"""

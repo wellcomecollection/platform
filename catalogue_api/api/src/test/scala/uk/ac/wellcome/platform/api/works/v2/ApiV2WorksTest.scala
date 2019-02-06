@@ -2,12 +2,13 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a list of works") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexV2, works: _*)
@@ -44,8 +45,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("returns a single work when requested with id") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWork
 
         insertIntoElasticsearch(indexV2, work)
@@ -69,8 +70,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
   it(
     "returns the requested page of results when requested with page & pageSize") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexV2, works: _*)
@@ -150,19 +151,18 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("ignores parameters that are unused when making an API request") {
-    withV2Api {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        server.httpGet(
-          path = s"/$apiPrefix/works?foo=bar",
-          andExpect = Status.Ok,
-          withJsonBody = emptyJsonResult(apiPrefix)
-        )
+    withHttpServer(ApiVersions.v2) { case (apiPrefix, server: EmbeddedHttpServer) =>
+      server.httpGet(
+        path = s"/$apiPrefix/works?foo=bar",
+        andExpect = Status.Ok,
+        withJsonBody = emptyJsonResult(apiPrefix)
+      )
     }
   }
 
   it("returns matching results if doing a full-text search") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "A drawing of a dodo"
         )
@@ -200,8 +200,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("searches different indices with the ?_index query parameter") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWork
           insertIntoElasticsearch(indexV2, work)
@@ -244,8 +244,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("looks up works in different indices with the ?_index query parameter") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWorkWith(
             title = "Playing with pangolins"
@@ -300,8 +300,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("shows the thumbnail field if available") {
-    withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+    withV2ApiFixtures {
+      case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           thumbnail = Some(
             DigitalLocation(
@@ -336,7 +336,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("only returns works from the v2 index") {
-    withV2Api {
+    withApiFixtures(ApiVersions.v2) {
       case (apiPrefix, indexV1, indexV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "Working with wombats"
