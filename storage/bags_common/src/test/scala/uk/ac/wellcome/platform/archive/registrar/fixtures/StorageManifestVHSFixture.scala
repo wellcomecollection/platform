@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.{
   VHSIndexEntry,
   VersionedHybridStore
 }
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

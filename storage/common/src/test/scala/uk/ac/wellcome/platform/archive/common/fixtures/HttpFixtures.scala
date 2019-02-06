@@ -14,7 +14,8 @@ import io.circe.Decoder
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.json.JsonUtil.fromJson
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

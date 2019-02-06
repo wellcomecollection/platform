@@ -8,7 +8,7 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

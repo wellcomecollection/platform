@@ -5,7 +5,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v2.DisplayV2SerialisationTestBase
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 trait ApiV2WorksTestBase
     extends ApiWorksTestBase

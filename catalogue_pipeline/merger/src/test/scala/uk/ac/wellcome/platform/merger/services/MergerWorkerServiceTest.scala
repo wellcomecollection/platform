@@ -19,7 +19,7 @@ import uk.ac.wellcome.platform.merger.fixtures.{
   MatcherResultFixture,
   WorkerServiceFixture
 }
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 class MergerWorkerServiceTest
     extends FunSpec

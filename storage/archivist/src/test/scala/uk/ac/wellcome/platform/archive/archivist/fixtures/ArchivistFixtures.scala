@@ -19,7 +19,8 @@ import uk.ac.wellcome.platform.archive.common.models.IngestBagRequest
 import uk.ac.wellcome.platform.archive.common.models.bagit.BagInfo
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 trait ArchivistFixtures
     extends Messaging

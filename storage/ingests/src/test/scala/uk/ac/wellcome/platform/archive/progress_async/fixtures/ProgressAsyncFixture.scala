@@ -21,7 +21,8 @@ import uk.ac.wellcome.platform.archive.progress_async.ProgressAsync
 import uk.ac.wellcome.platform.archive.progress_async.flows.ProgressUpdateFlow
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 trait ProgressAsyncFixture
     extends S3

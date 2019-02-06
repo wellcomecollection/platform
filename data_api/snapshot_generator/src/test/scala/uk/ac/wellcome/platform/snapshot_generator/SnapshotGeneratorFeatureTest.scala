@@ -19,7 +19,8 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.models.work.generators.WorksGenerators

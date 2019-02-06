@@ -12,7 +12,8 @@ import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

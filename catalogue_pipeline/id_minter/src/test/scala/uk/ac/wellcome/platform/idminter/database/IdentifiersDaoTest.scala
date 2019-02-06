@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.util.{Failure, Success}
 

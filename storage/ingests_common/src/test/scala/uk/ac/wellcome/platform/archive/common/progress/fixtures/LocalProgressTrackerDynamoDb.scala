@@ -6,7 +6,7 @@ import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import scala.collection.JavaConverters._
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.util.Random
 

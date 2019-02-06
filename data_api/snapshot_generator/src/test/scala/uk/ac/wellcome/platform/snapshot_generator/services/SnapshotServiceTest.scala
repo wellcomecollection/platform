@@ -31,7 +31,8 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 class SnapshotServiceTest
     extends FunSpec

@@ -11,7 +11,7 @@ import org.scalatest.Suite
 import uk.ac.wellcome.elasticsearch.DisplayElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.platform.snapshot_generator.services.SnapshotService
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

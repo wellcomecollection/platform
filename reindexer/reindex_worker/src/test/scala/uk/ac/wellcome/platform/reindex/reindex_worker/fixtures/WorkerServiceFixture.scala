@@ -12,7 +12,8 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
 }
 import uk.ac.wellcome.platform.reindex.reindex_worker.services.ReindexWorkerService
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

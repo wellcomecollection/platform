@@ -10,7 +10,8 @@ import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.platform.ingestor.config.models.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

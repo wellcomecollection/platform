@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.archive.common.models.bagit.{
 }
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 trait BagLocationFixtures extends S3 with BagIt {
   def withBag[R](
