@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a list of works") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
@@ -45,7 +45,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("returns a single work when requested with id") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWork
 
@@ -70,7 +70,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
   it(
     "returns the requested page of results when requested with page & pageSize") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
@@ -161,7 +161,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("returns matching results if doing a full-text search") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "A drawing of a dodo"
@@ -200,7 +200,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("searches different indices with the ?_index query parameter") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWork
@@ -244,7 +244,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("looks up works in different indices with the ?_index query parameter") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWorkWith(
@@ -300,7 +300,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("shows the thumbnail field if available") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           thumbnail = Some(
@@ -336,7 +336,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("only returns works from the v2 index") {
-    withApiFixtures(ApiVersions.v2) {
+    withApi(ApiVersions.v2) {
       case (apiPrefix, indexV1, indexV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "Working with wombats"

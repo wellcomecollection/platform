@@ -14,7 +14,7 @@ class ApiV2WorksIncludesTest
     with SubjectGenerators {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -59,7 +59,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?include=identifiers") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val otherIdentifier = createSourceIdentifier
         val work = createIdentifiedWorkWith(
@@ -88,7 +88,7 @@ class ApiV2WorksIncludesTest
   }
 
   it("renders the items if the items include is present") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           items = createIdentifiedItems(count = 1) :+ createUnidentifiableItemWith()
@@ -116,7 +116,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of subjects on a list endpoint if we pass ?include=subjects") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -157,7 +157,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of subjects on a single work endpoint if we pass ?include=subjects") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val subject = List(createSubject)
         val work = createIdentifiedWork.copy(subjects = subject)
@@ -183,7 +183,7 @@ class ApiV2WorksIncludesTest
   }
 
   it("includes a list of genres on a list endpoint if we pass ?include=genres") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -226,7 +226,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of genres on a single work endpoint if we pass ?include=genres") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val genre = List(
           Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
@@ -254,7 +254,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of contributors on a list endpoint if we pass ?include=contributors") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -297,7 +297,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of contributors on a single work endpoint if we pass ?include=contributors") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val contributor =
           List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
@@ -325,7 +325,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of production events on a list endpoint if we pass ?include=production") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -366,7 +366,7 @@ class ApiV2WorksIncludesTest
 
   it(
     "includes a list of production on a single work endpoint if we pass ?include=production") {
-    withV2ApiFixtures {
+    withV2Api {
       case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
         val productionEventList = createProductionEventList()
         val work = createIdentifiedWorkWith(

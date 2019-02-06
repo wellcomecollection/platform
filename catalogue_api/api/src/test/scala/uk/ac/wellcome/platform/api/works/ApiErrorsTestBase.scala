@@ -1,10 +1,8 @@
 package uk.ac.wellcome.platform.api.works
 
-import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   val apiVersion: ApiVersions.Value
@@ -162,8 +160,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
     //
     // By creating an index without a mapping, we don't have a canonicalId field
     // to sort on.  Trying to query this index of these will trigger one such exception!
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    withHttpServer() {
+      case (apiPrefix, server: EmbeddedHttpServer) =>
         withEmptyIndex { index =>
           server.httpGet(
             path = s"/$apiPrefix/works?_index=${index.name}",

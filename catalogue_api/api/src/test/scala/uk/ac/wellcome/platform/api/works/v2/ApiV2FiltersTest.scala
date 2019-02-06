@@ -10,7 +10,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
 
   describe("listing works") {
     it("ignores works with no workType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val noWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(workType = None)
@@ -44,7 +44,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("filters out works with a different workType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
@@ -79,7 +79,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("can filter by multiple workTypes") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
@@ -126,7 +126,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("filters by item LocationType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val noItemWorks = createIdentifiedWorks(count = 3)
           val matchingWork1 = createIdentifiedWorkWith(
@@ -183,7 +183,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
 
   describe("searching works") {
     it("ignores works with no workType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val noWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
@@ -220,7 +220,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("filters out works with a different workType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
@@ -257,7 +257,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("can filter by multiple workTypes") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val wrongWorkTypeWorks = (1 to 3).map { _ =>
             createIdentifiedWorkWith(
@@ -307,7 +307,7 @@ class ApiV2FiltersTest extends ApiV2WorksTestBase {
     }
 
     it("filters by item LocationType") {
-      withV2ApiFixtures {
+      withV2Api {
         case (apiPrefix, indexV2, server: EmbeddedHttpServer) =>
           val noItemWorks = createIdentifiedWorks(count = 3)
           val matchingWork1 = createIdentifiedWorkWith(

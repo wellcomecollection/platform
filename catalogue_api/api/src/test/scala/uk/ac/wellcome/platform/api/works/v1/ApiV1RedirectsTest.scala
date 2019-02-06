@@ -7,7 +7,7 @@ class ApiV1RedirectsTest extends ApiV1WorksTestBase {
   it("returns a 302 Redirect if looking up a redirected work") {
     val redirectedWork = createIdentifiedRedirectedWork
 
-    withV1ApiFixtures {
+    withV1Api {
       case (apiPrefix, indexV1, server: EmbeddedHttpServer) =>
         insertIntoElasticsearch(indexV1, redirectedWork)
         server.httpGet(
@@ -23,7 +23,7 @@ class ApiV1RedirectsTest extends ApiV1WorksTestBase {
   it("preserves query parameters on a 302 Redirect") {
     val redirectedWork = createIdentifiedRedirectedWork
 
-    withV1ApiFixtures {
+    withV1Api {
       case (apiPrefix, indexV1, server: EmbeddedHttpServer) =>
         insertIntoElasticsearch(indexV1, redirectedWork)
         server.httpGet(

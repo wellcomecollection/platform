@@ -24,7 +24,7 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexV1: Index, indexV2: Index)(
+  private def withServer[R](indexV1: Index, indexV2: Index)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
@@ -46,7 +46,7 @@ trait ApiWorksTestBase
 
   val apiName = "catalogue/"
 
-  def withApiFixtures[R](apiVersion: ApiVersions.Value)(
+  def withApi[R](apiVersion: ApiVersions.Value)(
     testWith: TestWith[(String, Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
@@ -56,7 +56,7 @@ trait ApiWorksTestBase
       }
     }
 
-  def withV1ApiFixtures[R](
+  def withV1Api[R](
     testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withServer(indexV1, Index("index-v2")) { server =>
@@ -64,7 +64,7 @@ trait ApiWorksTestBase
       }
     }
 
-  def withV2ApiFixtures[R](
+  def withV2Api[R](
     testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV2 =>
       withServer(Index("index-v1"), indexV2) { server =>
@@ -72,7 +72,7 @@ trait ApiWorksTestBase
       }
     }
 
-  def withHttpServer[R](apiVersion: ApiVersions.Value)(
+  def withHttpServer[R](apiVersion: ApiVersions.Value = ApiVersions.default)(
     testWith: TestWith[(String, EmbeddedHttpServer), R]): R =
     withServer(Index("index-v1"), Index("index-v2")) { server =>
       testWith((apiName + apiVersion, server))
