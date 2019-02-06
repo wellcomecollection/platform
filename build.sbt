@@ -98,7 +98,7 @@ lazy val config_elasticsearch = setupProject(project, "sbt_common/config/elastic
 )
 
 lazy val api = setupProject(project, "catalogue_api/api",
-  localDependencies = Seq(common, internal_model, display, elasticsearch),
+  localDependencies = Seq(internal_model, display, elasticsearch),
   externalDependencies = Dependencies.apiDependencies
 )
   .settings(Search.settings: _*)
