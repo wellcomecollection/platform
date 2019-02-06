@@ -24,7 +24,7 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  private def withServer[R](indexV1: Index, indexV2: Index)(
+  def withServer[R](indexV1: Index, indexV2: Index)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
@@ -49,29 +49,13 @@ trait ApiWorksTestBase
   def getApiPrefix(apiVersion: ApiVersions.Value = ApiVersions.default): String =
     apiName + apiVersion
 
-  def withApi[R](apiVersion: ApiVersions.Value)(
-    testWith: TestWith[(String, Index, Index, EmbeddedHttpServer), R]): R =
+  def withApi[R](
+    testWith: TestWith[(Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>
-          testWith((getApiPrefix(apiVersion), indexV1, indexV2, server))
+          testWith((indexV1, indexV2, server))
         }
-      }
-    }
-
-  def withV1Api[R](
-    testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
-    withLocalWorksIndex { indexV1 =>
-      withServer(indexV1, Index("index-v2")) { server =>
-        testWith((getApiPrefix(ApiVersions.v1), indexV1, server))
-      }
-    }
-
-  def withV2Api[R](
-    testWith: TestWith[(String, Index, EmbeddedHttpServer), R]): R =
-    withLocalWorksIndex { indexV2 =>
-      withServer(Index("index-v1"), indexV2) { server =>
-        testWith((getApiPrefix(ApiVersions.v2), indexV2, server))
       }
     }
 

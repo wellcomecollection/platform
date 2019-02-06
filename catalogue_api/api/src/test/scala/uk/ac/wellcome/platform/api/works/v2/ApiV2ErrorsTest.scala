@@ -6,7 +6,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 class ApiV2ErrorsTest extends ApiV2WorksTestBase with ApiErrorsTestBase {
   def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withV2Api { case (_, _, server: EmbeddedHttpServer) =>
+    withV2Api { case (_, server: EmbeddedHttpServer) =>
       testWith(server)
     }
 
