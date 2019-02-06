@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.api.works
 
-import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ApiErrorsTestBase { this: ApiWorksTestBase =>
-  def withApi[R]: TestWith[(String, Index, Index, EmbeddedHttpServer), R] => R
+  val apiPrefix: String
+
+  def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R
 
   describe("returns a 400 Bad Request for user errors") {
     describe("errors in the ?pageSize query") {
@@ -161,49 +162,46 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
     //
     // By creating an index without a mapping, we don't have a canonicalId field
     // to sort on.  Trying to query this index of these will trigger one such exception!
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        withEmptyIndex { index =>
-          server.httpGet(
-            path = s"/$apiPrefix/works?_index=${index.name}",
-            andExpect = Status.InternalServerError,
-            withJsonBody = s"""
-                              |{
-                              |  "@context": "https://localhost:8888/$apiPrefix/context.json",
-                              |  "type": "Error",
-                              |  "errorType": "http",
-                              |  "httpStatus": 500,
-                              |  "label": "Internal Server Error"
-                              |}
+    withHttpServer { server: EmbeddedHttpServer =>
+      withEmptyIndex { index =>
+        server.httpGet(
+          path = s"/${getApiPrefix()}/works?_index=${index.name}",
+          andExpect = Status.InternalServerError,
+          withJsonBody = s"""
+               |{
+               |  "@context": "https://localhost:8888/${getApiPrefix()}/context.json",
+               |  "type": "Error",
+               |  "errorType": "http",
+               |  "httpStatus": 500,
+               |  "label": "Internal Server Error"
+               |}
                """.stripMargin
-          )
-        }
+        )
+      }
     }
   }
 
   def assertIsBadRequest(path: String, description: String): Response =
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        server.httpGet(
-          path = s"/$apiPrefix$path",
-          andExpect = Status.BadRequest,
-          withJsonBody = badRequest(
-            apiPrefix = apiPrefix,
-            description = description
-          )
+    withServer { server: EmbeddedHttpServer =>
+      server.httpGet(
+        path = s"/$apiPrefix$path",
+        andExpect = Status.BadRequest,
+        withJsonBody = badRequest(
+          apiPrefix = apiPrefix,
+          description = description
         )
+      )
     }
 
   def assertIsNotFound(path: String, description: String): Response =
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-        server.httpGet(
-          path = s"/$apiPrefix$path",
-          andExpect = Status.NotFound,
-          withJsonBody = notFound(
-            apiPrefix = apiPrefix,
-            description = description
-          )
+    withServer { server: EmbeddedHttpServer =>
+      server.httpGet(
+        path = s"/$apiPrefix$path",
+        andExpect = Status.NotFound,
+        withJsonBody = notFound(
+          apiPrefix = apiPrefix,
+          description = description
         )
+      )
     }
 }

@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+      case (indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedInvisibleWork
 
         insertIntoElasticsearch(indexV2, work)
@@ -24,7 +24,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+      case (indexV2, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -59,7 +59,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV2Api {
-      case (apiPrefix, _, indexV2, server: EmbeddedHttpServer) =>
+      case (indexV2, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           title = "This shouldn't be deleted!"
         )

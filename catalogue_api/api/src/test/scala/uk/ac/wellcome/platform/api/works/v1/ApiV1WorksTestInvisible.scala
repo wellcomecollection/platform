@@ -8,7 +8,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work = createIdentifiedInvisibleWork
 
         insertIntoElasticsearch(indexV1, work)
@@ -25,7 +25,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
@@ -70,7 +70,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           title = "An upside-down umbrella"
         )

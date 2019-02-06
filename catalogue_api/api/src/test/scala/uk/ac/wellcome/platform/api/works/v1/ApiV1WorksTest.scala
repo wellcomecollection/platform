@@ -2,13 +2,14 @@ package uk.ac.wellcome.platform.api.works.v1
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal._
 
 class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("returns a list of works") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexV1, works: _*)
@@ -61,7 +62,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("returns a single work when requested with id") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWork
 
         insertIntoElasticsearch(indexV1, work)
@@ -90,7 +91,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("renders the items if the items include is present") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           itemsV1 = createIdentifiedItems(count = 1)
         )
@@ -123,7 +124,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it(
     "returns the requested page of results when requested with page & pageSize") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexV1, works: _*)
@@ -219,7 +220,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("ignores parameters that are unused when making an API request") {
     withV1Api {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+      case (_, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?foo=bar",
           andExpect = Status.Ok,
@@ -230,7 +231,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("returns matching results if doing a full-text search") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "A drawing of a dodo"
         )
@@ -275,7 +276,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val identifier0 = createSourceIdentifier
@@ -329,7 +330,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val otherIdentifier = createSourceIdentifier
         val work = createIdentifiedWorkWith(
           otherIdentifiers = List(otherIdentifier)
@@ -362,7 +363,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("searches different indices with the ?_index query parameter") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWork
           insertIntoElasticsearch(indexV1, work)
@@ -416,7 +417,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("looks up works in different indices with the ?_index query parameter") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         withLocalWorksIndex { altIndex =>
           val work = createIdentifiedWorkWith(
             title = "Wombles of Wimbledon"
@@ -482,7 +483,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     withV1Api {
-      case (apiPrefix, indexV1, _, server: EmbeddedHttpServer) =>
+      case (indexV1, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           thumbnail = Some(
             DigitalLocation(
@@ -522,8 +523,8 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   }
 
   it("only returns works from the v1 index") {
-    withV1Api {
-      case (apiPrefix, indexV1, indexV2, server: EmbeddedHttpServer) =>
+    withApi {
+      case (indexV1, indexV2, server: EmbeddedHttpServer) =>
         val work1 = createIdentifiedWorkWith(
           title = "One orange ocelot"
         )
@@ -534,7 +535,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works?query=ocelot",
+            path = s"/${getApiPrefix(ApiVersions.v1)}/works?query=ocelot",
             andExpect = Status.Ok,
             withJsonBody = s"""
                  |{
