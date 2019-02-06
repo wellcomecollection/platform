@@ -54,6 +54,33 @@ Two additional parameters are available:
 
 These last two arguments will increase the time the update process takes and are not necessary for checking the bagging and ingest processes.
 
+## Dashboard and reporting
+
+### Initial population
+
+To be run once each for the storage and production Dynamo status tables:
+
+`. migtool.sh ensure-population --filter ''`
+
+This ensures a row for every b number in the synced bucket. It can be run again later, when the synced bucket is re-synced. Running this means the percentage complete stats are real.
+
+### Generate dashboard reporting model
+
+To be run on a cron job for each of the staging and production environments, perhaps every 5 minutes unless it turns out to take too long:
+
+`. migtool.sh make-report`
+
+This scans the entire status table and assembles a blob of JSON containing summaries of the batches. This gets saved in S3. The dashboard reads this single S3 object to build the view for reporting.
+
+### Typical process
+
+The batch and ingest processes record information to the status table when they are running, but not every important piece of information will be gathered this way. The update process needs to be run, 
+
+* Run a batch job (bagging, or ingesting) for filter f at time t1 (e.g., at midnight)
+* Run an update job for filter f at time t2, where t2 is beyond the time you expect the batch job to have finished (e.g., in the morning)
+
+The dashboard is able to take a guess at whether the information for a given batch is up to date (has been updated), by comparing batch event timestamps written during the batch process with the timestamp the update_status process adds to the status table.
+
 
 ## Useful ways of managing errors
 
