@@ -13,7 +13,8 @@ class ApiContextTest extends ApiWorksTestBase {
           path = s"/${getApiPrefix(apiVersion)}/context.json",
           andExpect = Status.Ok,
           withJsonBody = IOUtils
-            .toString(getClass.getResourceAsStream("/context.json"), "UTF-8"))
+            .toString(getClass.getResourceAsStream("/context.json"), "UTF-8")
+        )
       }
     }
   }

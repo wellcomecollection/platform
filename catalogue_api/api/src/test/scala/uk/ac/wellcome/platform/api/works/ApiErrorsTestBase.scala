@@ -167,8 +167,7 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
         server.httpGet(
           path = s"/${getApiPrefix()}/works?_index=${index.name}",
           andExpect = Status.InternalServerError,
-          withJsonBody =
-            s"""
+          withJsonBody = s"""
                |{
                |  "@context": "https://localhost:8888/${getApiPrefix()}/context.json",
                |  "type": "Error",

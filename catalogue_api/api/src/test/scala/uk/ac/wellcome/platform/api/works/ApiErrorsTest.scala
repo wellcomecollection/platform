@@ -22,9 +22,8 @@ class ApiErrorsTest extends ApiWorksTestBase {
       server.httpGet(
         path = "/foo/bar",
         andExpect = Status.NotFound,
-        withJsonBody = notFound(
-          getApiPrefix(),
-          "Page not found for URL /foo/bar")
+        withJsonBody =
+          notFound(getApiPrefix(), "Page not found for URL /foo/bar")
       )
     }
   }

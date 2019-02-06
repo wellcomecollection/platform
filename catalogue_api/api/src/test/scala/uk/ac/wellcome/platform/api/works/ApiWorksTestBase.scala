@@ -46,11 +46,11 @@ trait ApiWorksTestBase
 
   val apiName = "catalogue/"
 
-  def getApiPrefix(apiVersion: ApiVersions.Value = ApiVersions.default): String =
+  def getApiPrefix(
+    apiVersion: ApiVersions.Value = ApiVersions.default): String =
     apiName + apiVersion
 
-  def withApi[R](
-    testWith: TestWith[(Index, Index, EmbeddedHttpServer), R]): R =
+  def withApi[R](testWith: TestWith[(Index, Index, EmbeddedHttpServer), R]): R =
     withLocalWorksIndex { indexV1 =>
       withLocalWorksIndex { indexV2 =>
         withServer(indexV1, indexV2) { server =>

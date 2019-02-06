@@ -6,8 +6,9 @@ import uk.ac.wellcome.test.fixtures.TestWith
 
 class ApiV1ErrorsTest extends ApiV1WorksTestBase with ApiErrorsTestBase {
   def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withV1Api { case (_, server: EmbeddedHttpServer) =>
-      testWith(server)
+    withV1Api {
+      case (_, server: EmbeddedHttpServer) =>
+        testWith(server)
     }
 
   describe("returns a 400 Bad Request for errors in the ?includes parameter") {
