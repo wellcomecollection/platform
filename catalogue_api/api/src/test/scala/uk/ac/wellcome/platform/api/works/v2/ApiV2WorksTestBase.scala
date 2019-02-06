@@ -7,5 +7,5 @@ import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 trait ApiV2WorksTestBase
     extends ApiWorksTestBase
     with DisplayV2SerialisationTestBase {
-  def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
+  val apiVersion: ApiVersions.Value = ApiVersions.v2
 }

@@ -3,10 +3,11 @@ package uk.ac.wellcome.platform.api.works
 import com.sksamuel.elastic4s.Index
 import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ApiErrorsTestBase { this: ApiWorksTestBase =>
-  def withApi[R]: TestWith[(String, Index, Index, EmbeddedHttpServer), R] => R
+  val apiVersion: ApiVersions.Value
 
   describe("returns a 400 Bad Request for user errors") {
     describe("errors in the ?pageSize query") {
@@ -182,8 +183,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   }
 
   def assertIsBadRequest(path: String, description: String): Response =
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    withHttpServer(apiVersion) {
+      case (apiPrefix, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix$path",
           andExpect = Status.BadRequest,
@@ -195,8 +196,8 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
     }
 
   def assertIsNotFound(path: String, description: String): Response =
-    withApi {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    withHttpServer(apiVersion) {
+      case (apiPrefix, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix$path",
           andExpect = Status.NotFound,
