@@ -75,21 +75,25 @@ endef
 # Args:
 #   $1 - Name of the Docker image
 #   $2 - Stack name
+#   $3 - ECR Repository URI
+#   $4 - Registry ID
 #
 define publish_service_ssm
 	$(ROOT)/docker_run.py \
 	    --aws --dind -- \
-	    wellcome/publish_service:32 \
+	    wellcome/publish_service:51 \
 	        --project_name=$(2) \
-	        --namespace=uk.ac.wellcome \
+	        --registry_id=$(4) \
 	        --label=latest \
-	        --image_name="$(1)"
+	        --image_name="$(1)" \
+	        --repo_uri="$(3)" \
+
 endef
 
 
 # Test an sbt project.
 #
-# Args:
+# Args:c
 #   $1 - Name of the project.
 #
 define sbt_test
@@ -174,6 +178,8 @@ endef
 #	$1 - Name of the project in sbt.
 #	$2 - Root of the project's source code.
 #	$3 - Stack name
+#   $4 - ECS Base URI
+#   $5 - Registry ID
 #
 define __sbt_ssm_target_template
 $(eval $(call __sbt_base_docker_template,$(1),$(2)))
@@ -183,7 +189,7 @@ $(1)-build:
 	$(call build_image,$(1),$(2)/Dockerfile)
 
 $(1)-publish: $(1)-build
-	$(call publish_service_ssm,$(1),$(3))
+	$(call publish_service_ssm,$(1),$(3),$(4),$(5))
 endef
 
 
@@ -310,6 +316,8 @@ endef
 #	$1 - Name of the ECS service.
 #	$2 - Path to the associated Dockerfile.
 #	$3 - Stack name
+#   $4 - ECS Base URI
+#   $5 - Registry ID
 #
 define __python_target
 $(1)-build:
@@ -327,7 +335,7 @@ $(1)-test:
 	$(call test_python,$(STACK_ROOT)/$(1))
 
 $(1)-publish: $(1)-build
-	$(call publish_service_ssm,$(1),$(3))
+	$(call publish_service_ssm,$(1),$(3),$(4),$(5))
 endef
 
 
@@ -361,11 +369,11 @@ define stack_setup
 # whitespace, but that's the general idea.
 
 $(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
-$(foreach proj,$(SBT_SSM_APPS),$(eval $(call __sbt_ssm_target_template,$(proj),$(STACK_ROOT)/$(proj),$(STACK_ROOT))))
+$(foreach proj,$(SBT_SSM_APPS),$(eval $(call __sbt_ssm_target_template,$(proj),$(STACK_ROOT)/$(proj),$(STACK_ROOT),$(ECR_BASE_URI),$(REGISTRY_ID))))
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
 $(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call __sbt_library_template,$(library))))
 $(foreach task,$(PYTHON_APPS),$(eval $(call __python_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
-$(foreach task,$(PYTHON_SSM_APPS),$(eval $(call __python_ssm_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile,$(STACK_ROOT))))
+$(foreach task,$(PYTHON_SSM_APPS),$(eval $(call __python_ssm_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile,$(STACK_ROOT),$(ECR_BASE_URI),$(REGISTRY_ID))))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
 endef

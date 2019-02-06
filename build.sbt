@@ -176,6 +176,8 @@ lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator
   externalDependencies = Dependencies.snapshotGeneratorDependencies
 )
 
+// -- Storage
+
 lazy val storage_common = setupProject(project, "storage/common",
   localDependencies = Seq(common, config_messaging, config_storage),
   externalDependencies = Dependencies.storageCommonDependencies

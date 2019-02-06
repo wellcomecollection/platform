@@ -6,6 +6,9 @@ include $(ROOT)/functions.Makefile
 SBT_APPS 	 =
 SBT_SSM_APPS = id_minter ingestor recorder matcher merger
 
+ECR_BASE_URI = 760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome
+REGISTRY_ID  = 760097843905
+
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
