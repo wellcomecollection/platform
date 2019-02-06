@@ -2,9 +2,12 @@ package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.test.fixtures.TestWith
 
 trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   val apiPrefix: String
+
+  def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R
 
   describe("returns a 400 Bad Request for user errors") {
     describe("errors in the ?pageSize query") {
@@ -180,7 +183,7 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   }
 
   def assertIsBadRequest(path: String, description: String): Response =
-    withHttpServer { server: EmbeddedHttpServer =>
+    withServer { server: EmbeddedHttpServer =>
       server.httpGet(
         path = s"/$apiPrefix$path",
         andExpect = Status.BadRequest,
@@ -192,7 +195,7 @@ trait ApiErrorsTestBase { this: ApiWorksTestBase =>
     }
 
   def assertIsNotFound(path: String, description: String): Response =
-    withHttpServer { server: EmbeddedHttpServer =>
+    withServer { server: EmbeddedHttpServer =>
       server.httpGet(
         path = s"/$apiPrefix$path",
         andExpect = Status.NotFound,

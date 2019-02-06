@@ -219,12 +219,13 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   }
 
   it("ignores parameters that are unused when making an API request") {
-    withHttpServer { server: EmbeddedHttpServer =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?foo=bar",
-        andExpect = Status.Ok,
-        withJsonBody = emptyJsonResult(apiPrefix)
-      )
+    withV1Api {
+      case (_, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?foo=bar",
+          andExpect = Status.Ok,
+          withJsonBody = emptyJsonResult(apiPrefix)
+        )
     }
   }
 
