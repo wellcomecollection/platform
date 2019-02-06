@@ -1,7 +1,7 @@
-module "catalogue_pipeline_20190201" {
+module "catalogue_pipeline_20190205" {
   source = "stack"
 
-  namespace = "catalogue-20190201"
+  namespace = "catalogue-20190205"
 
   release_label = "latest"
 
@@ -12,25 +12,29 @@ module "catalogue_pipeline_20190201" {
 
   dlq_alarm_arn = "${local.dlq_alarm_arn}"
 
+  # Transformer config
+  #
+  # If this pipeline is meant to be reindexed, remember to uncomment the
+  # reindexer topic names.
+
+  sierra_adapter_topic_names = [
+    # "${local.sierra_reindexer_topic_name}",
+    "${local.sierra_merged_bibs_topic_name}",
+
+    "${local.sierra_merged_items_topic_name}",
+  ]
+  miro_adapter_topic_names = [
+    # "${local.miro_reindexer_topic_name}",
+    "${local.miro_updates_topic_name}",
+  ]
+
   # Elasticsearch
 
-  es_works_index = "v2-2019-02-01-pipeline-update"
+  es_works_index = "v2-2019-02-05-extra-subject-labels"
 
   # RDS
 
   rds_ids_access_security_group_id = "${local.rds_access_security_group_id}"
-
-  # Transformer config
-
-  sierra_adapter_topic_names = [
-    "${local.sierra_reindexer_topic_name}",
-    "${local.sierra_merged_bibs_topic_name}",
-    "${local.sierra_merged_items_topic_name}",
-  ]
-  miro_adapter_topic_names = [
-    "${local.miro_reindexer_topic_name}",
-    "${local.miro_updates_topic_name}",
-  ]
 
   # Adapter VHS
 
