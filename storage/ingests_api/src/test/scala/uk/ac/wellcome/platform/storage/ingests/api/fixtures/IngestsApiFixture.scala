@@ -7,9 +7,15 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  HttpFixtures,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -65,10 +71,9 @@ trait IngestsApiFixture
     withLocalSnsTopic { topic =>
       val table = Table("does-not-exist", index = "does-not-exist")
       withMockMetricSender { metricsSender =>
-        withApp(table, topic, metricsSender) {
-          _ =>
-            testWith(
-              (table, topic, metricsSender, httpServerConfig.externalBaseURL))
+        withApp(table, topic, metricsSender) { _ =>
+          testWith(
+            (table, topic, metricsSender, httpServerConfig.externalBaseURL))
         }
       }
     }
@@ -79,10 +84,9 @@ trait IngestsApiFixture
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withMockMetricSender { metricsSender =>
-          withApp(table, topic, metricsSender) {
-            _ =>
-              testWith(
-                (table, topic, metricsSender, httpServerConfig.externalBaseURL))
+          withApp(table, topic, metricsSender) { _ =>
+            testWith(
+              (table, topic, metricsSender, httpServerConfig.externalBaseURL))
           }
         }
       }

@@ -12,7 +12,11 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
 import uk.ac.wellcome.platform.archive.common.http.HttpMetricResults
-import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayStorageSpace, StandardDisplayProvider}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayLocation,
+  DisplayStorageSpace,
+  StandardDisplayProvider
+}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.storage.bags.api.fixtures.BagsApiFixture
 import uk.ac.wellcome.platform.storage.bags.api.models.{
@@ -122,7 +126,9 @@ class BagsApiFeatureTest
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }
 
-                  assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.Success)
               }
             }
           }
@@ -151,7 +157,9 @@ class BagsApiFeatureTest
                     infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
 
-                  assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.Success)
               }
             }
           }
@@ -167,7 +175,9 @@ class BagsApiFeatureTest
             response =>
               response.status shouldBe StatusCodes.NotFound
 
-              assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.UserError)
           }
       }
     }
@@ -181,7 +191,9 @@ class BagsApiFeatureTest
             response =>
               response.status shouldBe StatusCodes.InternalServerError
 
-              assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.ServerError)
           }
       }
     }

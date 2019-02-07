@@ -11,15 +11,23 @@ import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.http.models.ErrorResponse
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagId,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{DisplayIngestMinimal, RequestDisplayIngest, ResponseDisplayIngest}
+import uk.ac.wellcome.platform.archive.display.{
+  DisplayIngestMinimal,
+  RequestDisplayIngest,
+  ResponseDisplayIngest
+}
 
 class Router(progressTracker: ProgressTracker,
              progressStarter: ProgressStarter,
              httpServerConfig: HTTPServerConfig,
-             contextURL: URL) extends Logging {
+             contextURL: URL)
+    extends Logging {
 
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._

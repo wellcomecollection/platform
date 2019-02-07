@@ -106,7 +106,7 @@ trait HttpFixtures extends Akka with ScalaFutures { this: Matchers =>
                             description: String,
                             statusCode: StatusCode = StatusCodes.BadRequest,
                             label: String = "Bad Request")(
-                             implicit materializer: ActorMaterializer): Assertion = {
+    implicit materializer: ActorMaterializer): Assertion = {
     response.status shouldBe statusCode
     response.entity.contentType shouldBe ContentTypes.`application/json`
 

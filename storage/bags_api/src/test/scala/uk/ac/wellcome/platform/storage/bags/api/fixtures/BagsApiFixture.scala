@@ -6,7 +6,10 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  HttpFixtures,
+  RandomThings
+}
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 import uk.ac.wellcome.platform.storage.bags.api.BagsApi
@@ -29,9 +32,8 @@ trait BagsApiFixture
   val contextURL = new URL(
     "http://api.wellcomecollection.org/storage/v1/context.json")
 
-  private def withApp[R](
-    metricsSender: MetricsSender,
-    vhs: StorageManifestVHS)(testWith: TestWith[BagsApi, R]): R =
+  private def withApp[R](metricsSender: MetricsSender, vhs: StorageManifestVHS)(
+    testWith: TestWith[BagsApi, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         val httpMetrics = new HttpMetrics(
@@ -66,7 +68,8 @@ trait BagsApiFixture
       }
     }
 
-  def withBrokenApp[R](testWith: TestWith[(StorageManifestVHS, MetricsSender, String), R]): R = {
+  def withBrokenApp[R](
+    testWith: TestWith[(StorageManifestVHS, MetricsSender, String), R]): R = {
     val bucket = Bucket("does-not-exist")
     val table = Table("does-not-exist", index = "does-not-exist")
     withStorageManifestVHS(table, bucket) { vhs =>

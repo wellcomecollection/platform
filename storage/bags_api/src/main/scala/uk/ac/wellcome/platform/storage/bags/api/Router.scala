@@ -14,11 +14,10 @@ import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.ExecutionContext
 
-class Router(
-  vhs: VersionedHybridStore[StorageManifest,
-                            EmptyMetadata,
-                            ObjectStore[StorageManifest]],
-  contextURL: URL)(implicit val ec: ExecutionContext) {
+class Router(vhs: VersionedHybridStore[StorageManifest,
+                                       EmptyMetadata,
+                                       ObjectStore[StorageManifest]],
+             contextURL: URL)(implicit val ec: ExecutionContext) {
 
   def routes: Route = {
     import akka.http.scaladsl.server.Directives._

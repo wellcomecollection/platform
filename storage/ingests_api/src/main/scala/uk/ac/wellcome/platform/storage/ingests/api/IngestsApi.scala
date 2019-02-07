@@ -9,7 +9,10 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.http.{HttpMetrics, WellcomeHttpApp}
+import uk.ac.wellcome.platform.archive.common.http.{
+  HttpMetrics,
+  WellcomeHttpApp
+}
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 

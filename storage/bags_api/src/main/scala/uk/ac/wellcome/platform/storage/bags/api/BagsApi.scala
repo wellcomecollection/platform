@@ -8,7 +8,10 @@ import akka.stream.ActorMaterializer
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.http.{HttpMetrics, WellcomeHttpApp}
+import uk.ac.wellcome.platform.archive.common.http.{
+  HttpMetrics,
+  WellcomeHttpApp
+}
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
