@@ -14,7 +14,9 @@ case class ErrorResponse(
 )
 
 case object ErrorResponse {
-  def apply(context: URL, statusCode: StatusCode, description: String): ErrorResponse =
+  def apply(context: URL,
+            statusCode: StatusCode,
+            description: String): ErrorResponse =
     ErrorResponse(
       context = context.toString,
       httpStatus = statusCode.intValue(),

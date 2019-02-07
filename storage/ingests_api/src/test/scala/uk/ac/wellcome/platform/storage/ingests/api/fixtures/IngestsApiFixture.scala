@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.storage.ingests.api.fixtures
 
 import java.net.URL
 
-import akka.http.scaladsl.model.{ContentTypes, HttpResponse, StatusCode, StatusCodes}
+import akka.http.scaladsl.model.{
+  ContentTypes,
+  HttpResponse,
+  StatusCode,
+  StatusCodes
+}
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.{ActorMaterializer, QueueOfferResult}
 import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
@@ -14,10 +19,19 @@ import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
-import uk.ac.wellcome.platform.archive.common.progress.fixtures.{ProgressGenerators, ProgressTrackerFixture}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  HttpFixtures,
+  RandomThings
+}
+import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
+  ProgressGenerators,
+  ProgressTrackerFixture
+}
 import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
-import uk.ac.wellcome.platform.storage.ingests.api.http.{HttpMetricResults, HttpMetrics}
+import uk.ac.wellcome.platform.storage.ingests.api.http.{
+  HttpMetricResults,
+  HttpMetrics
+}
 import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
@@ -74,38 +88,45 @@ trait IngestsApiFixture
       }
     }
 
-  def withBrokenApp[R](testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
+  def withBrokenApp[R](
+    testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
     withLocalSnsTopic { topic =>
       val table = Table("does-not-exist", index = "does-not-exist")
       withMockMetricSender { metricsSender =>
-        withApp(table, topic, metricsSender, httpServerConfig, contextURL) { _ =>
-          testWith((table, topic, metricsSender, httpServerConfig.externalBaseURL))
+        withApp(table, topic, metricsSender, httpServerConfig, contextURL) {
+          _ =>
+            testWith(
+              (table, topic, metricsSender, httpServerConfig.externalBaseURL))
         }
       }
     }
   }
 
-  def withConfiguredApp[R](testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
+  def withConfiguredApp[R](
+    testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withMockMetricSender { metricsSender =>
-          withApp(table, topic, metricsSender, httpServerConfig, contextURL) { _ =>
-            testWith((table, topic, metricsSender, httpServerConfig.externalBaseURL))
+          withApp(table, topic, metricsSender, httpServerConfig, contextURL) {
+            _ =>
+              testWith(
+                (table, topic, metricsSender, httpServerConfig.externalBaseURL))
           }
         }
       }
     }
   }
 
-  def assertMetricSent(metricsSender: MetricsSender, result: HttpMetricResults.Value): Future[QueueOfferResult] =
+  def assertMetricSent(
+    metricsSender: MetricsSender,
+    result: HttpMetricResults.Value): Future[QueueOfferResult] =
     verify(metricsSender, atLeastOnce())
       .incrementCount(metricName = s"${metricsName}_HttpResponse_$result")
 
-  def assertIsErrorResponse(
-    response: HttpResponse,
-    description: String,
-    statusCode: StatusCode = StatusCodes.BadRequest,
-    label: String = "Bad Request")(
+  def assertIsErrorResponse(response: HttpResponse,
+                            description: String,
+                            statusCode: StatusCode = StatusCodes.BadRequest,
+                            label: String = "Bad Request")(
     implicit materializer: ActorMaterializer): Assertion = {
     response.status shouldBe statusCode
     response.entity.contentType shouldBe ContentTypes.`application/json`

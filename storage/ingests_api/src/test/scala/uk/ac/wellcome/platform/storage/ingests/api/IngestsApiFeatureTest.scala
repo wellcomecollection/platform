@@ -127,7 +127,9 @@ class IngestsApiFeatureTest
                         25)
                     }
 
-                    assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -150,7 +152,9 @@ class IngestsApiFeatureTest
                       infoJson.findAllByKey("callback") shouldBe empty
                     }
 
-                    assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -165,7 +169,9 @@ class IngestsApiFeatureTest
             response.status shouldBe StatusCodes.NotFound
             response.entity.contentType shouldBe ContentTypes.`application/json`
 
-            assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+            assertMetricSent(
+              metricsSender,
+              result = HttpMetricResults.UserError)
           }
       }
     }
@@ -177,7 +183,9 @@ class IngestsApiFeatureTest
             response.status shouldBe StatusCodes.InternalServerError
             response.entity.contentType shouldBe ContentTypes.`application/json`
 
-            assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+            assertMetricSent(
+              metricsSender,
+              result = HttpMetricResults.ServerError)
           }
       }
     }
@@ -295,7 +303,9 @@ class IngestsApiFeatureTest
                   ))
               }
 
-              assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.Success)
             }
           }
       }
@@ -326,11 +336,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = "Invalid value at .sourceLocation: required property not supplied."
+                  description =
+                    "Invalid value at .sourceLocation: required property not supplied."
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -350,11 +363,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = "The request content was malformed:\nexpected json value got h (line 1, column 1)"
+                  description =
+                    "The request content was malformed:\nexpected json value got h (line 1, column 1)"
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -374,13 +390,16 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = "The request's Content-Type is not supported. Expected:\napplication/json",
+                  description =
+                    "The request's Content-Type is not supported. Expected:\napplication/json",
                   statusCode = StatusCodes.UnsupportedMediaType,
                   label = "Unsupported Media Type"
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -412,7 +431,9 @@ class IngestsApiFeatureTest
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -450,11 +471,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = "Invalid value at .sourceLocation.bucket: required property not supplied."
+                  description =
+                    "Invalid value at .sourceLocation.bucket: required property not supplied."
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -493,11 +517,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = "Invalid value at .sourceLocation.bucket: should be a String."
+                  description =
+                    "Invalid value at .sourceLocation.bucket: should be a String."
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -536,11 +563,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia."""
+                  description =
+                    """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia."""
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -579,11 +609,14 @@ class IngestsApiFeatureTest
               whenPostRequestReady(url, entity) { response: HttpResponse =>
                 assertIsErrorResponse(
                   response = response,
-                  description = """Invalid value at .ingestType.id: got "baboop", valid values are: create."""
+                  description =
+                    """Invalid value at .ingestType.id: got "baboop", valid values are: create."""
                 )
 
                 assertSnsReceivesNothing(topic)
-                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
         }
@@ -620,11 +653,14 @@ class IngestsApiFeatureTest
                 |}""".stripMargin
           )
 
-          whenPostRequestReady(s"$baseUrl/progress/$randomUUID", entity) { response =>
-            response.status shouldBe StatusCodes.InternalServerError
-            response.entity.contentType shouldBe ContentTypes.`application/json`
+          whenPostRequestReady(s"$baseUrl/progress/$randomUUID", entity) {
+            response =>
+              response.status shouldBe StatusCodes.InternalServerError
+              response.entity.contentType shouldBe ContentTypes.`application/json`
 
-            assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.ServerError)
           }
       }
     }
@@ -656,7 +692,9 @@ class IngestsApiFeatureTest
                           DisplayIngestMinimal(bagIngest))
                     }
 
-                    assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -690,7 +728,9 @@ class IngestsApiFeatureTest
                         displayBagProgresses shouldBe List(
                           DisplayIngestMinimal(bagIngest))
 
-                        assertMetricSent(metricsSender, result = HttpMetricResults.Success)
+                        assertMetricSent(
+                          metricsSender,
+                          result = HttpMetricResults.Success)
                     }
                 }
               }
@@ -712,7 +752,9 @@ class IngestsApiFeatureTest
                 whenReady(displayBagProgressFutures) { displayBagProgresses =>
                   displayBagProgresses shouldBe List.empty
 
-                  assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.UserError)
                 }
             }
           }

@@ -29,6 +29,7 @@ class HttpMetrics(name: String, metricsSender: MetricsSender) extends Logging {
       HttpMetricResults.Unrecognised
     }
 
-    metricsSender.incrementCount(metricName = s"${name}_HttpResponse_$httpMetric")
+    metricsSender.incrementCount(
+      metricName = s"${name}_HttpResponse_$httpMetric")
   }
 }
