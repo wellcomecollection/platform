@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.storage.ingests.api.http
+package uk.ac.wellcome.platform.archive.common.http
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCode}
 import akka.stream.QueueOfferResult

@@ -12,12 +12,12 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
+import uk.ac.wellcome.platform.archive.common.http.HttpMetricResults
 import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.storage.ingests.api.fixtures.IngestsApiFixture
-import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetricResults
 import uk.ac.wellcome.storage.ObjectLocation
 
 class IngestsApiFeatureTest

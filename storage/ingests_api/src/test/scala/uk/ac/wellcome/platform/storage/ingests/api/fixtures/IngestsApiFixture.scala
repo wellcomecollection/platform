@@ -29,13 +29,13 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressTrackerFixture
 }
 import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
-import uk.ac.wellcome.platform.storage.ingests.api.http.{
-  HttpMetricResults,
-  HttpMetrics
-}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.platform.archive.common.http.{
+  HttpMetricResults,
+  HttpMetrics
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

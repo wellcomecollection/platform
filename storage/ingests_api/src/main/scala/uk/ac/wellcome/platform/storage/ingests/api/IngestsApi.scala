@@ -11,8 +11,8 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
+import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
