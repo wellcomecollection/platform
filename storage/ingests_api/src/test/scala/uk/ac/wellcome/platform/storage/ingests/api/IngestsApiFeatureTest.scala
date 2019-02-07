@@ -40,7 +40,7 @@ class IngestsApiFeatureTest
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -135,7 +135,7 @@ class IngestsApiFeatureTest
 
     it("does not output empty values") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgressWith(callback = None)
@@ -156,7 +156,7 @@ class IngestsApiFeatureTest
 
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp {
-        case (_, _, baseUrl) =>
+        case (_, _, _, baseUrl) =>
           whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
             response.status shouldBe StatusCodes.NotFound
             response.entity.contentType shouldBe ContentTypes.`application/json`
@@ -168,7 +168,7 @@ class IngestsApiFeatureTest
   describe("POST /progress") {
     it("creates a progress tracker") {
       withConfiguredApp {
-        case (table, topic, baseUrl) =>
+        case (table, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -284,7 +284,7 @@ class IngestsApiFeatureTest
     it(
       "returns a json error if the ingest request doesn't have a sourceLocation") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -327,7 +327,7 @@ class IngestsApiFeatureTest
 
     it("returns a json error if the body of the request is not valid JSON") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -361,7 +361,7 @@ class IngestsApiFeatureTest
     it(
       "returns a json error if the content type of the request is not an accepted type") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -395,7 +395,7 @@ class IngestsApiFeatureTest
     it(
       "returns a json error if the ingest request doesn't have a sourceLocation and it doesn't have an ingestType") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -435,7 +435,7 @@ class IngestsApiFeatureTest
 
     it("returns a json error if the sourceLocation doesn't have a bucket field") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -486,7 +486,7 @@ class IngestsApiFeatureTest
 
     it("returns a json error if the sourceLocation has an invalid bucket field") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -537,7 +537,7 @@ class IngestsApiFeatureTest
 
     it("returns a json error if the provider doesn't have a valid id field") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -589,7 +589,7 @@ class IngestsApiFeatureTest
 
     it("returns a json error if the ingestType doesn't have a valid id field") {
       withConfiguredApp {
-        case (_, topic, baseUrl) =>
+        case (_, topic, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -644,7 +644,7 @@ class IngestsApiFeatureTest
   describe("GET /progress/find-by-bag-id/:bag-id") {
     it("returns a list of progresses for the given bag id") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -676,7 +676,7 @@ class IngestsApiFeatureTest
     it(
       "returns a list of progresses for the given bag id with : separated parts") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -708,7 +708,7 @@ class IngestsApiFeatureTest
 
     it("returns 'Not Found' if there are no progresses for the given bag id") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, _, baseUrl) =>
           withMaterializer { implicit materialiser =>
             whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$randomUUID") {
               response =>
@@ -723,6 +723,5 @@ class IngestsApiFeatureTest
           }
       }
     }
-
   }
 }

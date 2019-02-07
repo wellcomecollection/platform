@@ -5,6 +5,7 @@ import java.net.URL
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.fixtures.{
   HttpFixtures,
@@ -35,6 +36,7 @@ trait IngestsApiFixture
   private def withApp[R](
     table: Table,
     topic: Topic,
+    metricsSender: MetricsSender,
     httpServerConfig: HTTPServerConfig,
     contextURL: URL)(testWith: TestWith[IngestsApi, R]): R =
     withSNSWriter(topic) { snsWriter =>
@@ -44,6 +46,7 @@ trait IngestsApiFixture
             dynamoClient = dynamoDbClient,
             dynamoConfig = createDynamoConfigWith(table),
             snsWriter = snsWriter,
+            metricsSender = metricsSender,
             httpServerConfig = httpServerConfig,
             contextURL = contextURL
           )
@@ -55,7 +58,7 @@ trait IngestsApiFixture
       }
     }
 
-  def withConfiguredApp[R](testWith: TestWith[(Table, Topic, String), R]): R = {
+  def withConfiguredApp[R](testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
     val contextURL = new URL(
       "http://api.wellcomecollection.org/storage/v1/context.json")
 
@@ -63,8 +66,10 @@ trait IngestsApiFixture
 
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
-        withApp(table, topic, httpServerConfig, contextURL) { _ =>
-          testWith((table, topic, httpServerConfig.externalBaseURL))
+        withMockMetricSender { metricsSender =>
+          withApp(table, topic, metricsSender, httpServerConfig, contextURL) { _ =>
+            testWith((table, topic, metricsSender, httpServerConfig.externalBaseURL))
+          }
         }
       }
     }

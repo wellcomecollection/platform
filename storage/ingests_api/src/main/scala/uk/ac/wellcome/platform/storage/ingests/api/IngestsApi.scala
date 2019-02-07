@@ -12,6 +12,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -22,6 +23,7 @@ class IngestsApi(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig,
   snsWriter: SNSWriter,
+  metricsSender: MetricsSender,
   httpServerConfig: HTTPServerConfig,
   contextURL: URL
 )(implicit val actorSystem: ActorSystem,

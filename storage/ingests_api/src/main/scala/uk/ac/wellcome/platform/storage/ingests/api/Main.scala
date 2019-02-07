@@ -6,6 +6,7 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
+import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.HTTPServerBuilder
 
@@ -23,6 +24,7 @@ object Main extends WellcomeTypesafeApp {
       dynamoClient = DynamoBuilder.buildDynamoClient(config),
       dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
       snsWriter = SNSBuilder.buildSNSWriter(config),
+      metricsSender = MetricsBuilder.buildMetricsSender(config),
       httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
       contextURL = HTTPServerBuilder.buildContextURL(config)
     )
