@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http
+package uk.ac.wellcome.platform.storage.ingests.api
 
 import java.time.Instant
 import java.util.UUID
@@ -16,17 +16,17 @@ import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
-import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
-import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
+import uk.ac.wellcome.platform.storage.ingests.api.fixtures.IngestsApiFixture
+import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetricResults
 import uk.ac.wellcome.storage.ObjectLocation
 
-class ProgressHttpFeatureTest
+class IngestsApiFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with ProgressTrackerFixture
-    with ProgressHttpFixture
+    with IngestsApiFixture
     with RandomThings
     with Inside
     with IntegrationPatience
@@ -40,7 +40,7 @@ class ProgressHttpFeatureTest
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -126,6 +126,10 @@ class ProgressHttpFeatureTest
                           root.lastModifiedDate.string.getOption(json).get),
                         25)
                     }
+
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -135,7 +139,7 @@ class ProgressHttpFeatureTest
 
     it("does not output empty values") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgressWith(callback = None)
@@ -147,6 +151,10 @@ class ProgressHttpFeatureTest
                       val infoJson = parse(jsonString).right.get
                       infoJson.findAllByKey("callback") shouldBe empty
                     }
+
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -156,10 +164,28 @@ class ProgressHttpFeatureTest
 
     it("returns a 404 NotFound if no progress tracker matches id") {
       withConfiguredApp {
-        case (_, _, baseUrl) =>
+        case (_, _, metricsSender, baseUrl) =>
           whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
             response.status shouldBe StatusCodes.NotFound
             response.entity.contentType shouldBe ContentTypes.`application/json`
+
+            assertMetricSent(
+              metricsSender,
+              result = HttpMetricResults.UserError)
+          }
+      }
+    }
+
+    it("returns a 500 Server Error if reading from DynamoDB fails") {
+      withBrokenApp {
+        case (_, _, metricsSender, baseUrl) =>
+          whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
+            response.status shouldBe StatusCodes.InternalServerError
+            response.entity.contentType shouldBe ContentTypes.`application/json`
+
+            assertMetricSent(
+              metricsSender,
+              result = HttpMetricResults.ServerError)
           }
       }
     }
@@ -168,7 +194,7 @@ class ProgressHttpFeatureTest
   describe("POST /progress") {
     it("creates a progress tracker") {
       withConfiguredApp {
-        case (table, topic, baseUrl) =>
+        case (table, topic, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             val url = s"$baseUrl/progress"
 
@@ -276,366 +302,365 @@ class ProgressHttpFeatureTest
                     zippedBagLocation = ObjectLocation("bucket", "key.txt")
                   ))
               }
+
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.Success)
             }
           }
       }
     }
 
-    it(
-      "returns a json error if the ingest request doesn't have a sourceLocation") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
+    describe("returns a 400 error for malformed requests") {
+      it("if the ingest request doesn't have a sourceLocation") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
 
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              """|{
-                 |  "type": "Ingest",
-                 |  "ingestType": {
-                 |    "id": "create",
-                 |    "type": "IngestType"
-                 |  },
-                 |  "space": {
-                 |    "id": "bcnfgh",
-                 |    "type": "Space"
-                 |  }
-                 |}""".stripMargin
-            )
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                """|{
+                   |  "type": "Ingest",
+                   |  "ingestType": {
+                   |    "id": "create",
+                   |    "type": "IngestType"
+                   |  },
+                   |  "space": {
+                   |    "id": "bcnfgh",
+                   |    "type": "Space"
+                   |  }
+                   |}""".stripMargin
+              )
 
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  "Invalid value at .sourceLocation: required property not supplied.",
-                  "Bad Request",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it("returns a json error if the body of the request is not valid JSON") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              """hgjh""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  "The request content was malformed:\nexpected json value got h (line 1, column 1)",
-                  "Bad Request",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it(
-      "returns a json error if the content type of the request is not an accepted type") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`text/plain(UTF-8)`,
-              """hgjh""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.UnsupportedMediaType
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-              println(response)
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  415,
-                  "The request's Content-Type is not supported. Expected:\napplication/json",
-                  "Unsupported Media Type",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it(
-      "returns a json error if the ingest request doesn't have a sourceLocation and it doesn't have an ingestType") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              """|{
-                 |  "type": "Ingest",
-                 |  "space": {
-                 |    "id": "bcnfgh",
-                 |    "type": "Space"
-                 |  }
-                 |}""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  """|Invalid value at .sourceLocation: required property not supplied.
-                     |Invalid value at .ingestType: required property not supplied.""".stripMargin,
-                  "Bad Request",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it("returns a json error if the sourceLocation doesn't have a bucket field") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              s"""|{
-                 |  "type": "Ingest",
-                 |  "ingestType": {
-                 |    "id": "create",
-                 |    "type": "IngestType"
-                 |  },
-                 |  "sourceLocation":{
-                 |    "type": "Location",
-                 |    "provider": {
-                 |      "type": "Provider",
-                 |      "id": "${StandardDisplayProvider.id}"
-                 |    },
-                 |    "path": "b22454408.zip"
-                 |  },
-                 |  "space": {
-                 |    "id": "bcnfgh",
-                 |    "type": "Space"
-                 |  }
-                 |}""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  "Invalid value at .sourceLocation.bucket: required property not supplied.",
-                  "Bad Request",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it("returns a json error if the sourceLocation has an invalid bucket field") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              s"""|{
-                  |  "type": "Ingest",
-                  |  "ingestType": {
-                  |    "id": "create",
-                  |    "type": "IngestType"
-                  |  },
-                  |  "sourceLocation":{
-                  |    "type": "Location",
-                  |    "provider": {
-                  |      "type": "Provider",
-                  |      "id": "${StandardDisplayProvider.id}"
-                  |    },
-                  |    "bucket": {"name": "bucket"},
-                  |    "path": "b22454408.zip"
-                  |  },
-                  |  "space": {
-                  |    "id": "bcnfgh",
-                  |    "type": "Space"
-                  |  }
-                  |}""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  "Invalid value at .sourceLocation.bucket: should be a String.",
-                  "Bad Request",
-                  "Error")
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it("returns a json error if the provider doesn't have a valid id field") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              """|{
-                 |  "type": "Ingest",
-                 |  "ingestType": {
-                 |    "id": "create",
-                 |    "type": "IngestType"
-                 |  },
-                 |  "sourceLocation":{
-                 |    "type": "Location",
-                 |    "provider": {
-                 |      "type": "Provider",
-                 |      "id": "blipbloop"
-                 |    },
-                 |    "bucket": "bucket",
-                 |    "path": "b22454408.zip"
-                 |  },
-                 |  "space": {
-                 |    "id": "bcnfgh",
-                 |    "type": "Space"
-                 |  }
-                 |}""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia.""",
-                  "Bad Request",
-                  "Error"
-                )
-                assertSnsReceivesNothing(topic)
-              }
-            }
-          }
-      }
-    }
-
-    it("returns a json error if the ingestType doesn't have a valid id field") {
-      withConfiguredApp {
-        case (_, topic, baseUrl) =>
-          withMaterializer { implicit materialiser =>
-            val url = s"$baseUrl/progress"
-
-            val entity = HttpEntity(
-              ContentTypes.`application/json`,
-              """|{
-                 |  "type": "Ingest",
-                 |  "ingestType": {
-                 |    "id": "baboop",
-                 |    "type": "IngestType"
-                 |  },
-                 |  "sourceLocation":{
-                 |    "type": "Location",
-                 |    "provider": {
-                 |      "type": "Provider",
-                 |      "id": "aws-s3-standard"
-                 |    },
-                 |    "bucket": "bucket",
-                 |    "path": "b22454408.zip"
-                 |  },
-                 |  "space": {
-                 |    "id": "bcnfgh",
-                 |    "type": "Space"
-                 |  }
-                 |}""".stripMargin
-            )
-
-            whenPostRequestReady(url, entity) { response: HttpResponse =>
-              response.status shouldBe StatusCodes.BadRequest
-              response.entity.contentType shouldBe ContentTypes.`application/json`
-
-              val progressFuture =
-                Unmarshal(response.entity).to[ErrorResponse]
-
-              whenReady(progressFuture) { actualError =>
-                actualError shouldBe ErrorResponse(
-                  "http://api.wellcomecollection.org/storage/v1/context.json",
-                  400,
-                  """Invalid value at .ingestType.id: got "baboop", valid values are: create.""",
-                  "Bad Request",
-                  "Error"
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    "Invalid value at .sourceLocation: required property not supplied."
                 )
 
                 assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
               }
             }
+        }
+      }
+
+      it("if the body of the request is not valid JSON") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                """hgjh""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    "The request content was malformed:\nexpected json value got h (line 1, column 1)"
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the Content-Type of the request is not an accepted type") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`text/plain(UTF-8)`,
+                """hgjh""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    "The request's Content-Type is not supported. Expected:\napplication/json",
+                  statusCode = StatusCodes.UnsupportedMediaType,
+                  label = "Unsupported Media Type"
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the ingest request doesn't have a sourceLocation or ingestType") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                """|{
+                   |  "type": "Ingest",
+                   |  "space": {
+                   |    "id": "bcnfgh",
+                   |    "type": "Space"
+                   |  }
+                   |}""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    """|Invalid value at .sourceLocation: required property not supplied.
+                       |Invalid value at .ingestType: required property not supplied.""".stripMargin
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the sourceLocation doesn't have a bucket field") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                s"""|{
+                    |  "type": "Ingest",
+                    |  "ingestType": {
+                    |    "id": "create",
+                    |    "type": "IngestType"
+                    |  },
+                    |  "sourceLocation":{
+                    |    "type": "Location",
+                    |    "provider": {
+                    |      "type": "Provider",
+                    |      "id": "${StandardDisplayProvider.id}"
+                    |    },
+                    |    "path": "b22454408.zip"
+                    |  },
+                    |  "space": {
+                    |    "id": "bcnfgh",
+                    |    "type": "Space"
+                    |  }
+                    |}""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    "Invalid value at .sourceLocation.bucket: required property not supplied."
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the sourceLocation has an invalid bucket field") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                s"""|{
+                    |  "type": "Ingest",
+                    |  "ingestType": {
+                    |    "id": "create",
+                    |    "type": "IngestType"
+                    |  },
+                    |  "sourceLocation":{
+                    |    "type": "Location",
+                    |    "provider": {
+                    |      "type": "Provider",
+                    |      "id": "${StandardDisplayProvider.id}"
+                    |    },
+                    |    "bucket": {"name": "bucket"},
+                    |    "path": "b22454408.zip"
+                    |  },
+                    |  "space": {
+                    |    "id": "bcnfgh",
+                    |    "type": "Space"
+                    |  }
+                    |}""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    "Invalid value at .sourceLocation.bucket: should be a String."
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the provider doesn't have a valid id field") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                """|{
+                   |  "type": "Ingest",
+                   |  "ingestType": {
+                   |    "id": "create",
+                   |    "type": "IngestType"
+                   |  },
+                   |  "sourceLocation":{
+                   |    "type": "Location",
+                   |    "provider": {
+                   |      "type": "Provider",
+                   |      "id": "blipbloop"
+                   |    },
+                   |    "bucket": "bucket",
+                   |    "path": "b22454408.zip"
+                   |  },
+                   |  "space": {
+                   |    "id": "bcnfgh",
+                   |    "type": "Space"
+                   |  }
+                   |}""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia."""
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+
+      it("if the ingestType doesn't have a valid id field") {
+        withConfiguredApp {
+          case (_, topic, metricsSender, baseUrl) =>
+            withMaterializer { implicit materialiser =>
+              val url = s"$baseUrl/progress"
+
+              val entity = HttpEntity(
+                ContentTypes.`application/json`,
+                """|{
+                   |  "type": "Ingest",
+                   |  "ingestType": {
+                   |    "id": "baboop",
+                   |    "type": "IngestType"
+                   |  },
+                   |  "sourceLocation":{
+                   |    "type": "Location",
+                   |    "provider": {
+                   |      "type": "Provider",
+                   |      "id": "aws-s3-standard"
+                   |    },
+                   |    "bucket": "bucket",
+                   |    "path": "b22454408.zip"
+                   |  },
+                   |  "space": {
+                   |    "id": "bcnfgh",
+                   |    "type": "Space"
+                   |  }
+                   |}""".stripMargin
+              )
+
+              whenPostRequestReady(url, entity) { response: HttpResponse =>
+                assertIsErrorResponse(
+                  response = response,
+                  description =
+                    """Invalid value at .ingestType.id: got "baboop", valid values are: create."""
+                )
+
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(
+                  metricsSender,
+                  result = HttpMetricResults.UserError)
+              }
+            }
+        }
+      }
+    }
+
+    it("returns a 500 Server Error if updating DynamoDB fails") {
+      withBrokenApp {
+        case (_, _, metricsSender, baseUrl) =>
+          val entity = HttpEntity(
+            ContentTypes.`application/json`,
+            s"""|{
+                |  "type": "Ingest",
+                |  "ingestType": {
+                |    "id": "create",
+                |    "type": "IngestType"
+                |  },
+                |  "sourceLocation":{
+                |    "type": "Location",
+                |    "provider": {
+                |      "type": "Provider",
+                |      "id": "${StandardDisplayProvider.id}"
+                |    },
+                |    "bucket": "bukkit",
+                |    "path": "key"
+                |  },
+                |  "space": {
+                |    "id": "space",
+                |    "type": "Space"
+                |  },
+                |  "callback": {
+                |    "url": "${testCallbackUri.toString}"
+                |  }
+                |}""".stripMargin
+          )
+
+          whenPostRequestReady(s"$baseUrl/progress/$randomUUID", entity) {
+            response =>
+              response.status shouldBe StatusCodes.InternalServerError
+              response.entity.contentType shouldBe ContentTypes.`application/json`
+
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.ServerError)
           }
       }
     }
@@ -644,7 +669,7 @@ class ProgressHttpFeatureTest
   describe("GET /progress/find-by-bag-id/:bag-id") {
     it("returns a list of progresses for the given bag id") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -666,6 +691,10 @@ class ProgressHttpFeatureTest
                         displayBagProgresses shouldBe List(
                           DisplayIngestMinimal(bagIngest))
                     }
+
+                    assertMetricSent(
+                      metricsSender,
+                      result = HttpMetricResults.Success)
                 }
               }
             }
@@ -676,7 +705,7 @@ class ProgressHttpFeatureTest
     it(
       "returns a list of progresses for the given bag id with : separated parts") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (table, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -698,6 +727,10 @@ class ProgressHttpFeatureTest
                       displayBagProgresses =>
                         displayBagProgresses shouldBe List(
                           DisplayIngestMinimal(bagIngest))
+
+                        assertMetricSent(
+                          metricsSender,
+                          result = HttpMetricResults.Success)
                     }
                 }
               }
@@ -708,7 +741,7 @@ class ProgressHttpFeatureTest
 
     it("returns 'Not Found' if there are no progresses for the given bag id") {
       withConfiguredApp {
-        case (table, _, baseUrl) =>
+        case (_, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             whenGetRequestReady(s"$baseUrl/progress/find-by-bag-id/$randomUUID") {
               response =>
@@ -718,11 +751,14 @@ class ProgressHttpFeatureTest
                   Unmarshal(response.entity).to[List[DisplayIngestMinimal]]
                 whenReady(displayBagProgressFutures) { displayBagProgresses =>
                   displayBagProgresses shouldBe List.empty
+
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.UserError)
                 }
             }
           }
       }
     }
-
   }
 }

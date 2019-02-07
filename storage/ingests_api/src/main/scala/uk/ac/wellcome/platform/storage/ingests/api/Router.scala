@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http
+package uk.ac.wellcome.platform.storage.ingests.api
 
 import java.net.URL
 import java.util.UUID
@@ -7,21 +7,17 @@ import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
+import akka.http.scaladsl.server._
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
-import akka.http.scaladsl.server.{
-  MalformedRequestContentRejection,
-  RejectionHandler,
-  Route
-}
 import grizzled.slf4j.Logging
 import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
+import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagId,
   ExternalIdentifier
 }
-import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
 import uk.ac.wellcome.platform.archive.display.{
@@ -29,12 +25,14 @@ import uk.ac.wellcome.platform.archive.display.{
   RequestDisplayIngest,
   ResponseDisplayIngest
 }
-import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
+import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
+import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 
 import scala.concurrent.ExecutionContext
 
 class Router(progressTracker: ProgressTracker,
              progressStarter: ProgressStarter,
+             httpMetrics: HttpMetrics,
              httpServerConfig: HTTPServerConfig,
              contextURL: URL)(implicit ec: ExecutionContext)
     extends Logging {
@@ -42,43 +40,52 @@ class Router(progressTracker: ProgressTracker,
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
+
   implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
+
   import uk.ac.wellcome.platform.archive.display.DisplayProvider._
 
-  def routes: Route = pathPrefix("progress") {
-    post {
-      entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
-        onSuccess(progressStarter.initialise(requestDisplayIngest.toProgress)) {
-          progress =>
-            respondWithHeaders(List(createLocationHeader(progress))) {
-              complete(Created -> ResponseDisplayIngest(progress, contextURL))
-            }
+  val sendCloudWatchMetrics: Directive0 = mapResponse { resp: HttpResponse =>
+    httpMetrics.sendMetric(resp)
+    resp
+  }
+
+  def routes: Route = sendCloudWatchMetrics {
+    pathPrefix("progress") {
+      post {
+        entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
+          onSuccess(progressStarter.initialise(requestDisplayIngest.toProgress)) {
+            progress =>
+              respondWithHeaders(List(createLocationHeader(progress))) {
+                complete(Created -> ResponseDisplayIngest(progress, contextURL))
+              }
+          }
         }
-      }
-    } ~ path(JavaUUID) { id: UUID =>
-      get {
-        onSuccess(progressTracker.get(id)) {
-          case Some(progress) =>
-            complete(ResponseDisplayIngest(progress, contextURL))
-          case None =>
-            complete(NotFound -> "Progress monitor not found!")
+      } ~ path(JavaUUID) { id: UUID =>
+        get {
+          onSuccess(progressTracker.get(id)) {
+            case Some(progress) =>
+              complete(ResponseDisplayIngest(progress, contextURL))
+            case None =>
+              complete(NotFound -> "Progress monitor not found!")
+          }
         }
-      }
-    } ~ path("find-by-bag-id" / Segment) { combinedId: String =>
-      // Temporary route to match colon separated ids '/find-by-bag-id/storageSpace:bagId' used by DLCS
-      // remove when DLCS replaces this by '/find-by-bag-id/storageSpace/bagId'
-      get {
-        val parts = combinedId.split(':')
-        val bagId =
-          BagId(StorageSpace(parts.head), ExternalIdentifier(parts.last))
-        findProgress(bagId)
-      }
-    } ~ path("find-by-bag-id" / Segment / Segment) { (space, id) =>
-      // Route used by DLCS to find ingests for a bag, not part of the public/documented API.  Either remove
-      // if no longer needed after migration or enhance and document as part of the API.
-      get {
-        val bagId = BagId(StorageSpace(space), ExternalIdentifier(id))
-        findProgress(bagId)
+      } ~ path("find-by-bag-id" / Segment) { combinedId: String =>
+        // Temporary route to match colon separated ids '/find-by-bag-id/storageSpace:bagId' used by DLCS
+        // remove when DLCS replaces this by '/find-by-bag-id/storageSpace/bagId'
+        get {
+          val parts = combinedId.split(':')
+          val bagId =
+            BagId(StorageSpace(parts.head), ExternalIdentifier(parts.last))
+          findProgress(bagId)
+        }
+      } ~ path("find-by-bag-id" / Segment / Segment) { (space, id) =>
+        // Route used by DLCS to find ingests for a bag, not part of the public/documented API.  Either remove
+        // if no longer needed after migration or enhance and document as part of the API.
+        get {
+          val bagId = BagId(StorageSpace(space), ExternalIdentifier(id))
+          findProgress(bagId)
+        }
       }
     }
   }
@@ -95,10 +102,9 @@ class Router(progressTracker: ProgressTracker,
       info(s"""errors fetching ingests for $bagId: ${results.mkString(" ")}""")
       complete(
         InternalServerError -> ErrorResponse(
-          context = contextURL.toString,
-          httpStatus = InternalServerError.intValue,
-          description = "Internal server error",
-          label = InternalServerError.reason
+          context = contextURL,
+          statusCode = InternalServerError,
+          description = InternalServerError.reason
         ))
     }
   }
@@ -121,6 +127,22 @@ class Router(progressTracker: ProgressTracker,
           transformToJsonErrorResponse(statusCode, res)
         case x => x
       }
+      .mapRejectionResponse { resp: HttpResponse =>
+        httpMetrics.sendMetric(resp)
+        resp
+      }
+
+  implicit def exceptionHandler: ExceptionHandler = ExceptionHandler {
+    case err: Exception =>
+      logger.error(s"Unexpected exception $err")
+      val error = ErrorResponse(
+        context = contextURL,
+        statusCode = InternalServerError,
+        description = err.toString
+      )
+      httpMetrics.sendMetricForStatus(InternalServerError)
+      complete(InternalServerError -> error)
+  }
 
   private def createLocationHeader(progress: Progress) =
     Location(s"${httpServerConfig.externalBaseURL}/${progress.id}")
@@ -150,10 +172,11 @@ class Router(progressTracker: ProgressTracker,
 
     complete(
       BadRequest -> ErrorResponse(
-        contextURL.toString,
-        BadRequest.intValue,
-        message.toList.mkString("\n"),
-        BadRequest.reason))
+        context = contextURL,
+        statusCode = BadRequest,
+        description = message.toList.mkString("\n")
+      )
+    )
   }
 
   private def transformToJsonErrorResponse(statusCode: StatusCode,
@@ -163,10 +186,9 @@ class Router(progressTracker: ProgressTracker,
         val message = data.utf8String
         Marshal(
           ErrorResponse(
-            context = contextURL.toString,
-            httpStatus = statusCode.intValue,
-            description = message,
-            label = statusCode.reason)).to[MessageEntity]
+            context = contextURL,
+            statusCode = statusCode,
+            description = message)).to[MessageEntity]
       })
       .flatMapConcat(_.dataBytes)
 
