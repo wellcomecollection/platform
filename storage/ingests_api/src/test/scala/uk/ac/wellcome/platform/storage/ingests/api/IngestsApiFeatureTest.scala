@@ -169,6 +169,18 @@ class IngestsApiFeatureTest
           }
       }
     }
+
+    it("returns a 500 Server Error if reading from DynamoDB fails") {
+      withBrokenApp {
+        case (_, _, metricsSender, baseUrl) =>
+          whenGetRequestReady(s"$baseUrl/progress/$randomUUID") { response =>
+            response.status shouldBe StatusCodes.InternalServerError
+            response.entity.contentType shouldBe ContentTypes.`application/json`
+
+            assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+          }
+      }
+    }
   }
 
   describe("POST /progress") {
@@ -312,7 +324,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = "Invalid value at .sourceLocation: required property not supplied."
                 )
@@ -336,7 +348,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = "The request content was malformed:\nexpected json value got h (line 1, column 1)"
                 )
@@ -360,7 +372,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = "The request's Content-Type is not supported. Expected:\napplication/json",
                   statusCode = StatusCodes.UnsupportedMediaType,
@@ -392,7 +404,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description =
                     """|Invalid value at .sourceLocation: required property not supplied.
@@ -436,7 +448,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = "Invalid value at .sourceLocation.bucket: required property not supplied."
                 )
@@ -479,7 +491,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = "Invalid value at .sourceLocation.bucket: should be a String."
                 )
@@ -522,7 +534,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia."""
                 )
@@ -565,7 +577,7 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                assertResponseIsUserError(
+                assertIsErrorResponse(
                   response = response,
                   description = """Invalid value at .ingestType.id: got "baboop", valid values are: create."""
                 )
@@ -575,6 +587,45 @@ class IngestsApiFeatureTest
               }
             }
         }
+      }
+    }
+
+    it("returns a 500 Server Error if updating DynamoDB fails") {
+      withBrokenApp {
+        case (_, _, metricsSender, baseUrl) =>
+          val entity = HttpEntity(
+            ContentTypes.`application/json`,
+            s"""|{
+                |  "type": "Ingest",
+                |  "ingestType": {
+                |    "id": "create",
+                |    "type": "IngestType"
+                |  },
+                |  "sourceLocation":{
+                |    "type": "Location",
+                |    "provider": {
+                |      "type": "Provider",
+                |      "id": "${StandardDisplayProvider.id}"
+                |    },
+                |    "bucket": "bukkit",
+                |    "path": "key"
+                |  },
+                |  "space": {
+                |    "id": "space",
+                |    "type": "Space"
+                |  },
+                |  "callback": {
+                |    "url": "${testCallbackUri.toString}"
+                |  }
+                |}""".stripMargin
+          )
+
+          whenPostRequestReady(s"$baseUrl/progress/$randomUUID", entity) { response =>
+            response.status shouldBe StatusCodes.InternalServerError
+            response.entity.contentType shouldBe ContentTypes.`application/json`
+
+            assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+          }
       }
     }
   }

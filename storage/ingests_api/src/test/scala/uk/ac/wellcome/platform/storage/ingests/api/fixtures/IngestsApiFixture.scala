@@ -37,6 +37,11 @@ trait IngestsApiFixture
     with HttpFixtures
     with Messaging {
 
+  val contextURL = new URL(
+    "http://api.wellcomecollection.org/storage/v1/context.json")
+
+  val httpServerConfig: HTTPServerConfig = createHTTPServerConfig
+
   private def withApp[R](
     table: Table,
     topic: Topic,
@@ -66,12 +71,18 @@ trait IngestsApiFixture
       }
     }
 
+  def withBrokenApp[R](testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
+    withLocalSnsTopic { topic =>
+      val table = Table("does-not-exist", index = "does-not-exist")
+      withMockMetricSender { metricsSender =>
+        withApp(table, topic, metricsSender, httpServerConfig, contextURL) { _ =>
+          testWith((table, topic, metricsSender, httpServerConfig.externalBaseURL))
+        }
+      }
+    }
+  }
+
   def withConfiguredApp[R](testWith: TestWith[(Table, Topic, MetricsSender, String), R]): R = {
-    val contextURL = new URL(
-      "http://api.wellcomecollection.org/storage/v1/context.json")
-
-    val httpServerConfig = createHTTPServerConfig
-
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withMockMetricSender { metricsSender =>
@@ -87,7 +98,7 @@ trait IngestsApiFixture
     verify(metricsSender, atLeastOnce())
       .incrementCount(metricName = s"IngestsApi_HttpResponse_$result")
 
-  def assertResponseIsUserError(
+  def assertIsErrorResponse(
     response: HttpResponse,
     description: String,
     statusCode: StatusCode = StatusCodes.BadRequest,
@@ -100,7 +111,7 @@ trait IngestsApiFixture
 
     whenReady(progressFuture) { actualError =>
       actualError shouldBe ErrorResponse(
-        context = "http://api.wellcomecollection.org/storage/v1/context.json",
+        context = contextURL.toString,
         httpStatus = statusCode.intValue(),
         description = description,
         label = label
