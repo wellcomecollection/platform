@@ -5,10 +5,12 @@ import java.util.UUID
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
+import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Inside, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
@@ -19,6 +21,7 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.storage.ingests.api.fixtures.IngestsApiFixture
 import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.dynamo._
 
 class IngestsApiFeatureTest
     extends FunSpec
@@ -31,10 +34,6 @@ class IngestsApiFeatureTest
     with Inside
     with IntegrationPatience
     with JsonAssertions {
-
-  import de.heikoseeberger.akkahttpcirce.FailFastCirceSupport._
-  import uk.ac.wellcome.json.JsonUtil._
-  import uk.ac.wellcome.storage.dynamo._
 
   val contextUrl = "http://api.wellcomecollection.org/storage/v1/context.json"
   describe("GET /progress/:id") {
