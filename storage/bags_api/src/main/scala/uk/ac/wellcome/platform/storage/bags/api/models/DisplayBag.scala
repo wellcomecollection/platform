@@ -1,4 +1,5 @@
-package uk.ac.wellcome.platform.archive.registrar.http.models
+package uk.ac.wellcome.platform.storage.bags.api.models
+
 import java.net.URL
 
 import io.circe.generic.extras.JsonKey

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -23,7 +23,7 @@ object Main extends WellcomeTypesafeApp {
 
     val vhs = VHSBuilder.buildVHS[StorageManifest, EmptyMetadata](config)
 
-    new RegistrarHTTP(
+    new BagsApi(
       vhs = vhs,
       httpServerConfig = HTTPServerBuilder.buildHTTPServerConfig(config),
       contextURL = HTTPServerBuilder.buildContextURL(config)

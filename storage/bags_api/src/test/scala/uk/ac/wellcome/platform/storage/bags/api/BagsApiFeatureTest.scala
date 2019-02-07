@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -17,17 +17,22 @@ import uk.ac.wellcome.platform.archive.display.{
   StandardDisplayProvider
 }
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
-import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
-import uk.ac.wellcome.platform.archive.registrar.http.models._
+import uk.ac.wellcome.platform.storage.bags.api.fixtures.BagsApiFixture
+import uk.ac.wellcome.platform.storage.bags.api.models.{
+  DisplayBag,
+  DisplayBagInfo,
+  DisplayBagManifest,
+  DisplayFileDigest
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
-class RegistrarHttpFeatureTest
+class BagsApiFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with BagInfoGenerators
-    with RegistrarHttpFixture
+    with BagsApiFixture
     with RandomThings
     with IntegrationPatience
     with Inside

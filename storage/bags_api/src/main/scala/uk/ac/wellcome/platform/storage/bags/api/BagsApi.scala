@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import java.net.URL
 
@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class RegistrarHTTP(
+class BagsApi(
   vhs: VersionedHybridStore[StorageManifest,
                             EmptyMetadata,
                             ObjectStore[StorageManifest]],

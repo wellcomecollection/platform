@@ -1,23 +1,20 @@
-package uk.ac.wellcome.platform.archive.registrar.http.fixtures
+package uk.ac.wellcome.platform.storage.bags.api.fixtures
 
 import java.net.URL
 
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  HttpFixtures,
-  RandomThings
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
-import uk.ac.wellcome.platform.archive.registrar.http.RegistrarHTTP
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.platform.storage.bags.api.BagsApi
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait RegistrarHttpFixture
+trait BagsApiFixture
     extends RandomThings
     with ScalaFutures
     with StorageManifestVHSFixture
@@ -28,19 +25,19 @@ trait RegistrarHttpFixture
                  bucket: Bucket,
                  s3Prefix: String,
                  httpServerConfig: HTTPServerConfig,
-                 contextURL: URL)(testWith: TestWith[RegistrarHTTP, R]): R =
+                 contextURL: URL)(testWith: TestWith[BagsApi, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
         withStorageManifestVHS(table, bucket) { vhs =>
-          val registrarHTTP = new RegistrarHTTP(
+          val bagsApi = new BagsApi(
             vhs = vhs,
             httpServerConfig = httpServerConfig,
             contextURL = contextURL
           )
 
-          registrarHTTP.run()
+          bagsApi.run()
 
-          testWith(registrarHTTP)
+          testWith(bagsApi)
         }
       }
     }

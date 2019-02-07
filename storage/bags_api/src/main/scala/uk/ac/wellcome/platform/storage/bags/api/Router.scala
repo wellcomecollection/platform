@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import java.net.URL
 
@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.registrar.http.models.DisplayBag
+import uk.ac.wellcome.platform.storage.bags.api.models.DisplayBag
 import uk.ac.wellcome.storage.dynamo._
 
 class Router(vhs: VersionedHybridStore[StorageManifest,
