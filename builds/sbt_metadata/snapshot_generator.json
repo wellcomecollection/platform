@@ -2,7 +2,6 @@
   "id" : "snapshot_generator",
   "folder" : "data_api/snapshot_generator",
   "dependencyIds" : [
-    "common",
     "internal_model",
     "display",
     "config_elasticsearch",
