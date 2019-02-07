@@ -148,9 +148,14 @@ object Dependencies {
     elasticsearchDependencies ++
       circeOpticsDependencies ++
       guiceDependencies ++
-      scalacheckDependencies
+      scalacheckDependencies ++
+      WellcomeDependencies.fixturesLibrary
 
-  val apiDependencies: Seq[ModuleID] = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+  val apiDependencies: Seq[ModuleID] =
+    akkaDependencies ++
+      finatraDependencies ++
+      guiceDependencies ++
+      WellcomeDependencies.fixturesLibrary
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe
