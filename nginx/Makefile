@@ -31,13 +31,13 @@ nginx-build-grafana:
 nginx-build: nginx-build-loris nginx-build-services nginx-build-loris-delta nginx-build-grafana nginx-build-api-gw
 
 nginx-publish-api-gw: nginx-build-api-gw
-	$(call publish_service_ssm,nginx_api-gw,catalogue_api)
+	$(call publish_service_ssm,nginx_api-gw,catalogue_api,760097843905)
 
 nginx-publish-services: nginx-build-services
 	$(call publish_service,nginx_services)
 
 nginx-publish-loris-delta: nginx-build-loris-delta
-	$(call publish_service_ssm,nginx_loris-delta,loris)
+	$(call publish_service_ssm,nginx_loris-delta,loris,760097843905)
 
 nginx-publish-grafana: nginx-build-grafana
 	$(call publish_service,nginx_grafana)
