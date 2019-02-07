@@ -18,7 +18,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressTrackerFixture
 }
 import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
-import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
+import uk.ac.wellcome.platform.storage.ingests.api.http.{HttpMetricResults, HttpMetrics}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
@@ -83,7 +83,7 @@ trait IngestsApiFixture
     }
   }
 
-  def assertMetricSent(metricsSender: MetricsSender, result: String): Future[QueueOfferResult] =
+  def assertMetricSent(metricsSender: MetricsSender, result: HttpMetricResults.Value): Future[QueueOfferResult] =
     verify(metricsSender, atLeastOnce())
-      .incrementCount(metricName = s"IngestsApi_HttpResponse_result")
+      .incrementCount(metricName = s"IngestsApi_HttpResponse_$result")
 }
