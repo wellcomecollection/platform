@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http
+package uk.ac.wellcome.platform.storage.ingests.api
 
 import java.net.URL
 
@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProgressHTTP(
+class IngestsApi(
   dynamoClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig,
   snsWriter: SNSWriter,

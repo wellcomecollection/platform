@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http.model
+package uk.ac.wellcome.platform.storage.ingests.api.model
 
 import io.circe.generic.extras.JsonKey
 

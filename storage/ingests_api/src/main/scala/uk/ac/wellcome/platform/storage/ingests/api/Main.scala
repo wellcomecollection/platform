@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http
+package uk.ac.wellcome.platform.storage.ingests.api
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -19,7 +19,7 @@ object Main extends WellcomeTypesafeApp {
     implicit val executionContext: ExecutionContext =
       AkkaBuilder.buildExecutionContext()
 
-    new ProgressHTTP(
+    new IngestsApi(
       dynamoClient = DynamoBuilder.buildDynamoClient(config),
       dynamoConfig = DynamoBuilder.buildDynamoConfig(config),
       snsWriter = SNSBuilder.buildSNSWriter(config),

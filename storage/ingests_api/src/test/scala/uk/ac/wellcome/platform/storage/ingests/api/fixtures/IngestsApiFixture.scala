@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http.fixtures
+package uk.ac.wellcome.platform.storage.ingests.api.fixtures
 
 import java.net.URL
 
@@ -14,14 +14,14 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
 }
-import uk.ac.wellcome.platform.archive.progress_http.ProgressHTTP
+import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-trait ProgressHttpFixture
+trait IngestsApiFixture
     extends S3
     with RandomThings
     with LocalDynamoDb
@@ -36,11 +36,11 @@ trait ProgressHttpFixture
     table: Table,
     topic: Topic,
     httpServerConfig: HTTPServerConfig,
-    contextURL: URL)(testWith: TestWith[ProgressHTTP, R]): R =
+    contextURL: URL)(testWith: TestWith[IngestsApi, R]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
-          val progressHTTP = new ProgressHTTP(
+          val ingestsApi = new IngestsApi(
             dynamoClient = dynamoDbClient,
             dynamoConfig = createDynamoConfigWith(table),
             snsWriter = snsWriter,
@@ -48,9 +48,9 @@ trait ProgressHttpFixture
             contextURL = contextURL
           )
 
-          progressHTTP.run()
+          ingestsApi.run()
 
-          testWith(progressHTTP)
+          testWith(ingestsApi)
         }
       }
     }

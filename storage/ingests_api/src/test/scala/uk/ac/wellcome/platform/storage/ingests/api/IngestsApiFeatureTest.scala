@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.progress_http
+package uk.ac.wellcome.platform.storage.ingests.api
 
 import java.time.Instant
 import java.util.UUID
@@ -16,17 +16,17 @@ import uk.ac.wellcome.platform.archive.common.models._
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.ProgressTrackerFixture
 import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
-import uk.ac.wellcome.platform.archive.progress_http.fixtures.ProgressHttpFixture
-import uk.ac.wellcome.platform.archive.progress_http.model.ErrorResponse
+import uk.ac.wellcome.platform.storage.ingests.api.fixtures.IngestsApiFixture
+import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 import uk.ac.wellcome.storage.ObjectLocation
 
-class ProgressHttpFeatureTest
+class IngestsApiFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with ProgressTrackerFixture
-    with ProgressHttpFixture
+    with IngestsApiFixture
     with RandomThings
     with Inside
     with IntegrationPatience
