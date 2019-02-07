@@ -40,7 +40,7 @@ class IngestsApiFeatureTest
   describe("GET /progress/:id") {
     it("returns a progress tracker when available") {
       withConfiguredApp {
-        case (table, _, _, baseUrl) =>
+        case (table, _, metricsSender, baseUrl) =>
           withMaterializer { implicit materialiser =>
             withProgressTracker(table) { progressTracker =>
               val progress = createProgress
@@ -126,6 +126,8 @@ class IngestsApiFeatureTest
                           root.lastModifiedDate.string.getOption(json).get),
                         25)
                     }
+
+                    assertMetricSent(metricsSender, result = "Success")
                 }
               }
             }

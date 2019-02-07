@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.storage.ingests.api.fixtures
 
 import java.net.URL
 
+import akka.stream.QueueOfferResult
+import org.mockito.Mockito.{atLeastOnce, verify}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS}
@@ -21,6 +23,7 @@ import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 trait IngestsApiFixture
     extends S3
@@ -74,4 +77,8 @@ trait IngestsApiFixture
       }
     }
   }
+
+  def assertMetricSent(metricsSender: MetricsSender, result: String): Future[QueueOfferResult] =
+    verify(metricsSender, atLeastOnce())
+      .incrementCount(metricName = s"IngestsApi_HttpResponse_result")
 }
