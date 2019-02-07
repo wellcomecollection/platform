@@ -17,6 +17,13 @@ module "platform_cli" {
   pypi_password = "${var.pypi_password}"
 }
 
+module "scala_fixtures" {
+  source = "./scala_library"
+
+  name       = "fixtures"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
+}
+
 module "scala_json" {
   source = "./scala_library"
 
@@ -44,3 +51,12 @@ module "scala_messaging" {
   name       = "messaging"
   bucket_arn = "${aws_s3_bucket.releases.arn}"
 }
+
+module "scala_typesafe" {
+  source = "./scala_library"
+
+  name       = "typesafe-app"
+  repo_name  = "wellcome-typesafe-app"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
+}
+
