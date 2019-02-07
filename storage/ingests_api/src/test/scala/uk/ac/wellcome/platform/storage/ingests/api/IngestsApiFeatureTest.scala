@@ -18,7 +18,6 @@ import uk.ac.wellcome.platform.archive.common.progress.models._
 import uk.ac.wellcome.platform.archive.display._
 import uk.ac.wellcome.platform.storage.ingests.api.fixtures.IngestsApiFixture
 import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetricResults
-import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 import uk.ac.wellcome.storage.ObjectLocation
 
 class IngestsApiFeatureTest
@@ -313,25 +312,14 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = "Invalid value at .sourceLocation: required property not supplied."
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    "Invalid value at .sourceLocation: required property not supplied.",
-                    "Bad Request",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
+                assertSnsReceivesNothing(topic)
+                assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
-
-              assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
             }
         }
       }
@@ -348,23 +336,12 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = "The request content was malformed:\nexpected json value got h (line 1, column 1)"
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    "The request content was malformed:\nexpected json value got h (line 1, column 1)",
-                    "Bad Request",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -383,23 +360,14 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.UnsupportedMediaType
-                response.entity.contentType shouldBe ContentTypes.`application/json`
-                println(response)
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
+                assertResponseIsUserError(
+                  response = response,
+                  description = "The request's Content-Type is not supported. Expected:\napplication/json",
+                  statusCode = StatusCodes.UnsupportedMediaType,
+                  label = "Unsupported Media Type"
+                )
 
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    415,
-                    "The request's Content-Type is not supported. Expected:\napplication/json",
-                    "Unsupported Media Type",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -424,24 +392,14 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
-
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
+                assertResponseIsUserError(
+                  response = response,
+                  description =
                     """|Invalid value at .sourceLocation: required property not supplied.
-                       |Invalid value at .ingestType: required property not supplied.""".stripMargin,
-                    "Bad Request",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
+                       |Invalid value at .ingestType: required property not supplied.""".stripMargin
+                )
 
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -478,23 +436,12 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = "Invalid value at .sourceLocation.bucket: required property not supplied."
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    "Invalid value at .sourceLocation.bucket: required property not supplied.",
-                    "Bad Request",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -532,22 +479,12 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = "Invalid value at .sourceLocation.bucket: should be a String."
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    "Invalid value at .sourceLocation.bucket: should be a String.",
-                    "Bad Request",
-                    "Error")
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -585,23 +522,12 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia."""
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    """Invalid value at .sourceLocation.provider.id: got "blipbloop", valid values are: aws-s3-standard, aws-s3-ia.""",
-                    "Bad Request",
-                    "Error"
-                  )
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
@@ -639,24 +565,12 @@ class IngestsApiFeatureTest
               )
 
               whenPostRequestReady(url, entity) { response: HttpResponse =>
-                response.status shouldBe StatusCodes.BadRequest
-                response.entity.contentType shouldBe ContentTypes.`application/json`
+                assertResponseIsUserError(
+                  response = response,
+                  description = """Invalid value at .ingestType.id: got "baboop", valid values are: create."""
+                )
 
-                val progressFuture =
-                  Unmarshal(response.entity).to[ErrorResponse]
-
-                whenReady(progressFuture) { actualError =>
-                  actualError shouldBe ErrorResponse(
-                    "http://api.wellcomecollection.org/storage/v1/context.json",
-                    400,
-                    """Invalid value at .ingestType.id: got "baboop", valid values are: create.""",
-                    "Bad Request",
-                    "Error"
-                  )
-
-                  assertSnsReceivesNothing(topic)
-                }
-
+                assertSnsReceivesNothing(topic)
                 assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
               }
             }
