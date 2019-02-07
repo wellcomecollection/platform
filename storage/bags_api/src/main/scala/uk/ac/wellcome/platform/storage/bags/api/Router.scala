@@ -1,21 +1,23 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import java.net.URL
 
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Route
 import io.circe.Printer
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.registrar.http.models.DisplayBag
+import uk.ac.wellcome.platform.storage.bags.api.models.DisplayBag
 import uk.ac.wellcome.storage.dynamo._
+
+import scala.concurrent.ExecutionContext
 
 class Router(vhs: VersionedHybridStore[StorageManifest,
                                        EmptyMetadata,
                                        ObjectStore[StorageManifest]],
-             contextURL: URL) {
+             contextURL: URL)(implicit val ec: ExecutionContext) {
 
   def routes: Route = {
     import akka.http.scaladsl.server.Directives._

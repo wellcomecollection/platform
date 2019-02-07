@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.registrar.http
+package uk.ac.wellcome.platform.storage.bags.api
 
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -11,23 +11,29 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
+import uk.ac.wellcome.platform.archive.common.http.HttpMetricResults
 import uk.ac.wellcome.platform.archive.display.{
   DisplayLocation,
   DisplayStorageSpace,
   StandardDisplayProvider
 }
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
-import uk.ac.wellcome.platform.archive.registrar.http.fixtures.RegistrarHttpFixture
-import uk.ac.wellcome.platform.archive.registrar.http.models._
+import uk.ac.wellcome.platform.storage.bags.api.fixtures.BagsApiFixture
+import uk.ac.wellcome.platform.storage.bags.api.models.{
+  DisplayBag,
+  DisplayBagInfo,
+  DisplayBagManifest,
+  DisplayFileDigest
+}
 import uk.ac.wellcome.storage.ObjectLocation
 
-class RegistrarHttpFeatureTest
+class BagsApiFeatureTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with BagInfoGenerators
-    with RegistrarHttpFixture
+    with BagsApiFixture
     with RandomThings
     with IntegrationPatience
     with Inside
@@ -38,7 +44,7 @@ class RegistrarHttpFeatureTest
   describe("GET /registrar/:space/:id") {
     it("returns a bag when available") {
       withConfiguredApp {
-        case (vhs, baseUrl) =>
+        case (vhs, metricsSender, baseUrl) =>
           withMaterializer { implicit materializer =>
             val space = randomStorageSpace
             val bagInfo = randomBagInfo
@@ -119,6 +125,10 @@ class RegistrarHttpFeatureTest
 
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }
+
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.Success)
               }
             }
           }
@@ -127,7 +137,7 @@ class RegistrarHttpFeatureTest
 
     it("does not output null values") {
       withConfiguredApp {
-        case (vhs, baseUrl) =>
+        case (vhs, metricsSender, baseUrl) =>
           withMaterializer { implicit materializer =>
             val storageManifest = createStorageManifestWith(
               bagInfo = createBagInfoWith(externalDescription = None)
@@ -146,6 +156,10 @@ class RegistrarHttpFeatureTest
                         .get
                     infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
+
+                  assertMetricSent(
+                    metricsSender,
+                    result = HttpMetricResults.Success)
               }
             }
           }
@@ -154,14 +168,32 @@ class RegistrarHttpFeatureTest
 
     it("returns a 404 NotFound if no progress monitor matches id") {
       withConfiguredApp {
-        case (_, baseUrl) =>
-          withActorSystem { implicit actorSystem =>
-            val bagId = randomBagId
-            whenGetRequestReady(
-              s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
-              response =>
-                response.status shouldBe StatusCodes.NotFound
-            }
+        case (_, metricsSender, baseUrl) =>
+          val bagId = randomBagId
+          whenGetRequestReady(
+            s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+            response =>
+              response.status shouldBe StatusCodes.NotFound
+
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.UserError)
+          }
+      }
+    }
+
+    it("returns a 500 error if looking up the bag fails") {
+      withBrokenApp {
+        case (_, metricsSender, baseUrl) =>
+          val bagId = randomBagId
+          whenGetRequestReady(
+            s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+            response =>
+              response.status shouldBe StatusCodes.InternalServerError
+
+              assertMetricSent(
+                metricsSender,
+                result = HttpMetricResults.ServerError)
           }
       }
     }

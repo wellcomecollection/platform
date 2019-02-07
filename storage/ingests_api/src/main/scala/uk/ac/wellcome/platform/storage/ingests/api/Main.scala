@@ -9,7 +9,7 @@ import uk.ac.wellcome.config.messaging.builders.SNSBuilder
 import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.HTTPServerBuilder
-import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
+import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 
 import scala.concurrent.ExecutionContext
 
