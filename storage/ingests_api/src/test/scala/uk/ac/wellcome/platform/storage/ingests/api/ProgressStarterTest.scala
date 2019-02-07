@@ -28,12 +28,12 @@ class ProgressStarterTest
     with ScalaFutures
     with Matchers {
 
-  it("saves a progress to the database and sends a ingest bag request to sns") {
+  val progress = createProgress
+
+  it("saves a Progress to DynamoDB and send a notification to SNS") {
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withProgressStarter(table, topic) { progressStarter =>
-          val progress = createProgress
-
           whenReady(progressStarter.initialise(progress)) { p =>
             p shouldBe progress
             assertTableOnlyHasItem(progress, table)
@@ -51,6 +51,32 @@ class ProgressStarterTest
                 progress.sourceLocation.location.key)
             ))
           }
+        }
+      }
+    }
+  }
+
+  it("returns a failed future if saving to DynamoDB fails") {
+    withLocalSnsTopic { topic =>
+      val fakeTable = Table("does-not-exist", index = "does-not-exist")
+      withProgressStarter(fakeTable, topic) { progressStarter =>
+        val future = progressStarter.initialise(progress)
+
+        whenReady(future.failed) { _ =>
+          assertSnsReceivesNothing(topic)
+        }
+      }
+    }
+  }
+
+  it("returns a failed future if publishing to SNS fails") {
+    withProgressTrackerTable { table =>
+      val fakeTopic = Topic("does-not-exist")
+      withProgressStarter(table, fakeTopic) { progressStarter =>
+        val future = progressStarter.initialise(progress)
+
+        whenReady(future.failed) { _ =>
+          assertTableOnlyHasItem(progress, table)
         }
       }
     }
