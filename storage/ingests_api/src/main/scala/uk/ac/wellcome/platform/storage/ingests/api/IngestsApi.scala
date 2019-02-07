@@ -40,6 +40,7 @@ class IngestsApi(
       progressTracker = progressTracker,
       snsWriter = snsWriter
     ),
+    httpMetrics = httpMetrics,
     httpServerConfig = httpServerConfig,
     contextURL = contextURL
   )
@@ -47,7 +48,7 @@ class IngestsApi(
   implicit val rejectionHandler: RejectionHandler = router.rejectionHandler
   val bindingFuture: Future[Http.ServerBinding] = Http()
     .bindAndHandle(
-      handler = httpMetrics.sendCloudWatchMetrics { router.routes },
+      handler = router.routes,
       interface = httpServerConfig.host,
       port = httpServerConfig.port
     )

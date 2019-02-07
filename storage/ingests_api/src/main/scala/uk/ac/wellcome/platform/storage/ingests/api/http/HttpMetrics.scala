@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.storage.ingests.api.http
 
 import akka.http.scaladsl.model.HttpResponse
-import akka.http.scaladsl.server.Directive0
-import akka.http.scaladsl.server.Directives.mapResponse
+import akka.stream.QueueOfferResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.monitoring.MetricsSender
+
+import scala.concurrent.Future
 
 object HttpMetricResults extends Enumeration {
   type HttpMetricResults = Value
@@ -12,7 +13,8 @@ object HttpMetricResults extends Enumeration {
 }
 
 class HttpMetrics(name: String, metricsSender: MetricsSender) extends Logging {
-  val sendCloudWatchMetrics: Directive0 = mapResponse { resp: HttpResponse =>
+
+  def sendMetric(resp: HttpResponse): Future[QueueOfferResult] = {
     val httpMetric = if (resp.status.isSuccess()) {
         HttpMetricResults.Success
       } else if (resp.status.isFailure() && resp.status.intValue() < 500) {
@@ -25,7 +27,5 @@ class HttpMetrics(name: String, metricsSender: MetricsSender) extends Logging {
       }
 
     metricsSender.incrementCount(metricName = s"${name}_HttpResponse_${httpMetric}")
-
-    resp
   }
 }

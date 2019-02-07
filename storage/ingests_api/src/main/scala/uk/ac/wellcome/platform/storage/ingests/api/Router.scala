@@ -8,6 +8,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.server.{
+  Directive0,
   MalformedRequestContentRejection,
   RejectionHandler,
   Route
@@ -29,12 +30,14 @@ import uk.ac.wellcome.platform.archive.display.{
   RequestDisplayIngest,
   ResponseDisplayIngest
 }
+import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
 import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 
 import scala.concurrent.ExecutionContext
 
 class Router(progressTracker: ProgressTracker,
              progressStarter: ProgressStarter,
+             httpMetrics: HttpMetrics,
              httpServerConfig: HTTPServerConfig,
              contextURL: URL)(implicit ec: ExecutionContext)
     extends Logging {
@@ -42,43 +45,52 @@ class Router(progressTracker: ProgressTracker,
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
+
   implicit val printer = Printer.noSpaces.copy(dropNullValues = true)
+
   import uk.ac.wellcome.platform.archive.display.DisplayProvider._
 
-  def routes: Route = pathPrefix("progress") {
-    post {
-      entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
-        onSuccess(progressStarter.initialise(requestDisplayIngest.toProgress)) {
-          progress =>
-            respondWithHeaders(List(createLocationHeader(progress))) {
-              complete(Created -> ResponseDisplayIngest(progress, contextURL))
-            }
+  val sendCloudWatchMetrics: Directive0 = mapResponse { resp: HttpResponse =>
+    httpMetrics.sendMetric(resp)
+    resp
+  }
+
+  def routes: Route = sendCloudWatchMetrics {
+    pathPrefix("progress") {
+      post {
+        entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
+          onSuccess(progressStarter.initialise(requestDisplayIngest.toProgress)) {
+            progress =>
+              respondWithHeaders(List(createLocationHeader(progress))) {
+                complete(Created -> ResponseDisplayIngest(progress, contextURL))
+              }
+          }
         }
-      }
-    } ~ path(JavaUUID) { id: UUID =>
-      get {
-        onSuccess(progressTracker.get(id)) {
-          case Some(progress) =>
-            complete(ResponseDisplayIngest(progress, contextURL))
-          case None =>
-            complete(NotFound -> "Progress monitor not found!")
+      } ~ path(JavaUUID) { id: UUID =>
+        get {
+          onSuccess(progressTracker.get(id)) {
+            case Some(progress) =>
+              complete(ResponseDisplayIngest(progress, contextURL))
+            case None =>
+              complete(NotFound -> "Progress monitor not found!")
+          }
         }
-      }
-    } ~ path("find-by-bag-id" / Segment) { combinedId: String =>
-      // Temporary route to match colon separated ids '/find-by-bag-id/storageSpace:bagId' used by DLCS
-      // remove when DLCS replaces this by '/find-by-bag-id/storageSpace/bagId'
-      get {
-        val parts = combinedId.split(':')
-        val bagId =
-          BagId(StorageSpace(parts.head), ExternalIdentifier(parts.last))
-        findProgress(bagId)
-      }
-    } ~ path("find-by-bag-id" / Segment / Segment) { (space, id) =>
-      // Route used by DLCS to find ingests for a bag, not part of the public/documented API.  Either remove
-      // if no longer needed after migration or enhance and document as part of the API.
-      get {
-        val bagId = BagId(StorageSpace(space), ExternalIdentifier(id))
-        findProgress(bagId)
+      } ~ path("find-by-bag-id" / Segment) { combinedId: String =>
+        // Temporary route to match colon separated ids '/find-by-bag-id/storageSpace:bagId' used by DLCS
+        // remove when DLCS replaces this by '/find-by-bag-id/storageSpace/bagId'
+        get {
+          val parts = combinedId.split(':')
+          val bagId =
+            BagId(StorageSpace(parts.head), ExternalIdentifier(parts.last))
+          findProgress(bagId)
+        }
+      } ~ path("find-by-bag-id" / Segment / Segment) { (space, id) =>
+        // Route used by DLCS to find ingests for a bag, not part of the public/documented API.  Either remove
+        // if no longer needed after migration or enhance and document as part of the API.
+        get {
+          val bagId = BagId(StorageSpace(space), ExternalIdentifier(id))
+          findProgress(bagId)
+        }
       }
     }
   }
@@ -120,6 +132,10 @@ class Router(progressTracker: ProgressTracker,
               _) if contentType != ContentTypes.`application/json` =>
           transformToJsonErrorResponse(statusCode, res)
         case x => x
+      }
+      .mapRejectionResponse { resp: HttpResponse =>
+        httpMetrics.sendMetric(resp)
+        resp
       }
 
   private def createLocationHeader(progress: Progress) =
