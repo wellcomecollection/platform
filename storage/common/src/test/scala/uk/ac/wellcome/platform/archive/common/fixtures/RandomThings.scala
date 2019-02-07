@@ -12,9 +12,9 @@ trait RandomThings {
   def randomBagInfo =
     BagInfo(
       randomExternalIdentifier,
-      randomSourceOrganisation,
       randomPayloadOxum,
       randomLocalDate,
+      Some(randomSourceOrganisation),
       Some(randomExternalDescription),
       Some(randomInternalSenderIdentifier),
       Some(randomInternalSenderDescription)
