@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 04 December 2018.**
+**Last updated: 06 February 2019.**
 
 ## Problem statement
 
@@ -17,18 +17,18 @@ This service should:
 
 We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](storageservice-20190109.png)
+![archival storage service - page 1](storageservice-20190702.png)
 
 -   New assets are uploaded to an Ingest bucket in S3.
-    These assets are gzip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
+    These assets are zip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
 
 -   The event stream from S3 triggers the Archival Storage Service, which:
 
     1.  Retrieves a copy of the BagIt file from the Ingest bucket
     2.  Decompresses the BagIt file and copies it to a short-term Processing bucket
     3.  Validates the file -- i.e., checks that the contents match those described by the BagIt metadata
-    4.  Assuming the contents are valid, copies the files to a long-term Storage bucket
-    4.  Replicates content into the access bucket
+    4.  Assuming the contents are valid, copies the files to a long-term storage location
+    4.  Replicates the content into a second long-term storage location
     5.  Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
 
 [bagit]: https://en.wikipedia.org/wiki/BagIt
@@ -38,29 +38,30 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 We'll need to integrate with other services such as:
 
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
+- [Archivematica](https://archivematica.org) - for born-digital archives workflow
 
-These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
+These services will need to provide accessions in the BagIt format, zip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
 
 ### Storage
 
-Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class.
+All assets will be stored in S3 Infrequent Access and replicated to S3 Glacier. We will store a second replica in Azure Blob Storage with the Archive storage class.
 
-Archival AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
+S3 Glacier storage will have versioning enabled, but we will only keep the most recent version in S3 Infrequent Access.
 
-The underlying storage provider version should be stored for every file. The underlying storage provider version of the tagmanifest should be used as the overall version of the bag.
+The S3 Glacier version should be stored for every file. The S3 Glacier version of the tagmanifest should be used as the overall version of the bag.
 
 #### Locations
 
-The storage service will use three S3 buckets:
+The storage service will use two AWS S3 buckets and one Azure Blob Storage container:
 
-- Archival asset storage (AWS S3 Glacier, Dublin)
-- Archival asset storage replica (Azure Blob Storage Archive, Netherlands)
-- Access asset storage (AWS S3 IA, Dublin)
+- Warm primary storage (AWS S3 IA, Dublin)
+- Cold primary storage (AWS S3 Glacier, Dublin)
+- Cold disaster recovery (Azure Blob Storage Archive, Netherlands)
 
-Within each bucket, assets will be grouped into related spaces of content and identified by source identifier e.g.:
+Within each location, assets will be grouped into related spaces of content and identified by source identifier e.g.:
 
 - `/digitised/b0000000/{bag contents}`
-- `/born_digital/0000-0000-0000-0000/{bag contents}`
+- `/born-digital/0000-0000-0000-0000/{bag contents}`
 
 #### Assets
 
@@ -74,7 +75,7 @@ Assets will be stored in the above locations inside the BagIt bags that were tra
 
 From: [BagIt on Wikipedia](https://en.wikipedia.org/wiki/BagIt)
 
-Access copies may be in the same format as the archival copy, or a derivative format if this is more appropriate for access. For example, we would store high bitrate video masters as archival copies and lower bitrate videos as access copies. Any additional preservation formats created during the ingest workflow will be treated in the same way as any other asset, with separate archival and access copies.
+Any additional preservation formats created during the ingest workflow will be treated in the same way as any other asset and stored alongside the original files. Workflow systems are expected to record the link between original and derviatives assets in the METS files provided as part of the bag.
 
 #### Bag description
 
@@ -530,18 +531,18 @@ Response:
       }
     ]
   },
-  "accessLocation": {
-    "type": "Location",
-    "provider": {
-      "type": "Provider",
-      "id": "aws-s3-ia",
-      "label": "AWS S3 - Infrequent Access"
+  "storageLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-ia",
+        "label": "AWS S3 - Infrequent Access"
+      },
+      "bucket": "bucketname",
+      "path": "/digitised/b24923333",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
-    "bucket": "bucketname",
-    "path": "/digitised/b24923333",
-    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
-  },
-  "archiveLocations": [
     {
       "type": "Location",
       "provider": {
@@ -613,7 +614,7 @@ The METS file will be as provided out of the box by Archivematica.
 Request:
 
 ```http
-GET /bags/born_digital/yy-yy-yy-yy
+GET /bags/born-digital/yy-yy-yy-yy
 ```
 
 Response:
@@ -622,9 +623,9 @@ Response:
 {
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
-  "id": "born_digital/yy-yy-yy-yy",
+  "id": "born-digital/yy-yy-yy-yy",
   "space": {
-    "id": "born_digital",
+    "id": "born-digital",
     "type": "Space"
   },
   "info": {
@@ -676,18 +677,18 @@ Response:
       }
     ]
   },
-  "accessLocation": {
-    "type": "Location",
-    "provider": {
-      "type": "Provider",
-      "id": "aws-s3-ia",
-      "label": "AWS S3 - Infrequent Access"
+  "storageLocations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-ia",
+        "label": "AWS S3 - Infrequent Access"
+      },
+      "bucket": "bucketname",
+      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
-    "bucket": "bucketname",
-    "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-  },
-  "archiveLocations": [
     {
       "type": "Location",
       "provider": {
@@ -696,8 +697,8 @@ Response:
         "label": "AWS S3 - Glacier"
       },
       "bucket": "bucketname",
-      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Location",
@@ -707,8 +708,8 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "path": "/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "https://accountname.blob.core.windows.net/bucketname/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "https://accountname.blob.core.windows.net/bucketname/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
