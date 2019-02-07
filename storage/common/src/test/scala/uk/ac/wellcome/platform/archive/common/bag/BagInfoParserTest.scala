@@ -14,54 +14,42 @@ class BagInfoParserTest
   case class Thing(id: String)
   val t = Thing("a")
 
-  it("extracts a BagInfo object from a bagInfo file with required fields") {
+  it("extracts a BagInfo object from a bagInfo file with only required fields") {
     val externalIdentifier = randomExternalIdentifier
-    val sourceOrganisation = randomSourceOrganisation
     val payloadOxum = randomPayloadOxum
     val baggingDate = randomLocalDate
-    val bagInfoString = bagInfoFileContents(
-      externalIdentifier,
-      sourceOrganisation,
-      payloadOxum,
-      baggingDate,
-      None,
-      None,
-      None)
+    val bagInfoString =
+      bagInfoFileContents(externalIdentifier, payloadOxum, baggingDate)
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
-      bagit.BagInfo(
-        externalIdentifier,
-        sourceOrganisation,
-        payloadOxum,
-        baggingDate))
+      bagit.BagInfo(externalIdentifier, payloadOxum, baggingDate))
   }
 
   it(
-    "extracts a BagInfo object from a bagInfo file with required and optional fields") {
+    "extracts a BagInfo object from a bagInfo file with all required and optional fields") {
     val externalIdentifier = randomExternalIdentifier
-    val sourceOrganisation = randomSourceOrganisation
     val payloadOxum = randomPayloadOxum
     val baggingDate = randomLocalDate
+    val sourceOrganisation = Some(randomSourceOrganisation)
     val externalDescription = Some(randomExternalDescription)
     val internalSenderIdentifier = Some(randomInternalSenderIdentifier)
     val internalSenderDescription = Some(randomInternalSenderDescription)
 
     val bagInfoString = bagInfoFileContents(
       externalIdentifier,
-      sourceOrganisation,
       payloadOxum,
       baggingDate,
+      sourceOrganisation,
       externalDescription,
       internalSenderIdentifier,
-      internalSenderDescription
-    )
+      internalSenderDescription)
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Right(
       bagit.BagInfo(
         externalIdentifier,
-        sourceOrganisation,
         payloadOxum,
         baggingDate,
+        sourceOrganisation,
         externalDescription,
         internalSenderIdentifier,
         internalSenderDescription))
@@ -76,17 +64,6 @@ class BagInfoParserTest
 
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(t, List("External-Identifier")))
-  }
-
-  it(
-    "returns a left of invalid bag info error if there is no source organization in bag-info.txt") {
-    val bagInfoString =
-      s"""|External-Identifier: $randomExternalIdentifier
-          |Payload-Oxum: ${randomPayloadOxum.payloadBytes}.${randomPayloadOxum.numberOfPayloadFiles}
-          |Bagging-Date: $randomLocalDate""".stripMargin
-
-    BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
-      InvalidBagInfo(t, List("Source-Organization")))
   }
 
   it(
@@ -141,11 +118,7 @@ class BagInfoParserTest
     BagInfoParser.parseBagInfo(t, IOUtils.toInputStream(bagInfoString, "UTF-8")) shouldBe Left(
       InvalidBagInfo(
         t,
-        List(
-          "External-Identifier",
-          "Source-Organization",
-          "Payload-Oxum",
-          "Bagging-Date")))
+        List("External-Identifier", "Payload-Oxum", "Bagging-Date")))
   }
 
 }

@@ -1,26 +1,33 @@
 package uk.ac.wellcome.platform.archive.common.generators
 
+import java.time.LocalDate
+
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
-import uk.ac.wellcome.platform.archive.common.models.bagit.{
-  BagInfo,
-  ExternalDescription,
-  ExternalIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.models.bagit._
 
 trait BagInfoGenerators extends RandomThings {
+
   def createBagInfoWith(
     externalIdentifier: ExternalIdentifier = randomExternalIdentifier,
+    payloadOxum: PayloadOxum = randomPayloadOxum,
+    baggingDate: LocalDate = randomLocalDate,
+    sourceOrganisation: Option[SourceOrganisation] = Some(
+      randomSourceOrganisation),
     externalDescription: Option[ExternalDescription] = Some(
-      randomExternalDescription)
+      randomExternalDescription),
+    internalSenderIdentifier: Option[InternalSenderIdentifier] = Some(
+      randomInternalSenderIdentifier),
+    internalSenderDescription: Option[InternalSenderDescription] = Some(
+      randomInternalSenderDescription)
   ): BagInfo =
     BagInfo(
-      externalIdentifier = randomExternalIdentifier,
-      sourceOrganisation = randomSourceOrganisation,
-      payloadOxum = randomPayloadOxum,
-      baggingDate = randomLocalDate,
+      externalIdentifier = externalIdentifier,
+      payloadOxum = payloadOxum,
+      baggingDate = baggingDate,
+      sourceOrganisation = sourceOrganisation,
       externalDescription = externalDescription,
-      internalSenderIdentifier = Some(randomInternalSenderIdentifier),
-      internalSenderDescription = Some(randomInternalSenderDescription)
+      internalSenderIdentifier = internalSenderIdentifier,
+      internalSenderDescription = internalSenderDescription
     )
 
   def createBagInfo: BagInfo = createBagInfoWith()
