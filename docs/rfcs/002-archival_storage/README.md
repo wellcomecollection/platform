@@ -17,7 +17,7 @@ This service should:
 
 We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](storageservice-20190109.png)
+![archival storage service - page 1](storageservice-20190702.png)
 
 -   New assets are uploaded to an Ingest bucket in S3.
     These assets are zip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
