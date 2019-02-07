@@ -6,6 +6,7 @@ data "aws_iam_policy_document" "travis_permissions" {
 
     resources = [
       "${var.bucket_arn}/uk/ac/wellcome/${var.name}_2.12/*",
+      "${var.bucket_arn}/uk/ac/wellcome/${var.name}_typesafe_2.12/*",
     ]
   }
 
