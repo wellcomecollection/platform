@@ -5,3 +5,7 @@ variable "name" {
 variable "bucket_arn" {
   description = "ARN of the S3 bucket used for releases"
 }
+
+variable "repo_name" {
+  default = ""
+}
