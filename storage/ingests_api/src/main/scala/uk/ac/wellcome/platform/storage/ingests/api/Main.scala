@@ -22,6 +22,7 @@ object Main extends WellcomeTypesafeApp {
       AkkaBuilder.buildExecutionContext()
 
     val httpMetrics = new HttpMetrics(
+      name = "IngestsApi",
       metricsSender = MetricsBuilder.buildMetricsSender(config)
     )
 

@@ -42,6 +42,8 @@ trait IngestsApiFixture
 
   val httpServerConfig: HTTPServerConfig = createHTTPServerConfig
 
+  val metricsName = "IngestsApiFixture"
+
   private def withApp[R](
     table: Table,
     topic: Topic,
@@ -52,6 +54,7 @@ trait IngestsApiFixture
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
           val httpMetrics = new HttpMetrics(
+            name = metricsName,
             metricsSender = metricsSender
           )
 
@@ -96,7 +99,7 @@ trait IngestsApiFixture
 
   def assertMetricSent(metricsSender: MetricsSender, result: HttpMetricResults.Value): Future[QueueOfferResult] =
     verify(metricsSender, atLeastOnce())
-      .incrementCount(metricName = s"IngestsApi_HttpResponse_$result")
+      .incrementCount(metricName = s"${metricsName}_HttpResponse_$result")
 
   def assertIsErrorResponse(
     response: HttpResponse,

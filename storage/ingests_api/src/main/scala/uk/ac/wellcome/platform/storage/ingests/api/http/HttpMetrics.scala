@@ -8,20 +8,23 @@ import uk.ac.wellcome.monitoring.MetricsSender
 
 object HttpMetricResults extends Enumeration {
   type HttpMetricResults = Value
-  val Success, UserError, ServerError = Value
+  val Success, UserError, ServerError, Unrecognised = Value
 }
 
-class HttpMetrics(metricsSender: MetricsSender) extends Logging {
+class HttpMetrics(name: String, metricsSender: MetricsSender) extends Logging {
   val sendCloudWatchMetrics: Directive0 = mapResponse { resp: HttpResponse =>
-    if (resp.status.isSuccess()) {
-      info(s"@@AWLC Sent response SUCCESS")
-    } else if (resp.status.isRedirection()) {
-      info(s"@@AWLC Sent response REDIRECT")
-    } else if (resp.status.isFailure()) {
-      info(s"@@AWLC Sent response FAILURE")
-    } else {
-      warn(s"@@AWLC Sent unrecognised response code: ${resp.status}")
-    }
+    val httpMetric = if (resp.status.isSuccess()) {
+        HttpMetricResults.Success
+      } else if (resp.status.isFailure() && resp.status.intValue() < 500) {
+        HttpMetricResults.UserError
+      } else if (resp.status.isFailure()) {
+        HttpMetricResults.ServerError
+      } else {
+        warn(s"Sending unexpected response code: ${resp.status}")
+        HttpMetricResults.Unrecognised
+      }
+
+    metricsSender.incrementCount(metricName = s"${name}_HttpResponse_${httpMetric}")
 
     resp
   }
