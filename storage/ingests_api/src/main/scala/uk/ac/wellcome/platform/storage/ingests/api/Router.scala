@@ -95,10 +95,9 @@ class Router(progressTracker: ProgressTracker,
       info(s"""errors fetching ingests for $bagId: ${results.mkString(" ")}""")
       complete(
         InternalServerError -> ErrorResponse(
-          context = contextURL.toString,
-          httpStatus = InternalServerError.intValue,
-          description = "Internal server error",
-          label = InternalServerError.reason
+          context = contextURL,
+          statusCode = InternalServerError,
+          description = InternalServerError.reason
         ))
     }
   }
@@ -130,13 +129,12 @@ class Router(progressTracker: ProgressTracker,
     case err: Exception =>
       logger.error(s"Unexpected exception $err")
       val error = ErrorResponse(
-        context = contextURL.toString,
-        httpStatus = StatusCodes.InternalServerError.intValue,
-        description = err.toString,
-        label = "Internal Server Error"
+        context = contextURL,
+        statusCode = InternalServerError,
+        description = err.toString
       )
-      httpMetrics.sendMetricForStatus(StatusCodes.InternalServerError)
-      complete(StatusCodes.InternalServerError -> error)
+      httpMetrics.sendMetricForStatus(InternalServerError)
+      complete(InternalServerError -> error)
   }
 
   private def createLocationHeader(progress: Progress) =
@@ -167,10 +165,11 @@ class Router(progressTracker: ProgressTracker,
 
     complete(
       BadRequest -> ErrorResponse(
-        context = contextURL.toString,
-        httpStatus = BadRequest.intValue,
-        description = message.toList.mkString("\n"),
-        label = BadRequest.reason))
+        context = contextURL,
+        statusCode = BadRequest,
+        description = message.toList.mkString("\n")
+      )
+    )
   }
 
   private def transformToJsonErrorResponse(statusCode: StatusCode,
@@ -180,10 +179,9 @@ class Router(progressTracker: ProgressTracker,
         val message = data.utf8String
         Marshal(
           ErrorResponse(
-            context = contextURL.toString,
-            httpStatus = statusCode.intValue,
-            description = message,
-            label = statusCode.reason)).to[MessageEntity]
+            context = contextURL,
+            statusCode = statusCode,
+            description = message)).to[MessageEntity]
       })
       .flatMapConcat(_.dataBytes)
 
