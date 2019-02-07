@@ -11,11 +11,8 @@ import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.RandomThings
 import uk.ac.wellcome.platform.archive.common.generators.BagInfoGenerators
-import uk.ac.wellcome.platform.archive.display.{
-  DisplayLocation,
-  DisplayStorageSpace,
-  StandardDisplayProvider
-}
+import uk.ac.wellcome.platform.archive.common.http.HttpMetricResults
+import uk.ac.wellcome.platform.archive.display.{DisplayLocation, DisplayStorageSpace, StandardDisplayProvider}
 import uk.ac.wellcome.platform.archive.registrar.generators.StorageManifestGenerators
 import uk.ac.wellcome.platform.storage.bags.api.fixtures.BagsApiFixture
 import uk.ac.wellcome.platform.storage.bags.api.models.{
@@ -43,7 +40,7 @@ class BagsApiFeatureTest
   describe("GET /registrar/:space/:id") {
     it("returns a bag when available") {
       withConfiguredApp {
-        case (vhs, baseUrl) =>
+        case (vhs, metricsSender, baseUrl) =>
           withMaterializer { implicit materializer =>
             val space = randomStorageSpace
             val bagInfo = randomBagInfo
@@ -124,6 +121,8 @@ class BagsApiFeatureTest
 
                       Instant.parse(createdDateString) shouldBe storageManifest.createdDate
                   }
+
+                  assertMetricSent(metricsSender, result = HttpMetricResults.Success)
               }
             }
           }
@@ -132,7 +131,7 @@ class BagsApiFeatureTest
 
     it("does not output null values") {
       withConfiguredApp {
-        case (vhs, baseUrl) =>
+        case (vhs, metricsSender, baseUrl) =>
           withMaterializer { implicit materializer =>
             val storageManifest = createStorageManifestWith(
               bagInfo = createBagInfoWith(externalDescription = None)
@@ -151,6 +150,8 @@ class BagsApiFeatureTest
                         .get
                     infoJson.findAllByKey("externalDescription") shouldBe empty
                   }
+
+                  assertMetricSent(metricsSender, result = HttpMetricResults.Success)
               }
             }
           }
@@ -159,24 +160,29 @@ class BagsApiFeatureTest
 
     it("returns a 404 NotFound if no progress monitor matches id") {
       withConfiguredApp {
-        case (_, baseUrl) =>
+        case (_, metricsSender, baseUrl) =>
           val bagId = randomBagId
           whenGetRequestReady(
             s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
             response =>
               response.status shouldBe StatusCodes.NotFound
+
+              assertMetricSent(metricsSender, result = HttpMetricResults.UserError)
           }
       }
     }
 
     it("returns a 500 error if looking up the bag fails") {
-      withBrokenApp { case (_, baseUrl) =>
-        val bagId = randomBagId
-        whenGetRequestReady(
-          s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
-          response =>
-            response.status shouldBe StatusCodes.InternalServerError
-        }
+      withBrokenApp {
+        case (_, metricsSender, baseUrl) =>
+          val bagId = randomBagId
+          whenGetRequestReady(
+            s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+            response =>
+              response.status shouldBe StatusCodes.InternalServerError
+
+              assertMetricSent(metricsSender, result = HttpMetricResults.ServerError)
+          }
       }
     }
   }
