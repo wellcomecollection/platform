@@ -22,7 +22,7 @@ class BagsApi(
   contextURL: URL
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
-  executionContext: ExecutionContext)
+  ec: ExecutionContext)
     extends Logging
     with Runnable {
   val router = new Router(

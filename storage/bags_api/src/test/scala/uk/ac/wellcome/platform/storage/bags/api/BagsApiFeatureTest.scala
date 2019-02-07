@@ -160,14 +160,23 @@ class BagsApiFeatureTest
     it("returns a 404 NotFound if no progress monitor matches id") {
       withConfiguredApp {
         case (_, baseUrl) =>
-          withActorSystem { implicit actorSystem =>
-            val bagId = randomBagId
-            whenGetRequestReady(
-              s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
-              response =>
-                response.status shouldBe StatusCodes.NotFound
-            }
+          val bagId = randomBagId
+          whenGetRequestReady(
+            s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+            response =>
+              response.status shouldBe StatusCodes.NotFound
           }
+      }
+    }
+
+    it("returns a 500 error if looking up the bag fails") {
+      withBrokenApp { case (_, baseUrl) =>
+        val bagId = randomBagId
+        whenGetRequestReady(
+          s"$baseUrl/registrar/${bagId.space.underlying}/${bagId.externalIdentifier.underlying}") {
+          response =>
+            response.status shouldBe StatusCodes.InternalServerError
+        }
       }
     }
   }
