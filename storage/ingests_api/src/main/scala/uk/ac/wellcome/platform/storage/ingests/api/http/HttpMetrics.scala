@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.storage.ingests.api.http
 
-import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.{HttpResponse, StatusCode}
 import akka.stream.QueueOfferResult
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.monitoring.MetricsSender
@@ -14,18 +14,21 @@ object HttpMetricResults extends Enumeration {
 
 class HttpMetrics(name: String, metricsSender: MetricsSender) extends Logging {
 
-  def sendMetric(resp: HttpResponse): Future[QueueOfferResult] = {
-    val httpMetric = if (resp.status.isSuccess()) {
-        HttpMetricResults.Success
-      } else if (resp.status.isFailure() && resp.status.intValue() < 500) {
-        HttpMetricResults.UserError
-      } else if (resp.status.isFailure()) {
-        HttpMetricResults.ServerError
-      } else {
-        warn(s"Sending unexpected response code: ${resp.status}")
-        HttpMetricResults.Unrecognised
-      }
+  def sendMetric(resp: HttpResponse): Future[QueueOfferResult] =
+    sendMetricForStatus(resp.status)
 
-    metricsSender.incrementCount(metricName = s"${name}_HttpResponse_${httpMetric}")
+  def sendMetricForStatus(status: StatusCode): Future[QueueOfferResult] = {
+    val httpMetric = if (status.isSuccess()) {
+      HttpMetricResults.Success
+    } else if (status.isFailure() && status.intValue() < 500) {
+      HttpMetricResults.UserError
+    } else if (status.isFailure()) {
+      HttpMetricResults.ServerError
+    } else {
+      warn(s"Sending unexpected response code: ${status}")
+      HttpMetricResults.Unrecognised
+    }
+
+    metricsSender.incrementCount(metricName = s"${name}_HttpResponse_$httpMetric")
   }
 }

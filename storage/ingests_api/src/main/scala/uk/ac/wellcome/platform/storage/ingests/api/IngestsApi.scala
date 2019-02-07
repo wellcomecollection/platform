@@ -4,7 +4,7 @@ import java.net.URL
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.RejectionHandler
+import akka.http.scaladsl.server.{ExceptionHandler, RejectionHandler}
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import grizzled.slf4j.Logging
@@ -46,6 +46,7 @@ class IngestsApi(
   )
 
   implicit val rejectionHandler: RejectionHandler = router.rejectionHandler
+  implicit val exceptionHandler: ExceptionHandler = router.exceptionHandler
   val bindingFuture: Future[Http.ServerBinding] = Http()
     .bindAndHandle(
       handler = router.routes,

@@ -7,29 +7,17 @@ import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
-import akka.http.scaladsl.server.{
-  Directive0,
-  MalformedRequestContentRejection,
-  RejectionHandler,
-  Route
-}
+import akka.http.scaladsl.server._
 import akka.stream.scaladsl.Flow
 import akka.util.ByteString
 import grizzled.slf4j.Logging
 import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
-import uk.ac.wellcome.platform.archive.common.models.bagit.{
-  BagId,
-  ExternalIdentifier
-}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, ExternalIdentifier}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{
-  DisplayIngestMinimal,
-  RequestDisplayIngest,
-  ResponseDisplayIngest
-}
+import uk.ac.wellcome.platform.archive.display.{DisplayIngestMinimal, RequestDisplayIngest, ResponseDisplayIngest}
 import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
 import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 
@@ -138,6 +126,19 @@ class Router(progressTracker: ProgressTracker,
         resp
       }
 
+  implicit def exceptionHandler: ExceptionHandler = ExceptionHandler {
+    case err: Exception =>
+      logger.error(s"Unexpected exception $err")
+      val error = ErrorResponse(
+        context = contextURL.toString,
+        httpStatus = StatusCodes.InternalServerError.intValue,
+        description = err.toString,
+        label = "Internal Server Error"
+      )
+      httpMetrics.sendMetricForStatus(StatusCodes.InternalServerError)
+      complete(StatusCodes.InternalServerError -> error)
+  }
+
   private def createLocationHeader(progress: Progress) =
     Location(s"${httpServerConfig.externalBaseURL}/${progress.id}")
 
@@ -166,10 +167,10 @@ class Router(progressTracker: ProgressTracker,
 
     complete(
       BadRequest -> ErrorResponse(
-        contextURL.toString,
-        BadRequest.intValue,
-        message.toList.mkString("\n"),
-        BadRequest.reason))
+        context = contextURL.toString,
+        httpStatus = BadRequest.intValue,
+        description = message.toList.mkString("\n"),
+        label = BadRequest.reason))
   }
 
   private def transformToJsonErrorResponse(statusCode: StatusCode,
