@@ -59,4 +59,3 @@ module "scala_typesafe" {
   repo_name  = "wellcome-typesafe-app"
   bucket_arn = "${aws_s3_bucket.releases.arn}"
 }
-
