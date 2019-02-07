@@ -23,6 +23,7 @@ import uk.ac.wellcome.platform.archive.common.fixtures.{
   HttpFixtures,
   RandomThings
 }
+import uk.ac.wellcome.platform.archive.common.http.models.ErrorResponse
 import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressGenerators,
   ProgressTrackerFixture
@@ -32,7 +33,6 @@ import uk.ac.wellcome.platform.storage.ingests.api.http.{
   HttpMetricResults,
   HttpMetrics
 }
-import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
@@ -137,7 +137,7 @@ trait IngestsApiFixture
       actualError shouldBe ErrorResponse(
         context = contextURL.toString,
         httpStatus = statusCode.intValue(),
-        description = description,
+        description = Some(description),
         label = label
       )
     }

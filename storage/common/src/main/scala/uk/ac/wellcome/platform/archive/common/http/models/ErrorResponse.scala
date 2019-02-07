@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.storage.ingests.api.model
+package uk.ac.wellcome.platform.archive.common.http.models
 
 import java.net.URL
 
@@ -8,7 +8,7 @@ import io.circe.generic.extras.JsonKey
 case class ErrorResponse(
   @JsonKey("@context") context: String,
   httpStatus: Int,
-  description: String,
+  description: Option[String],
   label: String,
   `type`: String = "Error"
 )
@@ -20,7 +20,15 @@ case object ErrorResponse {
     ErrorResponse(
       context = context.toString,
       httpStatus = statusCode.intValue(),
-      description = description,
+      description = Some(description),
+      label = statusCode.reason()
+    )
+
+  def apply(context: URL, statusCode: StatusCode): ErrorResponse =
+    ErrorResponse(
+      context = context.toString,
+      httpStatus = statusCode.intValue(),
+      description = None,
       label = statusCode.reason()
     )
 }

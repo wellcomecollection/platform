@@ -13,6 +13,7 @@ import akka.util.ByteString
 import grizzled.slf4j.Logging
 import io.circe.{CursorOp, Printer}
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
+import uk.ac.wellcome.platform.archive.common.http.models.ErrorResponse
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.models.bagit.{
   BagId,
@@ -26,7 +27,6 @@ import uk.ac.wellcome.platform.archive.display.{
   ResponseDisplayIngest
 }
 import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
-import uk.ac.wellcome.platform.storage.ingests.api.model.ErrorResponse
 
 import scala.concurrent.ExecutionContext
 
