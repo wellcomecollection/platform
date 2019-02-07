@@ -152,7 +152,9 @@ object Dependencies {
       WellcomeDependencies.fixturesLibrary
 
   val apiDependencies: Seq[ModuleID] =
-    akkaDependencies ++
+    Seq(
+      "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    ) ++
       finatraDependencies ++
       guiceDependencies ++
       WellcomeDependencies.fixturesLibrary
