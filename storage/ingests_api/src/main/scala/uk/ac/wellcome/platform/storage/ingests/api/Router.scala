@@ -6,33 +6,28 @@ import java.util.UUID
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.Location
 import akka.http.scaladsl.server._
+import grizzled.slf4j.Logging
+import io.circe.Printer
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
 import uk.ac.wellcome.platform.archive.common.http.models.ErrorResponse
-import uk.ac.wellcome.platform.archive.common.http.{BaseRouter, HttpMetrics}
 import uk.ac.wellcome.platform.archive.common.models.StorageSpace
 import uk.ac.wellcome.platform.archive.common.models.bagit.{BagId, ExternalIdentifier}
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
-import uk.ac.wellcome.platform.archive.display.{
-  DisplayIngestMinimal,
-  RequestDisplayIngest,
-  ResponseDisplayIngest
-}
-
-import scala.concurrent.ExecutionContext
+import uk.ac.wellcome.platform.archive.display.{DisplayIngestMinimal, RequestDisplayIngest, ResponseDisplayIngest}
 
 class Router(progressTracker: ProgressTracker,
              progressStarter: ProgressStarter,
-             val httpMetrics: HttpMetrics,
              httpServerConfig: HTTPServerConfig,
-             val contextURL: URL)(implicit val ec: ExecutionContext)
-    extends BaseRouter {
+             contextURL: URL) extends Logging {
 
   import akka.http.scaladsl.server.Directives._
   import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
   import uk.ac.wellcome.json.JsonUtil._
 
-  def routes: Route = sendCloudWatchMetrics {
+  implicit val printer: Printer = Printer.noSpaces.copy(dropNullValues = true)
+
+  def routes: Route =
     pathPrefix("progress") {
       post {
         entity(as[RequestDisplayIngest]) { requestDisplayIngest =>
@@ -70,7 +65,6 @@ class Router(progressTracker: ProgressTracker,
         }
       }
     }
-  }
 
   private def findProgress(bagId: BagId) = {
     val results = progressTracker.findByBagId(bagId)

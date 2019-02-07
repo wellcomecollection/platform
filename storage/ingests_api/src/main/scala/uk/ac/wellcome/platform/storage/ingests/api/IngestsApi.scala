@@ -6,7 +6,6 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import grizzled.slf4j.Logging
 import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.archive.common.config.models.HTTPServerConfig
@@ -26,8 +25,7 @@ class IngestsApi(
 )(implicit val actorSystem: ActorSystem,
   materializer: ActorMaterializer,
   executionContext: ExecutionContext)
-    extends Logging
-    with Runnable {
+    extends Runnable {
   val progressTracker = new ProgressTracker(
     dynamoDbClient = dynamoClient,
     dynamoConfig = dynamoConfig
@@ -39,14 +37,17 @@ class IngestsApi(
       progressTracker = progressTracker,
       snsWriter = snsWriter
     ),
+    httpServerConfig = httpServerConfig,
+    contextURL = contextURL
+  )
+
+  val app = new WellcomeHttpApp(
+    routes = router.routes,
     httpMetrics = httpMetrics,
     httpServerConfig = httpServerConfig,
     contextURL = contextURL
   )
 
   def run(): Future[Http.HttpTerminated] =
-    WellcomeHttpApp.run(
-      httpServerConfig = httpServerConfig,
-      router = router
-    )
+    app.run()
 }

@@ -7,6 +7,7 @@ import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.common.fixtures.{HttpFixtures, RandomThings}
+import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 import uk.ac.wellcome.platform.storage.bags.api.BagsApi
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -33,8 +34,14 @@ trait BagsApiFixture
     vhs: StorageManifestVHS)(testWith: TestWith[BagsApi, R]): R =
     withActorSystem { implicit actorSystem =>
       withMaterializer(actorSystem) { implicit materializer =>
+        val httpMetrics = new HttpMetrics(
+          name = metricsName,
+          metricsSender = metricsSender
+        )
+
         val bagsApi = new BagsApi(
           vhs = vhs,
+          httpMetrics = httpMetrics,
           httpServerConfig = httpServerConfig,
           contextURL = contextURL
         )
