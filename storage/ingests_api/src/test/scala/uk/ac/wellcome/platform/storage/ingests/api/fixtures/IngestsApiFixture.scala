@@ -18,6 +18,7 @@ import uk.ac.wellcome.platform.archive.common.progress.fixtures.{
   ProgressTrackerFixture
 }
 import uk.ac.wellcome.platform.storage.ingests.api.IngestsApi
+import uk.ac.wellcome.platform.storage.ingests.api.http.HttpMetrics
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.fixtures.TestWith
@@ -45,11 +46,15 @@ trait IngestsApiFixture
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
+          val httpMetrics = new HttpMetrics(
+            metricsSender = metricsSender
+          )
+
           val ingestsApi = new IngestsApi(
             dynamoClient = dynamoDbClient,
             dynamoConfig = createDynamoConfigWith(table),
             snsWriter = snsWriter,
-            metricsSender = metricsSender,
+            httpMetrics = httpMetrics,
             httpServerConfig = httpServerConfig,
             contextURL = contextURL
           )
