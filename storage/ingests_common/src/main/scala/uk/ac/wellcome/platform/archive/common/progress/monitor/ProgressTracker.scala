@@ -20,20 +20,12 @@ class ProgressTracker(
   dynamoConfig: DynamoConfig
 )(implicit ec: ExecutionContext) extends Logging {
 
-  def get(id: UUID): Future[Option[Progress]] = Future {
-    blocking(Scanamo.get[Progress](dynamoDbClient)(dynamoConfig.table)(
-      'id -> id
-    )) match {
-      case Some(Right(progress)) => Some(progress)
-      case Some(Left(error)) => {
-        val exception = new RuntimeException(
-          s"Failed to get progress tracker ${error.toString}")
-        warn(s"Failed to get Dynamo record: $id", exception)
-        throw exception
-      }
-      case scala.None => scala.None
-    }
-  }
+  val versionedDao = new VersionedDao(
+    dynamoDbClient = dynamoDbClient,
+    dynamoConfig = dynamoConfig
+  )
+
+  def get(id: UUID): Future[Option[Progress]] = versionedDao.getRecord[Progress](id.toString)
 
   def initialise(progress: Progress): Future[Progress] = {
     val progressTable = Table[Progress](dynamoConfig.table)
