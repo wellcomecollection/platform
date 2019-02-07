@@ -92,17 +92,17 @@ env:
 
 jobs:
   include:
-    # - stage: quicktest
-    #   env: TASK=travis-format
-    #
-    # # Because this isn't under active development, and we're really squeezed
-    # # for build VMs, we aren't testing this in CI right now.
-    # # - env: TASK=travistooling-test
-    #
-    # - stage: sbt-common-test
-    #   env: TASK=elasticsearch-test
-    # - env: TASK=internal_model-test
-    # - env: TASK=display-test
+    - stage: quicktest
+      env: TASK=travis-format
+
+    # Because this isn't under active development, and we're really squeezed
+    # for build VMs, we aren't testing this in CI right now.
+    # - env: TASK=travistooling-test
+
+    - stage: sbt-common-test
+      env: TASK=elasticsearch-test
+    - env: TASK=internal_model-test
+    - env: TASK=display-test
 
     # Lambda tests.
     #
@@ -115,61 +115,61 @@ jobs:
     #
     # When this job runs, all the Lambdas get tested at once, but even this
     # isn't significantly longer than a Scala test.
-    #
-    # - stage: test
-    #   env:
-    #     - TRAVIS_LAMBDAS="snapshot_scheduler \
-    #       sierra_window_generator \
-    #       s3_demultiplexer \
-    #       lambdas/drain_ecs_container_instance \
-    #       lambdas/dynamo_write_heartbeat \
-    #       lambdas/ecs_ec2_instance_tagger \
-    #       post_to_slack \
-    #       update_service_list"
-    #     - TASK=travis-lambda-test
+
+    - stage: test
+      env:
+        - TRAVIS_LAMBDAS="snapshot_scheduler \
+          sierra_window_generator \
+          s3_demultiplexer \
+          lambdas/drain_ecs_container_instance \
+          lambdas/dynamo_write_heartbeat \
+          lambdas/ecs_ec2_instance_tagger \
+          post_to_slack \
+          update_service_list"
+        - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - env: TASK=api-test
-    # # (not under active development)
-    # # - env: TASK=api_docs-build
-    #
-    # # Catalogue pipeline stack
-    # - env: TASK=transformer_miro-test
-    # - env: TASK=transformer_sierra-test
-    # - env: TASK=ingestor-test
-    # - env: TASK=recorder-test
-    # - env: TASK=matcher-test
-    # - env: TASK=merger-test
-    # - env: TASK=id_minter-test
-    #
-    # # Data API stack
-    # - env: TASK=snapshot_generator-test
-    #
-    # # Reindexer stack
-    # - env: TASK=reindex_worker-test
-    #
-    # # Goobi adapter stack
-    # - env: TASK=goobi_reader-test
-    #
-    # # Sierra adapter stack
-    # - env: TASK=sierra_reader-test
-    # - env: TASK=sierra_items_to_dynamo-test
-    # - env: TASK=sierra_bib_merger-test
-    # - env: TASK=sierra_item_merger-test
-    #
-    # # Storage
-    # - env: TASK=storage_display-test
-    # - env: TASK=storage_common-test
-    # - env: TASK=archivist-test
-    # - env: TASK=ingests_common-test
-    # - env: TASK=ingests-test
-    # - env: TASK=ingests_api-test
-    # - env: TASK=bags_common-test
-    # - env: TASK=bags-test
-    # - env: TASK=bags_api-test
-    # - env: TASK=notifier-test
-    # - env: TASK=callback_stub_server-publish
-    # - env: TASK=bagger-publish
+    - env: TASK=api-build
+    # (not under active development)
+    # - env: TASK=api_docs-build
+
+    # Catalogue pipeline stack
+    - env: TASK=transformer_miro-test
+    - env: TASK=transformer_sierra-test
+    - env: TASK=ingestor-test
+    - env: TASK=recorder-test
+    - env: TASK=matcher-test
+    - env: TASK=merger-test
+    - env: TASK=id_minter-test
+
+    # Data API stack
+    - env: TASK=snapshot_generator-test
+
+    # Reindexer stack
+    - env: TASK=reindex_worker-test
+
+    # Goobi adapter stack
+    - env: TASK=goobi_reader-test
+
+    # Sierra adapter stack
+    - env: TASK=sierra_reader-test
+    - env: TASK=sierra_items_to_dynamo-test
+    - env: TASK=sierra_bib_merger-test
+    - env: TASK=sierra_item_merger-test
+
+    # Storage
+    - env: TASK=storage_display-test
+    - env: TASK=storage_common-test
+    - env: TASK=archivist-test
+    - env: TASK=ingests_common-test
+    - env: TASK=ingests-test
+    - env: TASK=ingests_api-test
+    - env: TASK=bags_common-test
+    - env: TASK=bags-test
+    - env: TASK=bags_api-test
+    - env: TASK=notifier-test
+    - env: TASK=callback_stub_server-publish
+    - env: TASK=bagger-publish
 
     # (not under active development)
 
