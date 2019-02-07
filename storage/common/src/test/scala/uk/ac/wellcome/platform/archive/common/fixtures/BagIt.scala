@@ -56,9 +56,9 @@ trait BagIt extends RandomThings {
         s"bag-info.txt",
         bagInfoFileContents(
           bagInfo.externalIdentifier,
+          bagInfo.sourceOrganisation,
           bagInfo.payloadOxum,
           bagInfo.baggingDate,
-          bagInfo.sourceOrganisation,
           bagInfo.externalDescription,
           bagInfo.internalSenderIdentifier,
           bagInfo.internalSenderDescription
@@ -120,29 +120,25 @@ trait BagIt extends RandomThings {
 
   def bagInfoFileContents(
     bagIdentifier: ExternalIdentifier,
+    sourceOrganisation: SourceOrganisation,
     payloadOxum: PayloadOxum,
     baggingDate: LocalDate,
-    sourceOrganisation: Option[SourceOrganisation] = None,
-    externalDescription: Option[ExternalDescription] = None,
-    internalSenderIdentifier: Option[InternalSenderIdentifier] = None,
-    internalSenderDescription: Option[InternalSenderDescription] = None)
-    : String = {
+    externalDescription: Option[ExternalDescription],
+    internalSenderIdentifier: Option[InternalSenderIdentifier],
+    internalSenderDescription: Option[InternalSenderDescription]) = {
     def optionalLine[T](maybeValue: Option[T], fieldName: String) =
       maybeValue.map(value => s"$fieldName: $value").getOrElse("")
 
-    val sourceOrganisationLine =
-      optionalLine(sourceOrganisation, "Source-Organization")
     val descriptionLine =
       optionalLine(externalDescription, "External-Description")
     val internalSenderIdentifierLine =
       optionalLine(internalSenderIdentifier, "Internal-Sender-Identifier")
     val internalSenderDescriptionLine =
       optionalLine(internalSenderDescription, "Internal-Sender-Description")
-
-    s"""External-Identifier: $bagIdentifier
+    s"""Source-Organization: $sourceOrganisation
+       |External-Identifier: $bagIdentifier
        |Payload-Oxum: ${payloadOxum.payloadBytes}.${payloadOxum.numberOfPayloadFiles}
        |Bagging-Date: ${baggingDate.toString}
-       |$sourceOrganisationLine
        |$descriptionLine
        |$internalSenderIdentifierLine
        |$internalSenderDescriptionLine
