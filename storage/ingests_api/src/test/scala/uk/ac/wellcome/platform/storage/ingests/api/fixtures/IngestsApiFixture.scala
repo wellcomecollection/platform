@@ -36,9 +36,7 @@ trait IngestsApiFixture
   private def withApp[R](
     table: Table,
     topic: Topic,
-    metricsSender: MetricsSender,
-    httpServerConfig: HTTPServerConfig,
-    contextURL: URL)(testWith: TestWith[IngestsApi, R]): R =
+    metricsSender: MetricsSender)(testWith: TestWith[IngestsApi, R]): R =
     withSNSWriter(topic) { snsWriter =>
       withActorSystem { implicit actorSystem =>
         withMaterializer(actorSystem) { implicit materializer =>
@@ -68,7 +66,7 @@ trait IngestsApiFixture
     withLocalSnsTopic { topic =>
       val table = Table("does-not-exist", index = "does-not-exist")
       withMockMetricSender { metricsSender =>
-        withApp(table, topic, metricsSender, httpServerConfig, contextURL) {
+        withApp(table, topic, metricsSender) {
           _ =>
             testWith(
               (table, topic, metricsSender, httpServerConfig.externalBaseURL))
@@ -82,7 +80,7 @@ trait IngestsApiFixture
     withLocalSnsTopic { topic =>
       withProgressTrackerTable { table =>
         withMockMetricSender { metricsSender =>
-          withApp(table, topic, metricsSender, httpServerConfig, contextURL) {
+          withApp(table, topic, metricsSender) {
             _ =>
               testWith(
                 (table, topic, metricsSender, httpServerConfig.externalBaseURL))
