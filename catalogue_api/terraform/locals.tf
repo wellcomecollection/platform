@@ -35,6 +35,16 @@ locals {
   remus_task_number   = "${local.remus_is_prod == "true" ? 3 : 1}"
   romulus_task_number = "${local.romulus_is_prod == "true" ? 3 : 1}"
 
+  # Amber = the "frozen" V1 API
+
+  v1_amber_es_config = {
+    index_v1 = "v1-2019-01-24-production-changes"
+    index_v2 = "v2-2019-01-24-production-changes"
+    doc_type = "work"
+  }
+  v1_amber_app_uri     = "760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome/api:bc67ea53369f7255ffca55e72f04d19102e8c419"
+  v1_amber_task_number = 2
+
   # Catalogue API
 
   vpc_id                         = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_id}"

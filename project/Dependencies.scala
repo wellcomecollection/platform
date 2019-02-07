@@ -1,6 +1,11 @@
 import sbt._
 
 object WellcomeDependencies {
+  val fixturesLibrary: Seq[ModuleID] = library(
+    name = "fixtures",
+    version = "1.0.0"
+  )
+
   val jsonLibrary: Seq[ModuleID] = library(
     name = "json",
     version = "1.1.1"
@@ -8,17 +13,17 @@ object WellcomeDependencies {
 
   val messagingLibrary: Seq[ModuleID] = library(
     name = "messaging",
-    version = "1.1.0"
+    version = "1.1.2"
   )
 
   val monitoringLibrary: Seq[ModuleID] = library(
     name = "monitoring",
-    version = "1.2.0"
+    version = "1.2.1"
   )
 
   val storageLibrary: Seq[ModuleID] = library(
     name = "storage",
-    version = "3.1.0"
+    version = "3.2.1"
   )
 
   private def library(name: String, version: String): Seq[ModuleID] = Seq(
@@ -135,7 +140,7 @@ object Dependencies {
       loggingDependencies ++ Seq(
       "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
       "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-    ) ++ apacheCommons
+    ) ++ apacheCommons ++ WellcomeDependencies.fixturesLibrary
 
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
@@ -143,9 +148,16 @@ object Dependencies {
     elasticsearchDependencies ++
       circeOpticsDependencies ++
       guiceDependencies ++
-      scalacheckDependencies
+      scalacheckDependencies ++
+      WellcomeDependencies.fixturesLibrary
 
-  val apiDependencies: Seq[ModuleID] = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+  val apiDependencies: Seq[ModuleID] =
+    Seq(
+      "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    ) ++
+      finatraDependencies ++
+      guiceDependencies ++
+      WellcomeDependencies.fixturesLibrary
 
   val typesafeDependencies: Seq[ModuleID] = Seq(
     "com.typesafe" % "config" % versions.typesafe

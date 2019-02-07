@@ -12,7 +12,7 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_bib_merger.fixtures.WorkerServiceFixture
 import uk.ac.wellcome.sierra_adapter.utils.SierraAdapterHelpers
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 class SierraBibMergerWorkerServiceTest
     extends FunSpec

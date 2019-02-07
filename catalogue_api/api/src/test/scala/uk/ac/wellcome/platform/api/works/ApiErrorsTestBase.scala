@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.{Response, Status}
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 trait ApiErrorsTestBase { this: ApiWorksTestBase =>
   val apiPrefix: String

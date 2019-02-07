@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   ScanSpecScanner
 }
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

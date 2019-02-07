@@ -67,9 +67,8 @@ lazy val display = setupProject(project, "sbt_common/display",
   externalDependencies = Dependencies.commonDisplayDependencies
 )
 
-// Elasticsearch depends on some models in the common lib.
 lazy val elasticsearch = setupProject(project, "sbt_common/elasticsearch",
-  localDependencies = Seq(common, internal_model),
+  localDependencies = Seq(internal_model),
   externalDependencies = Dependencies.commonElasticsearchDependencies
 )
 
@@ -98,48 +97,48 @@ lazy val config_elasticsearch = setupProject(project, "sbt_common/config/elastic
 )
 
 lazy val api = setupProject(project, "catalogue_api/api",
-  localDependencies = Seq(common, internal_model, display, elasticsearch),
+  localDependencies = Seq(internal_model, display, elasticsearch),
   externalDependencies = Dependencies.apiDependencies
 )
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
 lazy val ingestor = setupProject(project, "catalogue_pipeline/ingestor",
-  localDependencies = Seq(common, config_elasticsearch, config_messaging)
+  localDependencies = Seq(config_elasticsearch, config_messaging)
 )
   .settings(Search.settings: _*)
 
 lazy val transformer_miro = setupProject(project,
   folder = "catalogue_pipeline/transformer/transformer_miro",
-  localDependencies = Seq(common, internal_model, config_messaging),
+  localDependencies = Seq(internal_model, config_messaging),
   externalDependencies = Dependencies.miroTransformerDependencies
 )
 
 lazy val transformer_sierra = setupProject(project,
   folder = "catalogue_pipeline/transformer/transformer_sierra",
-  localDependencies = Seq(common, internal_model, config_messaging)
+  localDependencies = Seq(internal_model, config_messaging)
 )
 
 lazy val merger = setupProject(project, "catalogue_pipeline/merger",
-  localDependencies = Seq(common, internal_model, config_messaging)
+  localDependencies = Seq(internal_model, config_messaging)
 )
 
 lazy val id_minter = setupProject(project, "catalogue_pipeline/id_minter",
-  localDependencies = Seq(common, internal_model, config_messaging),
+  localDependencies = Seq(internal_model, config_messaging),
   externalDependencies = Dependencies.idminterDependencies
 )
 
 lazy val recorder = setupProject(project, "catalogue_pipeline/recorder",
-  localDependencies = Seq(common, internal_model, config_messaging, config_storage)
+  localDependencies = Seq(internal_model, config_messaging, config_storage)
 )
 
 lazy val matcher = setupProject(project, "catalogue_pipeline/matcher",
-  localDependencies = Seq(common, internal_model, config_messaging, config_storage),
+  localDependencies = Seq(internal_model, config_messaging, config_storage),
   externalDependencies = Dependencies.scalaGraphDependencies
 )
 
 lazy val reindex_worker = setupProject(project, "reindexer/reindex_worker",
-  localDependencies = Seq(common, config_messaging, config_storage)
+  localDependencies = Seq(config_messaging, config_storage)
 )
 
 lazy val goobi_reader = setupProject(project, "goobi_adapter/goobi_reader",
@@ -152,26 +151,26 @@ lazy val sierra_adapter_common = setupProject(project, "sierra_adapter/common",
 )
 
 lazy val sierra_reader = setupProject(project, "sierra_adapter/sierra_reader",
-  localDependencies = Seq(common, sierra_adapter_common),
+  localDependencies = Seq(sierra_adapter_common),
   externalDependencies = Dependencies.sierraReaderDependencies
 )
 
 lazy val sierra_items_to_dynamo = setupProject(project,
   folder = "sierra_adapter/sierra_items_to_dynamo",
-  localDependencies = Seq(common, sierra_adapter_common)
+  localDependencies = Seq(sierra_adapter_common)
 )
 
 lazy val sierra_bib_merger = setupProject(project, "sierra_adapter/sierra_bib_merger",
-  localDependencies = Seq(common, sierra_adapter_common)
+  localDependencies = Seq(sierra_adapter_common)
 )
 
 lazy val sierra_item_merger = setupProject(project, "sierra_adapter/sierra_item_merger",
-  localDependencies = Seq(common, sierra_adapter_common)
+  localDependencies = Seq(sierra_adapter_common)
 )
 
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
   localDependencies = Seq(
-    common, internal_model, display, config_elasticsearch, config_messaging
+    internal_model, display, config_elasticsearch, config_messaging
   ),
   externalDependencies = Dependencies.snapshotGeneratorDependencies
 )
@@ -179,7 +178,7 @@ lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator
 // -- Storage
 
 lazy val storage_common = setupProject(project, "storage/common",
-  localDependencies = Seq(common, config_messaging, config_storage),
+  localDependencies = Seq(config_messaging, config_storage),
   externalDependencies = Dependencies.storageCommonDependencies
 )
 

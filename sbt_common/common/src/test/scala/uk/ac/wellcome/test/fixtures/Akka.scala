@@ -2,6 +2,7 @@ package uk.ac.wellcome.test.fixtures
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import uk.ac.wellcome.fixtures._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

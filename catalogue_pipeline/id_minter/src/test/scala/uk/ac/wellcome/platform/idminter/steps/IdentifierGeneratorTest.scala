@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.idminter.database.{
 }
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.util.{Failure, Success}
 

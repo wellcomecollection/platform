@@ -2,6 +2,7 @@ package uk.ac.wellcome.sierra_adapter.utils
 
 import io.circe.Decoder
 import org.scalatest.Assertion
+import uk.ac.wellcome.fixtures._
 import uk.ac.wellcome.messaging.fixtures.{MessageInfo, Messaging}
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.models.transformable.SierraTransformable
@@ -17,7 +18,6 @@ import uk.ac.wellcome.storage.vhs.{
   VersionedHybridStore
 }
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
