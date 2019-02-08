@@ -5,9 +5,9 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.common.progress.monitor.ProgressTracker
+import uk.ac.wellcome.storage.typesafe.DynamoBuilder
 import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 

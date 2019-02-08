@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.transformer.miro
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SQSBuilder}
-import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
@@ -12,6 +11,7 @@ import uk.ac.wellcome.platform.transformer.miro.services.{
   MiroVHSRecordReceiver
 }
 import uk.ac.wellcome.platform.transformer.miro.source.MiroRecord
+import uk.ac.wellcome.storage.typesafe.S3Builder
 import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 

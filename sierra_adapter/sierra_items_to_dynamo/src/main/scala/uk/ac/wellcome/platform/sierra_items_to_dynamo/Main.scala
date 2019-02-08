@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
-import uk.ac.wellcome.config.storage.builders.VHSBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -11,6 +10,7 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.{
   DynamoInserter,
   SierraItemsToDynamoWorkerService
 }
+import uk.ac.wellcome.storage.typesafe.VHSBuilder
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder

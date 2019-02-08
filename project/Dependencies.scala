@@ -2,7 +2,9 @@ import sbt._
 
 object WellcomeDependencies {
   lazy val versions = new {
+    val messaging  = "1.2.0"
     val monitoring = "1.3.0"
+    val storage    = "3.3.0"
     val typesafe   = "1.0.0"
   }
 
@@ -18,7 +20,12 @@ object WellcomeDependencies {
 
   val messagingLibrary: Seq[ModuleID] = library(
     name = "messaging",
-    version = "1.1.2"
+    version = versions.messaging
+  )
+
+  val messagingTypesafeLibrary: Seq[ModuleID] = library(
+    name = "messaging_typesafe",
+    version = versions.messaging
   )
 
   val monitoringLibrary: Seq[ModuleID] = library(
@@ -33,7 +40,12 @@ object WellcomeDependencies {
 
   val storageLibrary: Seq[ModuleID] = library(
     name = "storage",
-    version = "3.2.1"
+    version = versions.storage
+  )
+
+  val storageTypesafeLibrary: Seq[ModuleID] = library(
+    name = "storage_typesafe",
+    version = versions.storage
   )
 
   val typesafeLibrary: Seq[ModuleID] = library(
@@ -180,11 +192,10 @@ object Dependencies {
 
   val configMessagingDependencies: Seq[ModuleID] =
     WellcomeDependencies.messagingLibrary ++
-    WellcomeDependencies.monitoringTypesafeLibrary
+    WellcomeDependencies.monitoringTypesafeLibrary ++
+    WellcomeDependencies.storageTypesafeLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
-
-  val typesafeStorageDependencies: Seq[ModuleID] = WellcomeDependencies.storageLibrary ++ WellcomeDependencies.typesafeLibrary
 
   val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
@@ -198,9 +209,13 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
   ) ++ circeOpticsDependencies
 
+  val ingestorDependencies: Seq[ModuleID] = WellcomeDependencies.messagingTypesafeLibrary
+
   val miroTransformerDependencies: Seq[ModuleID] = Seq(
     "org.apache.commons" % "commons-lang3" % "3.1"
-  )
+  ) ++ WellcomeDependencies.messagingTypesafeLibrary
+
+  val sierraTransformerDependencies: Seq[ModuleID] = WellcomeDependencies.messagingTypesafeLibrary
 
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka

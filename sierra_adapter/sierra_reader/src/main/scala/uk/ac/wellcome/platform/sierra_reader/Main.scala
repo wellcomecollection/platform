@@ -4,13 +4,13 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.messaging.builders.SQSBuilder
-import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.sierra_reader.config.builders.{
   ReaderConfigBuilder,
   SierraAPIConfigBuilder
 }
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
+import uk.ac.wellcome.storage.typesafe.S3Builder
 import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
