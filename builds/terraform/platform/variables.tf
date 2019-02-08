@@ -8,3 +8,5 @@ variable "sbt_releases_bucket_arn" {
 
 variable "lambda_pushes_topic_name" {}
 variable "ecr_pushes_topic_name" {}
+
+variable "repo_name" {}
