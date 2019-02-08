@@ -12,13 +12,14 @@ SBT_SSM_APPS = notifier \
                bags_api \
                bag_replicator
 
-ECR_BASE_URI = 975596993436.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome
-REGISTRY_ID  = 975596993436
+
+ACCOUNT_ID = 975596993436
+PROJECT_ID = storage
 
 SBT_DOCKER_LIBRARIES    = storage_common ingests_common
 SBT_NO_DOCKER_LIBRARIES = bags_common storage_display
 
-PYTHON_SSM_APPS = bagger callback_stub_server
+PYTHON_SSM_APPS = bagger
 PYTHON_APPS     =
 LAMBDAS 	    = lambdas/trigger_bag_ingest
 

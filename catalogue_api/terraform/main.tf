@@ -37,7 +37,7 @@ module "data_api" {
 
   es_config_snapshot = "${local.prod_es_config}"
 
-  snapshot_generator_release_uri = "${local.snapshot_generator_release_uri}"
+  snapshot_generator_release_uri = "${local.snapshot_generator_image}"
 
   critical_slack_webhook = ""
 
@@ -48,5 +48,5 @@ module "data_api" {
 module "api_docs" {
   source = "api_docs"
 
-  update_api_docs_release_uri = "${local.update_api_docs_release_uri}"
+  update_api_docs_release_uri = "${local.update_api_docs_image}"
 }

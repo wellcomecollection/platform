@@ -1,15 +1,21 @@
-data "aws_ssm_parameter" "api_release_uri" {
-  name = "/releases/catalogue_api/latest/api"
+locals {
+  api_image   = "${module.images.services["api"]}"
+  nginx_image = "${module.images.services["nginx_api-gw"]}"
+
+  snapshot_generator_image = "${module.images.services["snapshot_generator"]}"
+  update_api_docs_image    = "${module.images.services["update_api_docs"]}"
 }
 
-data "aws_ssm_parameter" "api_nginx_release_uri" {
-  name = "/releases/catalogue_api/latest/nginx_api-gw"
-}
+module "images" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/images?ref=v19.8.0"
 
-data "aws_ssm_parameter" "snapshot_generator_release_uri" {
-  name = "/releases/data_api/latest/snapshot_generator"
-}
+  project = "catalogue_api"
+  label   = "latest"
 
-data "aws_ssm_parameter" "update_api_docs_release_uri" {
-  name = "/releases/catalogue_api/latest/update_api_docs"
+  services = [
+    "api",
+    "snapshot_generator",
+    "update_api_docs",
+    "nginx_api-gw",
+  ]
 }
