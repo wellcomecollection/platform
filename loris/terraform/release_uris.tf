@@ -1,7 +1,16 @@
-data "aws_ssm_parameter" "loris_release_uri" {
-  name = "/releases/loris/latest/loris"
+locals {
+  loris_image = "${module.images.services["loris"]}"
+  nginx_image = "${module.images.services["nginx_loris-delta"]}"
 }
 
-data "aws_ssm_parameter" "nginx_loris_release_uri" {
-  name = "/releases/loris/latest/nginx_loris-delta"
+module "images" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/images?ref=v19.8.0"
+
+  project = "loris"
+  label   = "latest"
+
+  services = [
+    "loris",
+    "nginx_loris-delta",
+  ]
 }

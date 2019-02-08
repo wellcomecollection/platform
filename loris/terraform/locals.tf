@@ -4,7 +4,4 @@ locals {
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_vpc_delta_private_subnets}"
 
   cloudfront_logs_bucket_domain_name = "${data.terraform_remote_state.shared_infra.cloudfront_logs_bucket_domain_name}"
-
-  loris_release_uri       = "${data.aws_ssm_parameter.loris_release_uri.value}"
-  nginx_loris_release_uri = "${data.aws_ssm_parameter.nginx_loris_release_uri.value}"
 }

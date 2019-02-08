@@ -11,8 +11,8 @@ module "loris-2019_01_30" {
   private_subnets = "${local.private_subnets}"
   public_subnets  = "${local.public_subnets}"
 
-  sidecar_container_image = "${local.nginx_loris_release_uri}"
-  app_container_image     = "${local.loris_release_uri}"
+  sidecar_container_image = "${local.nginx_image}"
+  app_container_image     = "${local.loris_image}"
 
   asg_desired        = 4
   task_desired_count = 4
