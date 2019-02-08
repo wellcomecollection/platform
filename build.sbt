@@ -174,11 +174,13 @@ lazy val notifier = setupProject(project, "storage/notifier",
 )
 
 lazy val bags_common = setupProject(project, "storage/bags_common",
-  localDependencies = Seq(storage_common)
+  localDependencies = Seq(storage_common),
+  externalDependencies = WellcomeDependencies.storageTypesafeLibrary
 )
 
 lazy val bags = setupProject(project, "storage/bags",
-  localDependencies = Seq(bags_common)
+  localDependencies = Seq(bags_common),
+  externalDependencies = Dependencies.bagsApiDependencies
 )
 
 lazy val bags_api = setupProject(project, "storage/bags_api",

@@ -8,7 +8,7 @@ import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
-import uk.ac.wellcome.storage.typesafe.{S3Builder, VHSBuilder}
+import uk.ac.wellcome.storage.typesafe.VHSBuilder
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
