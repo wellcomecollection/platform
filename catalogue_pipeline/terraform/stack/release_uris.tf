@@ -12,8 +12,8 @@ locals {
 module "images" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/images?ref=v19.8.0"
 
-  project  = "catalogue_pipeline"
-  label    = "${var.release_label}"
+  project = "catalogue_pipeline"
+  label   = "${var.release_label}"
 
   services = [
     "ingestor",
