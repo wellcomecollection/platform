@@ -5,9 +5,9 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.VHSBuilder
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
@@ -27,7 +27,7 @@ object Main extends WellcomeTypesafeApp {
 
     val httpMetrics = new HttpMetrics(
       name = "BagsApi",
-      metricsSender = MetricsBuilder.buildMetricsSender(config)
+      metricsSender = MetricsSenderBuilder.buildMetricsSender(config)
     )
 
     new BagsApi(

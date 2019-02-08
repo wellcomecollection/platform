@@ -82,13 +82,8 @@ lazy val config_storage = setupProject(project, "sbt_common/config/storage",
   externalDependencies = Dependencies.typesafeStorageDependencies
 )
 
-lazy val config_monitoring = setupProject(project, "sbt_common/config/monitoring",
-  localDependencies = Seq(config_core),
-  externalDependencies = Dependencies.typesafeMonitoringDependencies
-)
-
 lazy val config_messaging = setupProject(project, "sbt_common/config/messaging",
-  localDependencies = Seq(config_core, config_monitoring, config_storage),
+  localDependencies = Seq(config_core, config_storage),
   externalDependencies = Dependencies.configMessagingDependencies
 )
 
@@ -236,7 +231,6 @@ lazy val root = (project in file("."))
 
     config_core,
     config_messaging,
-    config_monitoring,
     config_storage,
 
     api,

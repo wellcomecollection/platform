@@ -6,8 +6,8 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
 import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.config.core.models.AWSClientConfig
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.messaging.sqs.{SQSClientFactory, SQSConfig, SQSStream}
+import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 
 object SQSBuilder extends AWSClientConfigBuilder {
   def buildSQSConfig(config: Config, namespace: String = ""): SQSConfig = {
@@ -54,6 +54,6 @@ object SQSBuilder extends AWSClientConfigBuilder {
     new SQSStream[T](
       sqsClient = buildSQSAsyncClient(config),
       sqsConfig = buildSQSConfig(config),
-      metricsSender = MetricsBuilder.buildMetricsSender(config)
+      metricsSender = MetricsSenderBuilder.buildMetricsSender(config)
     )
 }

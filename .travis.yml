@@ -43,7 +43,6 @@ cache:
     - sbt_common/config/core/target
     - sbt_common/config/elasticsearch/target
     - sbt_common/config/messaging/target
-    - sbt_common/config/monitoring/target
     - sbt_common/config/storage/target
     - sbt_common/display/target
     - sbt_common/elasticsearch/target

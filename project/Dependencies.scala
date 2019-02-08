@@ -1,6 +1,10 @@
 import sbt._
 
 object WellcomeDependencies {
+  lazy val versions = new {
+    val monitoring = "1.3.0"
+  }
+
   val fixturesLibrary: Seq[ModuleID] = library(
     name = "fixtures",
     version = "1.0.0"
@@ -18,7 +22,12 @@ object WellcomeDependencies {
 
   val monitoringLibrary: Seq[ModuleID] = library(
     name = "monitoring",
-    version = "1.2.1"
+    version = versions.monitoring
+  )
+
+  val monitoringTypesafeLibrary: Seq[ModuleID] = library(
+    name = "monitoring_typesafe",
+    version = versions.monitoring
   )
 
   val storageLibrary: Seq[ModuleID] = library(
@@ -165,7 +174,10 @@ object Dependencies {
 
   val typesafeCoreDependencies: Seq[ModuleID] = typesafeDependencies ++ akkaDependencies
 
-  val configMessagingDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.messagingLibrary
+  val configMessagingDependencies: Seq[ModuleID] =
+    typesafeDependencies ++
+    WellcomeDependencies.messagingLibrary ++
+    WellcomeDependencies.monitoringTypesafeLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 

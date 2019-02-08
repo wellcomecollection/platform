@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.messaging.builders.SQSBuilder
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
+import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 
 object MessagingBuilder {
@@ -12,6 +12,6 @@ object MessagingBuilder {
     new MessageStream[T, R](
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
       sqsConfig = SQSBuilder.buildSQSConfig(config),
-      metricsSender = MetricsBuilder.buildMetricsSender(config)
+      metricsSender = MetricsSenderBuilder.buildMetricsSender(config)
     )
 }

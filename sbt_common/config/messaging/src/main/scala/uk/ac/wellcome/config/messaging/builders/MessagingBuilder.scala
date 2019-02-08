@@ -3,13 +3,9 @@ package uk.ac.wellcome.config.messaging.builders
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.S3Builder
-import uk.ac.wellcome.messaging.message.{
-  MessageStream,
-  MessageWriter,
-  MessageWriterConfig
-}
+import uk.ac.wellcome.messaging.message.{MessageStream, MessageWriter, MessageWriterConfig}
+import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 
@@ -30,7 +26,7 @@ object MessagingBuilder {
       sqsClient = SQSBuilder.buildSQSAsyncClient(config),
       sqsConfig =
         SQSBuilder.buildSQSConfig(config, namespace = "message.reader"),
-      metricsSender = MetricsBuilder.buildMetricsSender(config)
+      metricsSender = MetricsSenderBuilder.buildMetricsSender(config)
     )
   }
 
