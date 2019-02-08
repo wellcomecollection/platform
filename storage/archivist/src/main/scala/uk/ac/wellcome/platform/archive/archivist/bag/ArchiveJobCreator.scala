@@ -3,11 +3,19 @@ import java.util.zip.ZipFile
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archive.archivist.models._
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{BagNotFoundError, FileNotFoundError}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  BagNotFoundError,
+  FileNotFoundError
+}
 import uk.ac.wellcome.platform.archive.archivist.zipfile.ZipFileReader
 import uk.ac.wellcome.platform.archive.common.bag.BagInfoParser
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagItemPath, BagLocation, BagPath, ExternalIdentifier}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagItemPath,
+  BagLocation,
+  BagPath,
+  ExternalIdentifier
+}
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
 
 import scala.util.{Failure, Success}
@@ -29,22 +37,27 @@ object ArchiveJobCreator extends Logging {
       case Success(bagInfoPath) =>
         getBagIdentifier(zipFile, bagInfoPath, ingestBagRequest)
           .map { externalIdentifier =>
-            val bagRootPathInZip = ZippedBagFile.bagPathFromBagInfoPath(bagInfoPath)
-            val tagManifestLocation = BagItemPath(bagRootPathInZip, config.bagItConfig.tagManifestFileName)
-            val bagManifestLocations = config.bagItConfig.digestNames.map(BagItemPath(bagRootPathInZip, _))
+            val bagRootPathInZip =
+              ZippedBagFile.bagPathFromBagInfoPath(bagInfoPath)
+            val tagManifestLocation = BagItemPath(
+              bagRootPathInZip,
+              config.bagItConfig.tagManifestFileName)
+            val bagManifestLocations = config.bagItConfig.digestNames
+              .map(BagItemPath(bagRootPathInZip, _))
             ArchiveJob(
               externalIdentifier = externalIdentifier,
               zipFile = zipFile,
               bagRootPathInZip = bagRootPathInZip,
               bagUploadLocation = BagLocation(
-                            storageNamespace = config.uploadConfig.uploadNamespace,
-                            storagePrefix = config.uploadConfig.uploadPrefix,
-                            storageSpace = ingestBagRequest.storageSpace,
-                            bagPath = BagPath(externalIdentifier.toString)
+                storageNamespace = config.uploadConfig.uploadNamespace,
+                storagePrefix = config.uploadConfig.uploadPrefix,
+                storageSpace = ingestBagRequest.storageSpace,
+                bagPath = BagPath(externalIdentifier.toString)
               ),
               tagManifestLocation = tagManifestLocation,
               bagManifestLocations = bagManifestLocations,
-              config = config.bagItConfig)
+              config = config.bagItConfig
+            )
           }
       case Failure(e) =>
         Left(BagNotFoundError(e.getMessage, ingestBagRequest))

@@ -10,10 +10,12 @@ case class BagItemPath(underlying: String) extends AnyVal {
 }
 
 object BagItemPath {
-  def apply(maybeBagRootPath: Option[String] = None, itemPath: String): BagItemPath = {
+  def apply(maybeBagRootPath: Option[String] = None,
+            itemPath: String): BagItemPath = {
     maybeBagRootPath match {
       case None => BagItemPath(itemPath)
-      case Some(bagRootPath) => BagItemPath(f"${rTrimPath(bagRootPath)}/${lTrimPath(itemPath)}")
+      case Some(bagRootPath) =>
+        BagItemPath(f"${rTrimPath(bagRootPath)}/${lTrimPath(itemPath)}")
     }
   }
 

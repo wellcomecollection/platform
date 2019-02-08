@@ -10,27 +10,32 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 object ZippedBagFile extends Logging {
-  private val endsWithBagInfoFilenameRegexp = (BagIt.BagInfoFilename+"$").r
+  private val endsWithBagInfoFilenameRegexp = (BagIt.BagInfoFilename + "$").r
 
   def bagPathFromBagInfoPath(bagInfo: String): Option[String] = {
-    endsWithBagInfoFilenameRegexp replaceFirstIn(bagInfo, "") match {
-      case "" => None
+    endsWithBagInfoFilenameRegexp replaceFirstIn (bagInfo, "") match {
+      case ""        => None
       case s: String => Some(s)
     }
   }
 
   def locateBagInfo(zipFile: ZipFile): Try[String] = Try {
-    zipFile.entries()
+    zipFile
+      .entries()
       .asScala
-      .filter { e => e.getName.split("/").last == BagIt.BagInfoFilename && !e.isDirectory }
+      .filter { e =>
+        e.getName.split("/").last == BagIt.BagInfoFilename && !e.isDirectory
+      }
       .map(_.getName)
       .toList match {
       case Seq(bagInfo) =>
         bagInfo
       case Seq() =>
-        throw new FileNotFoundException(s"'${BagIt.BagInfoFilename}' not found.")
-      case matchingBagInfoFiles:Seq[_] =>
-        throw new IllegalArgumentException(s"Expected only one '${BagIt.BagInfoFilename}' found $matchingBagInfoFiles.")
+        throw new FileNotFoundException(
+          s"'${BagIt.BagInfoFilename}' not found.")
+      case matchingBagInfoFiles: Seq[_] =>
+        throw new IllegalArgumentException(
+          s"Expected only one '${BagIt.BagInfoFilename}' found $matchingBagInfoFiles.")
     }
   }
 }

@@ -60,8 +60,8 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
       bagUploadLocation = bagLocation,
       tagManifestLocation = BagItemPath("tagmanifest-sha256.txt"),
       bagManifestLocations = List(
-            BagItemPath("manifest-sha256.txt"),
-            BagItemPath("tagmanifest-sha256.txt")
+        BagItemPath("manifest-sha256.txt"),
+        BagItemPath("tagmanifest-sha256.txt")
       ),
       config = BagItConfig()
     )

@@ -22,11 +22,11 @@ object BagDigestFileCreator {
     * location, or returns an error if the line is incorrectly formatted.
     *
     */
-  def create[T]( line: String,
-                 job: T,
-                 bagRootPathInZip: Option[String],
-                 manifestName: String
-  ): Either[ArchiveError[T], BagDigestFile] = {
+  def create[T](
+    line: String,
+    job: T,
+    bagRootPathInZip: Option[String],
+    manifestName: String): Either[ArchiveError[T], BagDigestFile] = {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
     line match {

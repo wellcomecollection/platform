@@ -12,13 +12,26 @@ import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{ArchiveCompletion, BagDownload}
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, BagNotFoundError, ChecksumNotMatchedOnUploadError}
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, FileDownloadComplete}
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{
+  ArchiveCompletion,
+  BagDownload
+}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveJobError,
+  BagNotFoundError,
+  ChecksumNotMatchedOnUploadError
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveJob,
+  FileDownloadComplete
+}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{
+  BagLocation,
+  BagPath
+}
 import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
@@ -148,8 +161,8 @@ class ArchiveZipFileFlowTest
                   Sink.seq)
 
               whenReady(verification) { result =>
-                result shouldBe List(
-                  Left(BagNotFoundError("'bag-info.txt' not found.", ingestContext)))
+                result shouldBe List(Left(
+                  BagNotFoundError("'bag-info.txt' not found.", ingestContext)))
 
                 assertTopicReceivesProgressStatusUpdate(
                   ingestContext.id,

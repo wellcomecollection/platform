@@ -4,8 +4,15 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveItemJobError, ArchiveJobError}
-import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveDigestItemJob, ArchiveItemJob, ArchiveJob}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{
+  ArchiveItemJobError,
+  ArchiveJobError
+}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  ArchiveDigestItemJob,
+  ArchiveItemJob,
+  ArchiveJob
+}
 import uk.ac.wellcome.platform.archive.common.flows.FoldEitherFlow
 import uk.ac.wellcome.platform.archive.common.models.bagit.BagDigestFile
 import uk.ac.wellcome.platform.archive.common.models.error.ArchiveError
