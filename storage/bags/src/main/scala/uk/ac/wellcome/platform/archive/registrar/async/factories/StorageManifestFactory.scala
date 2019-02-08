@@ -83,7 +83,10 @@ object StorageManifestFactory {
 
     triedLines.flatMap { lines: List[String] =>
       lines.traverse { line =>
-        BagDigestFileCreator.create(line=line, job=bagManifestUpdate, manifestName=name)
+        BagDigestFileCreator.create(
+          line = line,
+          job = bagManifestUpdate,
+          manifestName = name)
       }
     }
   }
