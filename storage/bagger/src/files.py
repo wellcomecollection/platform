@@ -59,7 +59,7 @@ def process_alto(root, bag_details, alto, skip_file_download):
             )
             try:
                 source_bucket.download_file(source, destination)
-            except ClientError as ce:
+            except ClientError:
                 # check for possible case mismatch on checksum
                 # we may need to come back and do more, but take it step by step
                 # e.g., do we need to do b/B as well?
