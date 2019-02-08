@@ -6,8 +6,8 @@ import com.typesafe.config.Config
 import uk.ac.wellcome.config.core.WellcomeTypesafeApp
 import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
-import uk.ac.wellcome.config.monitoring.builders.MetricsBuilder
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
+import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.HTTPServerBuilder
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics
 
@@ -23,7 +23,7 @@ object Main extends WellcomeTypesafeApp {
 
     val httpMetrics = new HttpMetrics(
       name = "IngestsApi",
-      metricsSender = MetricsBuilder.buildMetricsSender(config)
+      metricsSender = MetricsSenderBuilder.buildMetricsSender(config)
     )
 
     new IngestsApi(

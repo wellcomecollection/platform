@@ -3,7 +3,6 @@
   "folder" : "sbt_common/config/messaging",
   "dependencyIds" : [
     "config_core",
-    "config_monitoring",
     "config_storage"
   ]
 }
