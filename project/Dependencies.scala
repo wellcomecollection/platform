@@ -161,14 +161,6 @@ object Dependencies {
     "com.github.tomakehurst" % "wiremock" % versions.wiremockVersion % "test"
   )
 
-  // Internal Library dependency groups
-  val commonDependencies =
-    testDependencies ++
-      loggingDependencies ++ Seq(
-      "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
-      "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
-    ) ++ apacheCommons ++ WellcomeDependencies.fixturesLibrary
-
   val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
   val commonElasticsearchDependencies: Seq[ModuleID] =

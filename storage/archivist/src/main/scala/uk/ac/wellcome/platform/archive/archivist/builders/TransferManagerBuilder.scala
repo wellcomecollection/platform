@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.archivist.builders
 
 import com.amazonaws.services.s3.transfer.TransferManager
-import com.amazonaws.services.s3.{AmazonS3, transfer}
+import com.amazonaws.services.s3.{transfer, AmazonS3}
 import com.typesafe.config.Config
 import uk.ac.wellcome.storage.typesafe.S3Builder
 

@@ -50,3 +50,26 @@ class Repository:
             self.projects[name] = project
 
         return self.projects[name]
+
+
+if __name__ == "__main__":
+    repo = Repository("builds/sbt_metadata")
+    while True:
+        no_deps = [k for k, v in repo.projects.items() if not v.dependencies]
+        for d in no_deps:
+            print(d)
+
+        for k in no_deps:
+            del repo.projects[k]
+
+        for k, v in repo.projects.items():
+            for d in no_deps:
+                v.dependencies = [dd for dd in v.dependencies if dd.name != d]
+
+        if not repo.projects:
+            break
+
+        print("~~~")
+        # break
+
+    # print(repo.projects)

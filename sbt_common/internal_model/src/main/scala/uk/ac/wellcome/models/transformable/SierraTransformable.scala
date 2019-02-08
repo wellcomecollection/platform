@@ -11,8 +11,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
 case class SierraTransformable(
   sierraId: SierraBibNumber,
   maybeBibRecord: Option[SierraBibRecord] = None,
-  itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map()
-)
+  itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map())
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =

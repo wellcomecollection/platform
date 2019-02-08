@@ -6,11 +6,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
-import uk.ac.wellcome.storage.typesafe.{
-  DynamoBuilder,
-  S3Builder,
-  VHSBuilder
-}
+import uk.ac.wellcome.storage.typesafe.{DynamoBuilder, S3Builder, VHSBuilder}
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
