@@ -17,16 +17,11 @@ case class DisplayBagInfo(
 
 object DisplayBagInfo {
   def apply(bagInfo: BagInfo): DisplayBagInfo = DisplayBagInfo(
-    externalIdentifier =
-      bagInfo.externalIdentifier.underlying,
-    payloadOxum =
-      bagInfo.payloadOxum.toString,
-    baggingDate =
-      bagInfo.baggingDate.toString,
-    sourceOrganization =
-      bagInfo.sourceOrganisation.map(_.underlying),
-    externalDescription =
-      bagInfo.externalDescription.map(_.underlying),
+    externalIdentifier = bagInfo.externalIdentifier.underlying,
+    payloadOxum = bagInfo.payloadOxum.toString,
+    baggingDate = bagInfo.baggingDate.toString,
+    sourceOrganization = bagInfo.sourceOrganisation.map(_.underlying),
+    externalDescription = bagInfo.externalDescription.map(_.underlying),
     internalSenderIdentifier =
       bagInfo.internalSenderIdentifier.map(_.underlying),
     internalSenderDescription =
