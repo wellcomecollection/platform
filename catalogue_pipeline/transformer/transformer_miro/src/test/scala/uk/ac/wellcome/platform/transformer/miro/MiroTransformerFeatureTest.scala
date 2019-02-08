@@ -14,7 +14,8 @@ import uk.ac.wellcome.platform.transformer.miro.transformers.MiroTransformableWr
 import uk.ac.wellcome.platform.transformer.miro.services.MiroTransformerWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

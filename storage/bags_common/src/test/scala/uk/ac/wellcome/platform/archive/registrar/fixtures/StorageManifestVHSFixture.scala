@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.{
   VHSIndexEntry,
   VersionedHybridStore
 }
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -22,13 +22,10 @@ trait StorageManifestVHSFixture extends LocalVersionedHybridStore {
                                                  EmptyMetadata,
                                                  ObjectStore[StorageManifest]]
 
-  def withStorageManifestVHS[R](
-    table: Table,
-    bucket: Bucket,
-    s3Prefix: String = "")(testWith: TestWith[StorageManifestVHS, R]): R =
-    withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table, s3Prefix) {
-      vhs =>
-        testWith(vhs)
+  def withStorageManifestVHS[R](table: Table, bucket: Bucket)(
+    testWith: TestWith[StorageManifestVHS, R]): R =
+    withTypeVHS[StorageManifest, EmptyMetadata, R](bucket, table) { vhs =>
+      testWith(vhs)
     }
 
   def storeSingleManifest(

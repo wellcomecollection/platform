@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.works.v1
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.platform.api.works.ApiErrorsTestBase
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.fixtures.TestWith
 
 class ApiV1ErrorsTest extends ApiV1WorksTestBase with ApiErrorsTestBase {
   def withServer[R](testWith: TestWith[EmbeddedHttpServer, R]): R =

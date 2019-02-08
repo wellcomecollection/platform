@@ -42,6 +42,22 @@ module "remus" {
   ]
 }
 
+module "v1_amber" {
+  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/stage?ref=v17.0.0"
+
+  stage_name = "v1_amber"
+  api_id     = "${aws_api_gateway_rest_api.api.id}"
+
+  variables = {
+    port = "${local.v1_amber_listener_port}"
+  }
+
+  depends_on = [
+    "${module.root_resource_integration.uri}",
+    "${module.simple_integration.uri}",
+  ]
+}
+
 # Base path mappings
 
 resource "aws_api_gateway_base_path_mapping" "catalogue_stage" {
@@ -82,7 +98,7 @@ module "root_resource_integration" {
 }
 
 module "simple_resource" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/resource?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//api_gateway/modules/resource?ref=v14.2.0"
 
   api_id = "${aws_api_gateway_rest_api.api.id}"
 
@@ -95,7 +111,7 @@ module "simple_resource" {
 }
 
 module "simple_integration" {
-  source = "git::https://github.com/wellcometrust/terraform.git//api_gateway/modules/integration/proxy?ref=v14.2.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//api_gateway/modules/integration/proxy?ref=v14.2.0"
 
   api_id        = "${aws_api_gateway_rest_api.api.id}"
   resource_id   = "${module.simple_resource.resource_id}"

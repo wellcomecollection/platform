@@ -115,7 +115,7 @@ jobs:
     #
     # When this job runs, all the Lambdas get tested at once, but even this
     # isn't significantly longer than a Scala test.
-    #
+
     - stage: test
       env:
         - TRAVIS_LAMBDAS="snapshot_scheduler \
@@ -129,7 +129,7 @@ jobs:
         - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - env: TASK=api-test
+    - env: TASK=api-build
     # (not under active development)
     # - env: TASK=api_docs-build
 

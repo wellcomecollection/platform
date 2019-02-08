@@ -17,6 +17,10 @@ module "catalogue_api" {
   romulus_es_config       = "${local.romulus_es_config}"
   romulus_task_number     = "${local.romulus_task_number}"
 
+  v1_amber_container_image = "${local.v1_amber_app_uri}"
+  v1_amber_es_config       = "${local.v1_amber_es_config}"
+  v1_amber_task_number     = "${local.v1_amber_task_number}"
+
   nginx_container_image = "${local.nginx_container_uri}"
 
   production_api = "${local.production_api}"

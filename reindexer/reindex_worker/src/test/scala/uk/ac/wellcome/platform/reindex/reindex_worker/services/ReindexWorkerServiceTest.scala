@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.reindex.reindex_worker.fixtures.{
   ReindexableTable,
   WorkerServiceFixture
 }
-import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.CompleteReindexParameters
 import uk.ac.wellcome.storage.ObjectLocation

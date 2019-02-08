@@ -21,7 +21,8 @@ import uk.ac.wellcome.platform.archive.registrar.async.Registrar
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, S3}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.platform.archive.registrar.fixtures.StorageManifestVHSFixture
 
 trait RegistrarFixtures
