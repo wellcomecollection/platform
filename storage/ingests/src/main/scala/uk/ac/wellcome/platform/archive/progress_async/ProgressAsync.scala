@@ -7,7 +7,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.messaging.{
@@ -20,6 +19,7 @@ import uk.ac.wellcome.platform.archive.progress_async.flows.{
   CallbackNotificationFlow,
   ProgressUpdateFlow
 }
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.Future
 

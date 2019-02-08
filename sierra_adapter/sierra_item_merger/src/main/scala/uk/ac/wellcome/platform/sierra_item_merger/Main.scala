@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.config.storage.builders.S3Builder
 import uk.ac.wellcome.json.JsonUtil._
@@ -14,6 +12,8 @@ import uk.ac.wellcome.platform.sierra_item_merger.services.{
   SierraItemMergerWorkerService
 }
 import uk.ac.wellcome.sierra_adapter.config.builders.SierraTransformableVHSBuilder
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 import scala.concurrent.ExecutionContext
 

@@ -3,8 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.elasticsearch.builders.ElasticBuilder
 import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -13,6 +11,8 @@ import uk.ac.wellcome.platform.snapshot_generator.services.{
   SnapshotGeneratorWorkerService,
   SnapshotService
 }
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 import scala.concurrent.ExecutionContext
 

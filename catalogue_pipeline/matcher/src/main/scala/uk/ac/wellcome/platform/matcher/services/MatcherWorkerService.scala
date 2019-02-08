@@ -3,13 +3,13 @@ package uk.ac.wellcome.platform.matcher.services
 import akka.Done
 import akka.actor.ActorSystem
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.models.VersionExpectedConflictException
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.{ExecutionContext, Future}
 

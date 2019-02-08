@@ -17,7 +17,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.{
   AbstractSierraRecord,
@@ -29,6 +28,7 @@ import uk.ac.wellcome.platform.sierra_reader.config.models.{
   ReaderConfig,
   SierraAPIConfig
 }
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._

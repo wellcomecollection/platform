@@ -2,14 +2,14 @@ package uk.ac.wellcome.platform.ingestor
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.elasticsearch.builders.ElasticBuilder
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.platform.ingestor.config.builders.IngestorConfigBuilder
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 import scala.concurrent.ExecutionContext
 

@@ -1,14 +1,14 @@
 package uk.ac.wellcome.platform.reindex.reindex_worker.services
 
 import akka.Done
-import uk.ac.wellcome.Runnable
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.reindex.reindex_worker.models.{
   ReindexJobConfig,
   ReindexRequest
 }
-import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.{ExecutionContext, Future}
 

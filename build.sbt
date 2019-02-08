@@ -54,10 +54,6 @@ def setupProject(
     .settings(libraryDependencies ++= externalDependencies)
 }
 
-lazy val common = setupProject(project, "sbt_common/common",
-  externalDependencies = Dependencies.commonDependencies
-)
-
 lazy val internal_model = setupProject(project, "sbt_common/internal_model",
   externalDependencies = Dependencies.internalModelDependencies
 )
@@ -72,23 +68,18 @@ lazy val elasticsearch = setupProject(project, "sbt_common/elasticsearch",
   externalDependencies = Dependencies.commonElasticsearchDependencies
 )
 
-lazy val config_core = setupProject(project, "sbt_common/config/core",
-  localDependencies = Seq(common),
-  externalDependencies = Dependencies.typesafeCoreDependencies
-)
-
 lazy val config_storage = setupProject(project, "sbt_common/config/storage",
-  localDependencies = Seq(config_core),
   externalDependencies = Dependencies.typesafeStorageDependencies
 )
 
 lazy val config_messaging = setupProject(project, "sbt_common/config/messaging",
-  localDependencies = Seq(config_core, config_storage),
+  localDependencies = Seq(config_storage),
   externalDependencies = Dependencies.configMessagingDependencies
 )
 
 lazy val config_elasticsearch = setupProject(project, "sbt_common/config/elasticsearch",
-  localDependencies = Seq(config_core, elasticsearch)
+  localDependencies = Seq(elasticsearch),
+  externalDependencies = WellcomeDependencies.typesafeLibrary
 )
 
 lazy val api = setupProject(project, "catalogue_api/api",
@@ -223,13 +214,10 @@ lazy val bag_replicator = setupProject(project, "storage/bag_replicator",
 
 lazy val root = (project in file("."))
   .aggregate(
-    common,
-
     internal_model,
     display,
     elasticsearch,
 
-    config_core,
     config_messaging,
     config_storage,
 

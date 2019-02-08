@@ -8,7 +8,6 @@ import akka.event.{Logging, LoggingAdapter}
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishResult
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.messaging.{
@@ -17,6 +16,7 @@ import uk.ac.wellcome.platform.archive.common.messaging.{
 }
 import uk.ac.wellcome.platform.archive.common.models.CallbackNotification
 import uk.ac.wellcome.platform.archive.notifier.flows.NotificationFlow
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.Future
 

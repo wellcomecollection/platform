@@ -10,7 +10,6 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import grizzled.slf4j.Logging
 import io.circe.Encoder
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.bagreplicator.config.{
@@ -32,6 +31,7 @@ import uk.ac.wellcome.platform.archive.common.models.{
   ReplicationResult
 }
 import uk.ac.wellcome.platform.archive.common.progress.models._
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
