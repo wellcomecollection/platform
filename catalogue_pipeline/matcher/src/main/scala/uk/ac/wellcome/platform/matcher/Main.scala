@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.matcher
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.config.storage.builders.DynamoBuilder
 import uk.ac.wellcome.json.JsonUtil._
@@ -13,6 +11,8 @@ import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoRowL
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 import scala.concurrent.ExecutionContext
 

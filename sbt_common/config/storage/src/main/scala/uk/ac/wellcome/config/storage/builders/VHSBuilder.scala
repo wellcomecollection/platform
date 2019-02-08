@@ -1,12 +1,12 @@
 package uk.ac.wellcome.config.storage.builders
 
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 import uk.ac.wellcome.storage.vhs.{VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 import scala.concurrent.ExecutionContext
 

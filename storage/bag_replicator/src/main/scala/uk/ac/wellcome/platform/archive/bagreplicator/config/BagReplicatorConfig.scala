@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.bagreplicator.config
 
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 case class BagReplicatorConfig(
   parallelism: Int,

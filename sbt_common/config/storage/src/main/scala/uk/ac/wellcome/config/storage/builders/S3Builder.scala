@@ -2,12 +2,12 @@ package uk.ac.wellcome.config.storage.builders
 
 import com.amazonaws.services.s3.AmazonS3
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
-import uk.ac.wellcome.config.core.models.AWSClientConfig
+import uk.ac.wellcome.config.models.AWSClientConfig
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
+import uk.ac.wellcome.typesafe.config.builders.AWSClientConfigBuilder
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 import scala.concurrent.ExecutionContext
 

@@ -3,8 +3,6 @@ package uk.ac.wellcome.platform.idminter
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import io.circe.Json
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.platform.idminter.config.builders.{
   IdentifiersTableBuilder,
@@ -14,6 +12,8 @@ import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.IdentifiersTable
 import uk.ac.wellcome.platform.idminter.services.IdMinterWorkerService
 import uk.ac.wellcome.platform.idminter.steps.{IdEmbedder, IdentifierGenerator}
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 import scala.concurrent.ExecutionContext
 

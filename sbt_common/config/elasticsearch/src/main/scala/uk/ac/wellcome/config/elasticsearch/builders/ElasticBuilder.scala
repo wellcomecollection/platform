@@ -3,8 +3,8 @@ package uk.ac.wellcome.config.elasticsearch.builders
 import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.elasticsearch.{DisplayElasticConfig, ElasticClientBuilder}
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 object ElasticBuilder {
   def buildElasticClient(config: Config): ElasticClient = {

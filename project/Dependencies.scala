@@ -3,6 +3,7 @@ import sbt._
 object WellcomeDependencies {
   lazy val versions = new {
     val monitoring = "1.3.0"
+    val typesafe   = "1.0.0"
   }
 
   val fixturesLibrary: Seq[ModuleID] = library(
@@ -33,6 +34,11 @@ object WellcomeDependencies {
   val storageLibrary: Seq[ModuleID] = library(
     name = "storage",
     version = "3.2.1"
+  )
+
+  val typesafeLibrary: Seq[ModuleID] = library(
+    name = "typesafe-app",
+    version = versions.typesafe
   )
 
   private def library(name: String, version: String): Seq[ModuleID] = Seq(
@@ -172,16 +178,13 @@ object Dependencies {
     "com.typesafe" % "config" % versions.typesafe
   )
 
-  val typesafeCoreDependencies: Seq[ModuleID] = typesafeDependencies ++ akkaDependencies
-
   val configMessagingDependencies: Seq[ModuleID] =
-    typesafeDependencies ++
     WellcomeDependencies.messagingLibrary ++
     WellcomeDependencies.monitoringTypesafeLibrary
 
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 
-  val typesafeStorageDependencies: Seq[ModuleID] = akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary
+  val typesafeStorageDependencies: Seq[ModuleID] = WellcomeDependencies.storageLibrary ++ WellcomeDependencies.typesafeLibrary
 
   val internalModelDependencies = Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv

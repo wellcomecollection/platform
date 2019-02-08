@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.idminter.config.builders
 
 import com.typesafe.config.Config
 import scalikejdbc.{ConnectionPool, ConnectionPoolSettings, DB}
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.idminter.config.models.RDSClientConfig
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 object RDSBuilder {
   def buildDB(config: Config): DB = {

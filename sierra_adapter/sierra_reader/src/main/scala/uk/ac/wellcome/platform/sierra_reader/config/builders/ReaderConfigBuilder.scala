@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.sierra_reader.config.builders
 
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.builders.EnrichConfig._
 import uk.ac.wellcome.platform.sierra_reader.config.models.ReaderConfig
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes.{
   bibs,
   items
 }
+import uk.ac.wellcome.typesafe.config.builders.EnrichConfig._
 
 object ReaderConfigBuilder {
   def buildReaderConfig(config: Config): ReaderConfig = {

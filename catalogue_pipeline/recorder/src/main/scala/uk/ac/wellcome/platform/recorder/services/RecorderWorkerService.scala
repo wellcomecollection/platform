@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.recorder.services
 
 import akka.Done
-import uk.ac.wellcome.Runnable
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.message.{
   MessageNotification,
@@ -17,6 +16,7 @@ import uk.ac.wellcome.storage.vhs.{
   VHSIndexEntry,
   VersionedHybridStore
 }
+import uk.ac.wellcome.typesafe.Runnable
 
 import scala.concurrent.{ExecutionContext, Future}
 

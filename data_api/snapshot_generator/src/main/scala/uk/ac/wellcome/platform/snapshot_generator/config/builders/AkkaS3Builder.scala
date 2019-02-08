@@ -5,17 +5,12 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.impl.ListBucketVersion2
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{
-  AWSCredentialsProvider,
-  AWSStaticCredentialsProvider,
-  BasicAWSCredentials,
-  DefaultAWSCredentialsProviderChain
-}
+import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.AwsRegionProvider
 import com.typesafe.config.Config
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.config.core.builders.AWSClientConfigBuilder
-import uk.ac.wellcome.config.core.models.AWSClientConfig
+import uk.ac.wellcome.config.models.AWSClientConfig
+import uk.ac.wellcome.typesafe.config.builders.AWSClientConfigBuilder
 
 object AkkaS3Builder extends AWSClientConfigBuilder with Logging {
 

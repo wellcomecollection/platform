@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.archive.registrar.async
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.core.WellcomeTypesafeApp
-import uk.ac.wellcome.config.core.builders.AkkaBuilder
 import uk.ac.wellcome.config.messaging.builders.SNSBuilder
 import uk.ac.wellcome.config.storage.builders.{S3Builder, VHSBuilder}
 import uk.ac.wellcome.json.JsonUtil._
@@ -11,6 +9,8 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.platform.archive.common.config.builders._
 import uk.ac.wellcome.platform.archive.registrar.common.models.StorageManifest
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
+import uk.ac.wellcome.typesafe.WellcomeTypesafeApp
+import uk.ac.wellcome.typesafe.config.builders.AkkaBuilder
 
 object Main extends WellcomeTypesafeApp {
   runWithConfig { config: Config =>
