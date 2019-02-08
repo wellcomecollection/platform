@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.recorder
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.typesafe.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
 import uk.ac.wellcome.storage.typesafe.VHSBuilder

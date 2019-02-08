@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.sierra_reader
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.SQSBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.typesafe.SQSBuilder
 import uk.ac.wellcome.platform.sierra_reader.config.builders.{
   ReaderConfigBuilder,
   SierraAPIConfigBuilder

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.idminter
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import io.circe.Json
-import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
+import uk.ac.wellcome.messaging.typesafe.MessagingBuilder
 import uk.ac.wellcome.platform.idminter.config.builders.{
   IdentifiersTableBuilder,
   RDSBuilder

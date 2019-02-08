@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.reindex.reindex_worker
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.typesafe.{SNSBuilder, SQSBuilder}
 import uk.ac.wellcome.platform.reindex.reindex_worker.config.ReindexJobConfigBuilder
 import uk.ac.wellcome.platform.reindex.reindex_worker.dynamo.{
   MaxRecordsScanner,

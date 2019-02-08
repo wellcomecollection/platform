@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archive.common.config.builders
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.SQSBuilder
+import uk.ac.wellcome.messaging.typesafe.SQSBuilder
 import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
 

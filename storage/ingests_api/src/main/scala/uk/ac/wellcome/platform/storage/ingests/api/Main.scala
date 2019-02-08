@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.storage.ingests.api
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.SNSBuilder
+import uk.ac.wellcome.messaging.typesafe.SNSBuilder
 import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.HTTPServerBuilder
 import uk.ac.wellcome.platform.archive.common.http.HttpMetrics

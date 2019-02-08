@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.ingestor
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import uk.ac.wellcome.config.elasticsearch.builders.ElasticBuilder
-import uk.ac.wellcome.config.messaging.builders.MessagingBuilder
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.typesafe.MessagingBuilder
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.platform.ingestor.config.builders.IngestorConfigBuilder
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService

@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.matcher
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.typesafe.{MessagingBuilder, SNSBuilder}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.typesafe.MetricsSenderBuilder
 import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, DynamoRowLockDao}

@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.archive.archivist
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.SNSBuilder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.typesafe.SNSBuilder
 import uk.ac.wellcome.platform.archive.archivist.builders.TransferManagerBuilder
 import uk.ac.wellcome.platform.archive.archivist.config.BagUploaderConfigBuilder
 import uk.ac.wellcome.platform.archive.common.config.builders.MessagingBuilder

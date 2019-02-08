@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.transformer.sierra
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import uk.ac.wellcome.config.messaging.builders.{MessagingBuilder, SQSBuilder}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.typesafe.{MessagingBuilder, SQSBuilder}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
