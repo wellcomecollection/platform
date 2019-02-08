@@ -11,6 +11,6 @@ object TransferManagerBuilder {
       .withS3Client(s3Client)
       .build
 
-  def buildTransformerManager(config: Config): TransferManager =
+  def buildTransferManager(config: Config): TransferManager =
     buildTransferManager(S3Builder.buildS3Client(config))
 }
