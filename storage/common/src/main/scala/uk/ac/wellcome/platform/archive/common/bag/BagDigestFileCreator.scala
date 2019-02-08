@@ -25,7 +25,7 @@ object BagDigestFileCreator {
   def create[T](
     line: String,
     job: T,
-    bagRootPathInZip: Option[String],
+    bagRootPathInZip: Option[String] = None,
     manifestName: String): Either[ArchiveError[T], BagDigestFile] = {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
