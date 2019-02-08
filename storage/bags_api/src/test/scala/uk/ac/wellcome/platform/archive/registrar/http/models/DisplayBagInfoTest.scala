@@ -11,8 +11,8 @@ class DisplayBagInfoTest extends FunSpec with RandomThings with Matchers {
     DisplayBagInfo(bagInfo) shouldBe DisplayBagInfo(
       bagInfo.externalIdentifier.underlying,
       s"${bagInfo.payloadOxum.payloadBytes}.${bagInfo.payloadOxum.numberOfPayloadFiles}",
-      bagInfo.sourceOrganisation.underlying,
       bagInfo.baggingDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+      Some(bagInfo.sourceOrganisation.get.underlying),
       Some(bagInfo.externalDescription.get.underlying),
       Some(bagInfo.internalSenderIdentifier.get.underlying),
       Some(bagInfo.internalSenderDescription.get.underlying),
