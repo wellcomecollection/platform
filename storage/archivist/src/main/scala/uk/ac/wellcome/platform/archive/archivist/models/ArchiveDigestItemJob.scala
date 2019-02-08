@@ -10,7 +10,7 @@ case class ArchiveDigestItemJob(archiveJob: ArchiveJob,
                                 bagDigestItem: BagDigestFile) {
   def uploadLocation: ObjectLocation = {
     val bagItemLocation = BagItemLocation(
-      bagLocation = archiveJob.bagLocation,
+      bagLocation = archiveJob.bagUploadLocation,
       bagItemPath = bagDigestItem.path
     )
 

@@ -39,10 +39,12 @@ class ArchiveJobCreatorTest
             ArchiveJob(
               bagIdentifier,
               actualZipFile,
+              None,
               bagLocation,
-              bagItConfig,
-              bagManifestLocations)) =>
-          actualZipFile.size() shouldBe (new ZipFile(file)).size()
+              tagManifestLocation,
+              bagManifestLocations,
+              bagItConfig)) =>
+          actualZipFile.size() shouldBe new ZipFile(file).size()
           bagLocation shouldBe BagLocation(
             storageNamespace = bucketName,
             storagePrefix = "archive",
@@ -50,6 +52,7 @@ class ArchiveJobCreatorTest
             bagPath = BagPath(bagIdentifier.toString)
           )
           bagItConfig shouldBe BagItConfig()
+          tagManifestLocation shouldBe BagItemPath("tagmanifest-sha256.txt")
           bagManifestLocations should contain only (BagItemPath(
             "tagmanifest-sha256.txt"), BagItemPath("manifest-sha256.txt"))
       }

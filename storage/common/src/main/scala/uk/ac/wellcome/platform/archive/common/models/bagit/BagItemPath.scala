@@ -10,6 +10,21 @@ case class BagItemPath(underlying: String) extends AnyVal {
 }
 
 object BagItemPath {
+  def apply(maybeBagRootPath: Option[String] = None, itemPath: String): BagItemPath = {
+    maybeBagRootPath match {
+      case None => BagItemPath(itemPath)
+      case Some(bagRootPath) => BagItemPath(f"${rTrimPath(bagRootPath)}/${lTrimPath(itemPath)}")
+    }
+  }
+
+  private def lTrimPath(path: String): String = {
+    path.replaceAll("^/", "")
+  }
+
+  private def rTrimPath(path: String): String = {
+    path.replaceAll("/$", "")
+  }
+
   implicit val encoder: Encoder[BagItemPath] = Encoder.instance[BagItemPath] {
     space: BagItemPath =>
       Json.fromString(space.toString)

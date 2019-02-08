@@ -9,7 +9,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 case class ArchiveItemJob(archiveJob: ArchiveJob, bagItemPath: BagItemPath) {
   def uploadLocation: ObjectLocation = {
     val bagItemLocation = BagItemLocation(
-      bagLocation = archiveJob.bagLocation,
+      bagLocation = archiveJob.bagUploadLocation,
       bagItemPath = bagItemPath
     )
 

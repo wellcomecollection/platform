@@ -61,7 +61,7 @@ object ArchiveItemJobCreator {
         .filter { _.nonEmpty }
         .traverse { line =>
           BagDigestFileCreator
-            .create(line.trim(), job, zipLocation.bagItemPath.toString)
+            .create(line.trim(), job, job.bagRootPathInZip, zipLocation.bagItemPath.toString)
             .map { bagItem =>
               ArchiveDigestItemJob(archiveJob = job, bagDigestItem = bagItem)
             }

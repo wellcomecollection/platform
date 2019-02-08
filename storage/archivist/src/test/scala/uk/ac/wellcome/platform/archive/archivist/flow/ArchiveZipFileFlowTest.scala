@@ -7,35 +7,22 @@ import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Inside, Matchers}
+import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.messaging.fixtures.SNS
 import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.archive.archivist.fixtures.ArchivistFixtures
 import uk.ac.wellcome.platform.archive.archivist.generators.BagUploaderConfigGenerators
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  ArchiveJob,
-  FileDownloadComplete
-}
-import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{
-  ArchiveCompletion,
-  BagDownload
-}
-import uk.ac.wellcome.platform.archive.archivist.models.errors.{
-  ArchiveJobError,
-  ChecksumNotMatchedOnUploadError,
-  FileNotFoundError
-}
+import uk.ac.wellcome.platform.archive.archivist.models.TypeAliases.{ArchiveCompletion, BagDownload}
+import uk.ac.wellcome.platform.archive.archivist.models.errors.{ArchiveJobError, BagNotFoundError, ChecksumNotMatchedOnUploadError}
+import uk.ac.wellcome.platform.archive.archivist.models.{ArchiveJob, FileDownloadComplete}
 import uk.ac.wellcome.platform.archive.common.fixtures.FileEntry
 import uk.ac.wellcome.platform.archive.common.generators.IngestBagRequestGenerators
-import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.models._
-import uk.ac.wellcome.platform.archive.common.models.bagit.{
-  BagLocation,
-  BagPath
-}
+import uk.ac.wellcome.platform.archive.common.models.bagit.{BagLocation, BagPath}
+import uk.ac.wellcome.platform.archive.common.models.error.InvalidBagManifestError
 import uk.ac.wellcome.platform.archive.common.progress.ProgressUpdateAssertions
 import uk.ac.wellcome.platform.archive.common.progress.models.Progress
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.fixtures.TestWith
 import uk.ac.wellcome.test.fixtures.Akka
 
 import scala.collection.JavaConverters._
@@ -162,7 +149,7 @@ class ArchiveZipFileFlowTest
 
               whenReady(verification) { result =>
                 result shouldBe List(
-                  Left(FileNotFoundError("bag-info.txt", ingestContext)))
+                  Left(BagNotFoundError("'bag-info.txt' not found.", ingestContext)))
 
                 assertTopicReceivesProgressStatusUpdate(
                   ingestContext.id,
@@ -213,7 +200,7 @@ class ArchiveZipFileFlowTest
                         archiveJob shouldBe a[ArchiveJob]
                         archiveJob
                           .asInstanceOf[ArchiveJob]
-                          .bagLocation shouldBe BagLocation(
+                          .bagUploadLocation shouldBe BagLocation(
                           storageNamespace = storageBucket.name,
                           storagePrefix = "archive",
                           storageSpace = ingestContext.storageSpace,

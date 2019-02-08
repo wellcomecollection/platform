@@ -429,14 +429,14 @@ class ArchivistFeatureTest
                   assertTopicReceivesFailedProgress(
                     requestId = invalidRequest1.id,
                     expectedDescription =
-                      "Failed reading file bag-info.txt from zip file",
+                      "Failed to identify bag in zip file, 'bag-info.txt' not found.",
                     progressTopic = progressTopic
                   )
 
                   assertTopicReceivesFailedProgress(
                     requestId = invalidRequest2.id,
                     expectedDescription =
-                      "Failed reading file bag-info.txt from zip file",
+                      "Failed to identify bag in zip file, 'bag-info.txt' not found.",
                     progressTopic = progressTopic
                   )
                 }

@@ -22,19 +22,19 @@ object BagDigestFileCreator {
     * location, or returns an error if the line is incorrectly formatted.
     *
     */
-  def create[T](
-    line: String,
-    job: T,
-    manifestName: String
+  def create[T]( line: String,
+                 job: T,
+                 bagRootPathInZip: Option[String],
+                 manifestName: String
   ): Either[ArchiveError[T], BagDigestFile] = {
     val checksumLineRegex = """(.+?)\s+(.+)""".r
 
     line match {
-      case checksumLineRegex(checksum, key) =>
+      case checksumLineRegex(checksum, itemPath) =>
         Right(
           BagDigestFile(
             checksum = checksum.trim,
-            path = BagItemPath(key.trim)
+            path = BagItemPath(bagRootPathInZip, itemPath.trim)
           )
         )
       case _ => Left(InvalidBagManifestError(job, manifestName, line))

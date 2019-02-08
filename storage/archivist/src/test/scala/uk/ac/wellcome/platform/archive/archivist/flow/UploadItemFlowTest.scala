@@ -52,7 +52,7 @@ class UploadItemFlowTest
 
             getContentFromS3(
               bucket,
-              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName") shouldBe fileContent
+              s"${archiveItemJob.archiveJob.bagUploadLocation.completePath}/$fileName") shouldBe fileContent
           }
 
         }
@@ -84,7 +84,7 @@ class UploadItemFlowTest
             val exception = intercept[AmazonS3Exception] {
               getContentFromS3(
                 bucket,
-                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
+                s"archive/${archiveItemJob.archiveJob.bagUploadLocation.bagPath}/$bagIdentifier/$fileName")
             }
             exception.getErrorCode shouldBe "NoSuchKey"
           }

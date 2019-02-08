@@ -44,7 +44,7 @@ class DownloadAndVerifyDigestItemFlowTest
 
           s3Client.putObject(
             bucket.name,
-            s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName",
+            s"${archiveItemJob.archiveJob.bagUploadLocation.completePath}/$fileName",
             fileContent)
 
           val source = Source.single(archiveItemJob)
@@ -75,7 +75,7 @@ class DownloadAndVerifyDigestItemFlowTest
 
           s3Client.putObject(
             bucket.name,
-            s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName",
+            s"${archiveItemJob.archiveJob.bagUploadLocation.completePath}/$fileName",
             fileContent)
 
           val source = Source.single(archiveItemJob)

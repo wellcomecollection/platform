@@ -41,6 +41,10 @@ case class FileNotFoundError[T](path: String, t: T) extends ArchiveError[T] {
   override def toString = s"Failed reading file $path from zip file"
 }
 
+case class BagNotFoundError[T](message: String, t: T) extends ArchiveError[T] {
+  override def toString = s"Failed to identify bag in zip file, $message"
+}
+
 case class ArchiveJobError(t: ArchiveJob,
                            errors: List[ArchiveError[ArchiveDigestItemJob]])
     extends ArchiveError[ArchiveJob]

@@ -57,12 +57,13 @@ trait ArchiveJobGenerators extends ExternalIdentifierGenerators {
     ArchiveJob(
       externalIdentifier = bagIdentifier,
       zipFile = new ZipFile(file),
-      bagLocation = bagLocation,
-      config = BagItConfig(),
+      bagUploadLocation = bagLocation,
+      tagManifestLocation = BagItemPath("tagmanifest-sha256.txt"),
       bagManifestLocations = List(
-        BagItemPath("manifest-sha256.txt"),
-        BagItemPath("tagmanifest-sha256.txt")
-      )
+            BagItemPath("manifest-sha256.txt"),
+            BagItemPath("tagmanifest-sha256.txt")
+      ),
+      config = BagItConfig()
     )
   }
 }

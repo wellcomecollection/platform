@@ -57,7 +57,7 @@ class UploadDigestItemFlowTest
           whenReady(futureResult) { result =>
             result shouldBe Right(archiveItemJob)
             val s3Key =
-              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName"
+              s"${archiveItemJob.archiveJob.bagUploadLocation.completePath}/$fileName"
 
             val storedObject = s3Client.getObject(bucket.name, s3Key)
             storedObject.getObjectMetadata.getUserMetadata should contain only Entry(
@@ -98,7 +98,7 @@ class UploadDigestItemFlowTest
               archiveItemJob))
             getContentFromS3(
               bucket,
-              s"${archiveItemJob.archiveJob.bagLocation.completePath}/$fileName") shouldBe fileContent
+              s"${archiveItemJob.archiveJob.bagUploadLocation.completePath}/$fileName") shouldBe fileContent
           }
 
         }
@@ -130,7 +130,7 @@ class UploadDigestItemFlowTest
             val exception = intercept[AmazonS3Exception] {
               getContentFromS3(
                 bucket,
-                s"archive/${archiveItemJob.archiveJob.bagLocation.bagPath}/$bagIdentifier/$fileName")
+                s"archive/${archiveItemJob.archiveJob.bagUploadLocation.bagPath}/$bagIdentifier/$fileName")
             }
             exception.getErrorCode shouldBe "NoSuchKey"
           }
