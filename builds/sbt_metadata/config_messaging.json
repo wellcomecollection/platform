@@ -1,6 +1,0 @@
-{
-  "id" : "config_messaging",
-  "folder" : "sbt_common/config/messaging",
-  "dependencyIds" : [
-  ]
-}

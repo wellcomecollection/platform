@@ -190,11 +190,6 @@ object Dependencies {
     "com.typesafe" % "config" % versions.typesafe
   )
 
-  val configMessagingDependencies: Seq[ModuleID] =
-    WellcomeDependencies.messagingLibrary ++
-    WellcomeDependencies.monitoringTypesafeLibrary ++
-    WellcomeDependencies.storageTypesafeLibrary
-
   val typesafeMonitoringDependencies: Seq[ModuleID] = typesafeDependencies ++ WellcomeDependencies.monitoringLibrary
 
   val internalModelDependencies = Seq(

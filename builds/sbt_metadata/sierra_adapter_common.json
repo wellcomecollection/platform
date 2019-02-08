@@ -2,7 +2,6 @@
   "id" : "sierra_adapter_common",
   "folder" : "sierra_adapter/common",
   "dependencyIds" : [
-    "internal_model",
-    "config_messaging"
+    "internal_model"
   ]
 }

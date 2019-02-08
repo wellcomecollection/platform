@@ -68,10 +68,6 @@ lazy val elasticsearch = setupProject(project, "sbt_common/elasticsearch",
   externalDependencies = Dependencies.commonElasticsearchDependencies
 )
 
-lazy val config_messaging = setupProject(project, "sbt_common/config/messaging",
-  externalDependencies = Dependencies.configMessagingDependencies
-)
-
 lazy val config_elasticsearch = setupProject(project, "sbt_common/config/elasticsearch",
   localDependencies = Seq(elasticsearch),
   externalDependencies = WellcomeDependencies.typesafeLibrary
@@ -85,55 +81,53 @@ lazy val api = setupProject(project, "catalogue_api/api",
   .settings(Swagger.settings: _*)
 
 lazy val ingestor = setupProject(project, "catalogue_pipeline/ingestor",
-  localDependencies = Seq(config_elasticsearch, config_messaging),
+  localDependencies = Seq(config_elasticsearch),
   externalDependencies = Dependencies.ingestorDependencies
 )
   .settings(Search.settings: _*)
 
 lazy val transformer_miro = setupProject(project,
   folder = "catalogue_pipeline/transformer/transformer_miro",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = Dependencies.miroTransformerDependencies
 )
 
 lazy val transformer_sierra = setupProject(project,
   folder = "catalogue_pipeline/transformer/transformer_sierra",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = Dependencies.sierraTransformerDependencies
 )
 
 lazy val merger = setupProject(project, "catalogue_pipeline/merger",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val id_minter = setupProject(project, "catalogue_pipeline/id_minter",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = Dependencies.idminterDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val recorder = setupProject(project, "catalogue_pipeline/recorder",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val matcher = setupProject(project, "catalogue_pipeline/matcher",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = Dependencies.scalaGraphDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val reindex_worker = setupProject(project, "reindexer/reindex_worker",
-  localDependencies = Seq(config_messaging),
   externalDependencies = WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val goobi_reader = setupProject(project, "goobi_adapter/goobi_reader",
-  localDependencies = Seq(config_messaging),
   externalDependencies = Dependencies.goobiReaderDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
 lazy val sierra_adapter_common = setupProject(project, "sierra_adapter/common",
-  localDependencies = Seq(internal_model, config_messaging),
+  localDependencies = Seq(internal_model),
   externalDependencies = WellcomeDependencies.messagingTypesafeLibrary
 )
 
@@ -156,16 +150,13 @@ lazy val sierra_item_merger = setupProject(project, "sierra_adapter/sierra_item_
 )
 
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
-  localDependencies = Seq(
-    internal_model, display, config_elasticsearch, config_messaging
-  ),
+  localDependencies = Seq(internal_model, display, config_elasticsearch),
   externalDependencies = Dependencies.snapshotGeneratorDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
 // -- Storage
 
 lazy val storage_common = setupProject(project, "storage/common",
-  localDependencies = Seq(config_messaging),
   externalDependencies = Dependencies.storageCommonDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
@@ -220,7 +211,6 @@ lazy val root = (project in file("."))
     elasticsearch,
 
     config_elasticsearch,
-    config_messaging,
 
     api,
     ingestor,

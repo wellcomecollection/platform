@@ -2,7 +2,6 @@
   "id" : "recorder",
   "folder" : "catalogue_pipeline/recorder",
   "dependencyIds" : [
-    "internal_model",
-    "config_messaging"
+    "internal_model"
   ]
 }
