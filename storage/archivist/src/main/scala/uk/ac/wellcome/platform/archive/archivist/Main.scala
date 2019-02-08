@@ -14,11 +14,13 @@ import uk.ac.wellcome.platform.archive.common.config.builders.MessagingBuilder
 object Main extends WellcomeTypesafeApp {
   runWithConfig { config: Config =>
     implicit val actorSystem: ActorSystem = AkkaBuilder.buildActorSystem()
-    implicit val s3Client = S3Builder.buildS3Client(config)
+    implicit val s3Client =
+      S3Builder.buildS3Client(config)
     implicit val transferManager =
       TransferManagerBuilder.buildTransferManager(
         S3Builder.buildS3Client(config))
-    implicit val snsClient = SNSBuilder.buildSNSClient(config)
+    implicit val snsClient =
+      SNSBuilder.buildSNSClient(config)
 
     new Archivist(
       messageStream =

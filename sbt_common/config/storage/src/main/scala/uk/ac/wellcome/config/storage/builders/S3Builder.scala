@@ -17,7 +17,8 @@ object S3Builder extends AWSClientConfigBuilder {
       region = awsClientConfig.region,
       endpoint = awsClientConfig.endpoint.getOrElse(""),
       accessKey = awsClientConfig.accessKey.getOrElse(""),
-      secretKey = awsClientConfig.secretKey.getOrElse("")
+      secretKey = awsClientConfig.secretKey.getOrElse(""),
+      maxConnections = awsClientConfig.maxConnections
     )
 
   def buildS3Client(config: Config): AmazonS3 =
