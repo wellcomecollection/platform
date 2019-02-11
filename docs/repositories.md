@@ -20,7 +20,7 @@ This is an overview of how code for the various Wellcome Collection projects is 
 
     [![Build Status](https://travis-ci.org/wellcometrust/catalogue.svg?branch=master)](https://travis-ci.org/wellcometrust/catalogue)
 
-*   [wellcometrust/catalogue](https://github.com/wellcometrust/catalogue): The workflow service (infrastructure for Goobi).
+*   [wellcometrust/workflow](https://github.com/wellcometrust/catalogue): The Workflow service (infrastructure for Goobi).
 
     [![Build Status](https://travis-ci.org/wellcometrust/workflow.svg?branch=master)](https://travis-ci.org/wellcometrust/workflow)
 
