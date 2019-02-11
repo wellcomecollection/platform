@@ -6,7 +6,7 @@ You can see a list of all our repositories by [searching for the `wellcome-digit
 
 This is an overview of how code for the various Wellcome Collection projects is split up:
 
-![](weco_overview.png)
+![](weco-overview.png)
 
 # Repositories
 
