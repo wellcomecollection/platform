@@ -39,9 +39,7 @@ if __name__ == "__main__":
     # the code, and for which we might push changes.
     extension_to_format_task = [
         (".tf", "format-terraform"),
-        ((".sbt", ".scala"), "format-scala"),
         (".py", "format-python"),
-        # (".json", "format-json"),
     ]
 
     for extension, format_task in extension_to_format_task:

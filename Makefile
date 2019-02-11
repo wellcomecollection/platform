@@ -1,5 +1,8 @@
-include functions.Makefile
-include formatting.Makefile
+export ECR_BASE_URI = 975596993436.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome
+export REGISTRY_ID  = 975596993436
+
+include makefiles/functions.Makefile
+include makefiles/formatting.Makefile
 
 include infrastructure/critical/Makefile
 include infrastructure/shared/Makefile
@@ -18,19 +21,3 @@ travis-lambda-test:
 
 travis-lambda-publish:
 	python run_travis_lambdas.py publish
-
-
-travistooling-test:
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT):/data \
-		--env encrypted_83630750896a_key=$(encrypted_83630750896a_key) \
-		--env encrypted_83630750896a_iv=$(encrypted_83630750896a_iv) \
-		wellcome/build_tooling \
-		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT):/data \
-		wellcome/build_tooling \
-		coverage report --rcfile=travistooling/.coveragerc
-
-travistooling-publish:
-	$(error "Nothing to do for this task")
