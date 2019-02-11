@@ -11,56 +11,12 @@ branches:
   only:
     - master
 
-install:
-  # We need this for the Elasticsearch Docker container to start
-  # See https://github.com/travis-ci/travis-ci/issues/6534
-  - sudo sysctl -w vm.max_map_count=262144
-
 cache:
   directories:
     - $HOME/.sbt
     - $HOME/.ivy2/cache
     - project/target
     - target
-
-    - catalogue_api/api/target
-
-    - catalogue_pipeline/id_minter/target
-    - catalogue_pipeline/ingestor/target
-    - catalogue_pipeline/matcher/target
-    - catalogue_pipeline/merger/target
-    - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/transformer_miro/target
-    - catalogue_pipeline/transformer/transformer_sierra/target
-
-    - data_api/snapshot_generator/target
-
-    - goobi_adapter/goobi_reader/target
-
-    - reindexer/reindex_worker/target
-
-    - sbt_common/config/elasticsearch/target
-    - sbt_common/display/target
-    - sbt_common/elasticsearch/target
-    - sbt_common/internal_model/target
-
-    - sierra_adapter/common/target
-    - sierra_adapter/sierra_reader/target
-    - sierra_adapter/sierra_items_to_dynamo/target
-    - sierra_adapter/sierra_bib_merger/target
-    - sierra_adapter/sierra_item_merger/target
-
-    - storage/archivist/target
-    - storage/common/target
-    - storage/display/target
-    - storage/notifier/target
-    - storage/ingests/target
-    - storage/ingests_common/target
-    - storage/ingests_api/target
-    - storage/bags/target
-    - storage/bags_common/target
-    - storage/bags_api/target
-    - storage/bag_replicator/target
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -73,8 +29,6 @@ script:
 
 env:
   global:
-    - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
-
     # This forces Python to print everything to stdout/stderr immediately.
     # Otherwise, we've seen issues where all the output from our Travis scripts
     # gets buffered, and only gets printed at the end of the test...
@@ -90,15 +44,6 @@ jobs:
     - stage: quicktest
       env: TASK=travis-format
 
-    # Because this isn't under active development, and we're really squeezed
-    # for build VMs, we aren't testing this in CI right now.
-    # - env: TASK=travistooling-test
-
-    - stage: sbt-common-test
-      env: TASK=elasticsearch-test
-    - env: TASK=internal_model-test
-    - env: TASK=display-test
-
     # Lambda tests.
     #
     # We test all the Lambdas in a single job to reduce the number of small
@@ -113,58 +58,13 @@ jobs:
 
     - stage: test
       env:
-        - TRAVIS_LAMBDAS="snapshot_scheduler \
-          sierra_window_generator \
-          s3_demultiplexer \
+        - TRAVIS_LAMBDAS="
           lambdas/drain_ecs_container_instance \
           lambdas/dynamo_write_heartbeat \
           lambdas/ecs_ec2_instance_tagger \
           post_to_slack \
           update_service_list"
         - TASK=travis-lambda-test
-
-    # Catalogue API stack
-    - env: TASK=api-build
-    # (not under active development)
-    # - env: TASK=api_docs-build
-
-    # Catalogue pipeline stack
-    - env: TASK=transformer_miro-test
-    - env: TASK=transformer_sierra-test
-    - env: TASK=ingestor-test
-    - env: TASK=recorder-test
-    - env: TASK=matcher-test
-    - env: TASK=merger-test
-    - env: TASK=id_minter-test
-
-    # Data API stack
-    - env: TASK=snapshot_generator-test
-
-    # Reindexer stack
-    - env: TASK=reindex_worker-test
-
-    # Goobi adapter stack
-    - env: TASK=goobi_reader-test
-
-    # Sierra adapter stack
-    - env: TASK=sierra_reader-test
-    - env: TASK=sierra_items_to_dynamo-test
-    - env: TASK=sierra_bib_merger-test
-    - env: TASK=sierra_item_merger-test
-
-    # Storage
-    - env: TASK=storage_display-test
-    - env: TASK=storage_common-test
-    - env: TASK=archivist-test
-    - env: TASK=ingests_common-test
-    - env: TASK=ingests-test
-    - env: TASK=ingests_api-test
-    - env: TASK=bags_common-test
-    - env: TASK=bags-test
-    - env: TASK=bags_api-test
-    - env: TASK=notifier-test
-    - env: TASK=callback_stub_server-publish
-    - env: TASK=bagger-publish
 
     # (not under active development)
 
@@ -177,15 +77,4 @@ jobs:
 
 stages:
   - quicktest
-  - sbt-common-test
   - test
-
-# This has a Slack API token for posting messages about build failures to
-# our team channel.  It was created by following the "Setup Instructions" at
-# https://wellcome.slack.com/services/B7HD6DUT0#service_setup.
-notifications:
-  slack:
-    secure: XOqr5bsa/A0Ne1My2+c240Q1GUQfqs7/xWLC+e8yDVRDmspTbouTYMtYDG2htLG/pUCUBdeOWdUVDabSetwSHqM4+xvwAtnm9KcNFT1KumVQ/8ZeEVHgrr6sAdI/OzT01JEzvm4cbGTtn/lDc4rZ6DrLeMwvul0dIZMC5PNrMt0qsByj5JtlVU+ih3qZ0fYypeLp4AG7rmpFOaiVPAlXdxpkqtojwP8Q6vDdBA36H24ifiT/snu0Gg3zcR3KCVhTJYNsTe7fNNRffVd/Tl5tBwicx5o+pCf+q+hlfFSw4l3/TnzDlIG5uCccLZVcLdwnnOwQofzjJ7bZPRPbLAa6ynbWTFagwSYzZC3JPfWeyP+I136mK7HqlTG/gD1hUisa/qGUfC9EQIxrg3CXmPj9iGFUhLCUFPR0EUUAfkjcoFUqlPf8EyetE7swBV8d3ngsbfG8H8w42lR60d8f9EhP0N6enWwDRVLky4/PETK7zLPPK42pBy/rIwDpCgYQ7QpetQQyoMM0f5hsTXGUrNZadYN9e6iaJBhKuIggeDUrK7hw4v1bAihzRhPYOWJU+dc7mGoSsJFnPHExyXWu51qejhGoGu9BFu1uI3Unb5Gdb17umYxOm96P5pvR3DC4QoEEVMa7CIOgvKVGhflPqtUaY3Sah2fs0Y6tZfVDsdmwxgo=
-    on_success: change
-    on_failure: always
-    on_pull_requests: false

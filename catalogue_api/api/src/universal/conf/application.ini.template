@@ -1,8 +1,0 @@
--api.host=${api_host}
--es.host=${es_host}
--es.port=${es_port}
--es.index.v1=${es_index_v1}
--es.index.v2=${es_index_v2}
--es.username=${es_username}
--es.password=${es_password}
--es.protocol=${es_protocol}
