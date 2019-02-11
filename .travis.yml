@@ -35,8 +35,6 @@ cache:
 
     - data_api/snapshot_generator/target
 
-    - goobi_adapter/goobi_reader/target
-
     - reindexer/reindex_worker/target
 
     - sbt_common/common/target
@@ -141,9 +139,6 @@ jobs:
 
     # Reindexer stack
     - env: TASK=reindex_worker-test
-
-    # Goobi adapter stack
-    - env: TASK=goobi_reader-test
 
     # Storage
     - env: TASK=storage_display-test

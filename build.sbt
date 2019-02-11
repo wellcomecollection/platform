@@ -141,11 +141,6 @@ lazy val reindex_worker = setupProject(project, "reindexer/reindex_worker",
   localDependencies = Seq(config_messaging, config_storage)
 )
 
-lazy val goobi_reader = setupProject(project, "goobi_adapter/goobi_reader",
-  localDependencies = Seq(config_messaging, config_storage),
-  externalDependencies = Dependencies.goobiReaderDependencies
-)
-
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
   localDependencies = Seq(
     internal_model, display, config_elasticsearch, config_messaging
@@ -227,8 +222,6 @@ lazy val root = (project in file("."))
     merger,
 
     reindex_worker,
-
-    goobi_reader,
 
     snapshot_generator,
 
