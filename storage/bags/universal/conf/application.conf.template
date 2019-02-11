@@ -1,6 +1,0 @@
-aws.sqs.queue.url="${queue_url}"
-aws.sns.topic.arn="${progress_topic_arn}"
-aws.vhs.dynamo.tableName="${vhs_table_name}"
-aws.vhs.s3.bucketName="${vhs_bucket_name}"
-aws.vhs.s3.globalPrefix=archive
-metrics.namespace=bags

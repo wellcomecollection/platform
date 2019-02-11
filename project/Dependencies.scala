@@ -212,17 +212,5 @@ object Dependencies {
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   ) ++ circeOpticsDependencies
 
-  val storageCommonDependencies: Seq[ModuleID] = Seq(
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
-    "com.typesafe.akka" %% "akka-http" % versions.akkaHttp,
-    "org.rogach" %% "scallop" % "3.1.3",
-    "de.heikoseeberger" %% "akka-http-circe" % "1.21.1",
-    "com.amazonaws" % "aws-java-sdk-cloudwatchmetrics" % versions.aws
-  ) ++ akkaDependencies ++ typesafeDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
-
   val goobiReaderDependencies: Seq[ModuleID] = WellcomeDependencies.jsonLibrary
-
-  val bagsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
-  val ingestsApiDependencies: Seq[ModuleID] = circeOpticsDependencies
 }

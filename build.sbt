@@ -154,58 +154,6 @@ lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator
   externalDependencies = Dependencies.snapshotGeneratorDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
 )
 
-// -- Storage
-
-lazy val storage_common = setupProject(project, "storage/common",
-  externalDependencies = Dependencies.storageCommonDependencies ++ WellcomeDependencies.messagingTypesafeLibrary
-)
-
-lazy val storage_display = setupProject(project, "storage/display",
-  localDependencies = Seq(storage_common)
-)
-
-lazy val archivist = setupProject(project, "storage/archivist",
-  localDependencies = Seq(storage_common)
-)
-
-lazy val notifier = setupProject(project, "storage/notifier",
-  localDependencies = Seq(storage_common, storage_display),
-  externalDependencies = Dependencies.wiremockDependencies
-)
-
-lazy val bags_common = setupProject(project, "storage/bags_common",
-  localDependencies = Seq(storage_common),
-  externalDependencies = WellcomeDependencies.storageTypesafeLibrary
-)
-
-lazy val bags = setupProject(project, "storage/bags",
-  localDependencies = Seq(bags_common),
-  externalDependencies = Dependencies.bagsApiDependencies
-)
-
-lazy val bags_api = setupProject(project, "storage/bags_api",
-  localDependencies = Seq(bags_common, storage_display),
-  externalDependencies = Dependencies.bagsApiDependencies
-)
-
-lazy val ingests_common = setupProject(project, "storage/ingests_common",
-  localDependencies = Seq(storage_common)
-)
-
-lazy val ingests = setupProject(project, "storage/ingests",
-  localDependencies = Seq(ingests_common),
-  externalDependencies = Dependencies.wiremockDependencies
-)
-
-lazy val ingests_api = setupProject(project, "storage/ingests_api",
-  localDependencies = Seq(ingests_common, storage_display),
-  externalDependencies = Dependencies.ingestsApiDependencies
-)
-
-lazy val bag_replicator = setupProject(project, "storage/bag_replicator",
-  localDependencies = Seq(storage_common)
-)
-
 lazy val root = (project in file("."))
   .aggregate(
     internal_model,
@@ -231,16 +179,5 @@ lazy val root = (project in file("."))
     sierra_items_to_dynamo,
     sierra_bib_merger,
     sierra_item_merger,
-    snapshot_generator,
-
-    storage_common,
-    storage_display,
-    archivist,
-    bag_replicator,
-    notifier,
-    ingests_api,
-    ingests,
-    bags_common,
-    bags_api,
-    bags
+    snapshot_generator
   )

@@ -1,5 +1,0 @@
-boto3
-bagit
-requests
-fire
-python-dateutil
