@@ -10,6 +10,32 @@ This is an overview of how code for the various Wellcome Collection projects is 
 
 # Repositories
 
+## Projects
+
+*   [wellcometrust/platform](https://github.com/wellcometrust/platform): Shared infrastructure and docs.
+
+    [![Build Status](https://travis-ci.org/wellcometrust/platform.svg?branch=master)](https://travis-ci.org/wellcometrust/platform)
+
+*   [wellcometrust/catalogue](https://github.com/wellcometrust/catalogue): The Catalogue API & pipeline.
+
+    [![Build Status](https://travis-ci.org/wellcometrust/catalogue.svg?branch=master)](https://travis-ci.org/wellcometrust/catalogue)
+
+*   [wellcometrust/catalogue](https://github.com/wellcometrust/catalogue): The workflow service (infrastructure for Goobi).
+
+    [![Build Status](https://travis-ci.org/wellcometrust/workflow.svg?branch=master)](https://travis-ci.org/wellcometrust/workflow)
+
+*   [wellcometrust/storage-service](https://github.com/wellcometrust/storage-service): The archival storage service.
+
+    [![Build Status](https://travis-ci.org/wellcometrust/storage-service.svg?branch=master)](https://travis-ci.org/wellcometrust/storage-service)
+
+*   [wellcometrust/storage-service](https://github.com/wellcometrust/storage-service): The archival storage service.
+
+    [![Build Status](https://travis-ci.org/wellcometrust/storage-service.svg?branch=master)](https://travis-ci.org/wellcometrust/storage-service)
+
+*   [wellcometrust/archivematica-infra](https://github.com/wellcometrust/archivematica-infra): Archivematica infrastructure for digital workflow.
+
+    [![Build Status](https://travis-ci.org/wellcometrust/archivematica-infra.svg?branch=master)](https://travis-ci.org/wellcometrust/archivematica-infra)
+
 ## Build & Infrastructure
 
 We use linux containers to encapsulate build dependencies and tools in order that wrangling with installing the correct set of dependencies or reprodcuing CI issues is minimised.
@@ -20,7 +46,7 @@ We use linux containers to encapsulate build dependencies and tools in order tha
 
 *   [wellcometrust/terraform-modules](https://github.com/wellcometrust/terraform-modules): Contains reusable Terraform modules that we use to define our infrastructure.
 
-    [![Build Status](https://travis-ci.org/wellcometrust/v.svg?branch=master)](https://travis-ci.org/wellcometrust/terraform-modules)
+    [![Build Status](https://travis-ci.org/wellcometrust/terraform-modules.svg?branch=master)](https://travis-ci.org/wellcometrust/terraform-modules)
 
 ## Scala Libraries
 
@@ -50,7 +76,7 @@ The bulk of our code is written in Scala. There are a number of cross product li
 
     [![Build Status](https://travis-ci.org/wellcometrust/scala-fixtures.svg?branch=master)](https://travis-ci.org/wellcometrust/scala-fixtures)
 
-*   [wellcometrust/sierra-streams-source](https://github.com/wellcometrust/sierra-streams-source): Is a Scala library that provides Akka Streams from objects in a [Sierra API][sierra].
+*   [wellcometrust/sierra-streams-source](https://github.com/wellcometrust/sierra-streams-source): Is a Scala library that provides Akka Streams from objects the [Sierra API](https://techdocs.iii.com/sierraapi/Content/titlePage.htm).
 
     Sierra is the library management system we use at Wellcome Collection, and one of the data sources for the platform.
 
