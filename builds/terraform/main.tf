@@ -1,27 +1,11 @@
 module "platform" {
   source = "./platform"
-
   repo_name = "platform"
-
-  infra_bucket_arn = "${local.infra_bucket_arn}"
-
-  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-
-  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
-  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
 }
 
 module "catalogue_repo" {
   source = "./platform"
-
   repo_name = "catalogue"
-
-  infra_bucket_arn = "${local.infra_bucket_arn}"
-
-  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-
-  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
-  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
 
   providers = {
     aws = "aws.catalogue"
@@ -30,15 +14,7 @@ module "catalogue_repo" {
 
 module "storage_repo" {
   source = "./platform"
-
   repo_name = "storage"
-
-  infra_bucket_arn = "${local.infra_bucket_arn}"
-
-  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-
-  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
-  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
 
   providers = {
     aws = "aws.storage"
