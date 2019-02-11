@@ -7,18 +7,11 @@ include infrastructure/shared/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
-include data_api/Makefile
 include data_science/Makefile
-include catalogue_api/Makefile
-include catalogue_pipeline/Makefile
-include goobi_adapter/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
-include sbt_common/Makefile
-include sierra_adapter/Makefile
 include nginx/Makefile
 include reporting/Makefile
-include storage/Makefile
 
 travis-lambda-test:
 	python run_travis_lambdas.py test
