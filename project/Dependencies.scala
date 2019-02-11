@@ -51,7 +51,6 @@ object Dependencies {
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"
-    val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
     val typesafe = "1.3.2"
@@ -190,10 +189,6 @@ object Dependencies {
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
   )
-
-  val sierraReaderDependencies: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
-  ) ++ circeOpticsDependencies
 
   val storageCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,

@@ -49,12 +49,6 @@ cache:
     - sbt_common/elasticsearch/target
     - sbt_common/internal_model/target
 
-    - sierra_adapter/common/target
-    - sierra_adapter/sierra_reader/target
-    - sierra_adapter/sierra_items_to_dynamo/target
-    - sierra_adapter/sierra_bib_merger/target
-    - sierra_adapter/sierra_item_merger/target
-
     - storage/archivist/target
     - storage/common/target
     - storage/display/target
@@ -150,12 +144,6 @@ jobs:
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
-
-    # Sierra adapter stack
-    - env: TASK=sierra_reader-test
-    - env: TASK=sierra_items_to_dynamo-test
-    - env: TASK=sierra_bib_merger-test
-    - env: TASK=sierra_item_merger-test
 
     # Storage
     - env: TASK=storage_display-test

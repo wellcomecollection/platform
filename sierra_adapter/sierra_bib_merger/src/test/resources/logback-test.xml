@@ -1,5 +1,0 @@
-<configuration>
-  <include resource="base-logback-test.xml"/>
-
-  <logger name="uk.ac.wellcome.platform.sierra_bib_merger.Server" level="WARN"/>
-</configuration>

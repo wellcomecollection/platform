@@ -146,28 +146,6 @@ lazy val goobi_reader = setupProject(project, "goobi_adapter/goobi_reader",
   externalDependencies = Dependencies.goobiReaderDependencies
 )
 
-lazy val sierra_adapter_common = setupProject(project, "sierra_adapter/common",
-  localDependencies = Seq(internal_model, config_messaging, config_storage)
-)
-
-lazy val sierra_reader = setupProject(project, "sierra_adapter/sierra_reader",
-  localDependencies = Seq(sierra_adapter_common),
-  externalDependencies = Dependencies.sierraReaderDependencies
-)
-
-lazy val sierra_items_to_dynamo = setupProject(project,
-  folder = "sierra_adapter/sierra_items_to_dynamo",
-  localDependencies = Seq(sierra_adapter_common)
-)
-
-lazy val sierra_bib_merger = setupProject(project, "sierra_adapter/sierra_bib_merger",
-  localDependencies = Seq(sierra_adapter_common)
-)
-
-lazy val sierra_item_merger = setupProject(project, "sierra_adapter/sierra_item_merger",
-  localDependencies = Seq(sierra_adapter_common)
-)
-
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
   localDependencies = Seq(
     internal_model, display, config_elasticsearch, config_messaging
@@ -251,11 +229,7 @@ lazy val root = (project in file("."))
     reindex_worker,
 
     goobi_reader,
-    sierra_adapter_common,
-    sierra_reader,
-    sierra_items_to_dynamo,
-    sierra_bib_merger,
-    sierra_item_merger,
+
     snapshot_generator,
 
     storage_common,
