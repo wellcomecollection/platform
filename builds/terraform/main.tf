@@ -22,6 +22,27 @@ module "catalogue_repo" {
 
   lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
   ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
+
+  providers = {
+    aws = "aws.catalogue"
+  }
+}
+
+module "storage_repo" {
+  source = "./platform"
+
+  repo_name = "storage"
+
+  infra_bucket_arn = "${local.infra_bucket_arn}"
+
+  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
+
+  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
+  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
+
+  providers = {
+    aws = "aws.storage"
+  }
 }
 
 module "platform_cli" {

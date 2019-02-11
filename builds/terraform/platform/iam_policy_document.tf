@@ -1,11 +1,3 @@
-data "aws_sns_topic" "lambda_pushes_topic" {
-  name = "${var.lambda_pushes_topic_name}"
-}
-
-data "aws_sns_topic" "ecr_pushes_topic" {
-  name = "${var.ecr_pushes_topic_name}"
-}
-
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
     actions = [
@@ -52,17 +44,6 @@ data "aws_iam_policy_document" "travis_permissions" {
 
     resources = [
       "*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "sns:Publish",
-    ]
-
-    resources = [
-      "${data.aws_sns_topic.lambda_pushes_topic.arn}",
-      "${data.aws_sns_topic.ecr_pushes_topic.arn}",
     ]
   }
 
