@@ -82,4 +82,4 @@ The bulk of our code is written in Scala. There are a number of cross product li
 
 Most of our build tooling & some application code is written in Python, these libraries are shared across projects.
 
-*   [AWS Utilities][https://github.com/wellcometrust/aws_utils] Is a Python library containing AWS-related utilities that we use in our AWS Lambdas
+*   [AWS Utilities](https://github.com/wellcometrust/aws_utils) Is a Python library containing AWS-related utilities that we use in our AWS Lambdas
