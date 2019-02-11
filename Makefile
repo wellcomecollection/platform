@@ -15,9 +15,3 @@ include monitoring/Makefile
 include ontologies/Makefile
 include nginx/Makefile
 include reporting/Makefile
-
-travis-lambda-test:
-	python run_travis_lambdas.py test
-
-travis-lambda-publish:
-	python run_travis_lambdas.py publish

@@ -1,5 +1,5 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-include $(ROOT)/functions.Makefile
+include $(ROOT)/makefiles/functions.Makefile
 
 
 # Build and tag a Docker image (specifically for nginx).

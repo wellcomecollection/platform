@@ -20,28 +20,24 @@ jobs:
     - stage: preflight
       env: TASK=travis-format
 
-    # Lambda tests.
-    #
-    # We test all the Lambdas in a single job.
-    # This reduces the number of VMs we start.
-    - stage: test
-      env:
-        - TRAVIS_LAMBDAS="
-          lambdas/drain_ecs_container_instance \
-          lambdas/dynamo_write_heartbeat \
-          lambdas/ecs_ec2_instance_tagger \
-          post_to_slack \
-          update_service_list"
-        - TASK=travis-lambda-test
+    - stage: shared_lambdas
+      env: TASK=dynamo_write_heartbeat-test
+    - env: TASK=drain_ecs_container_instance-test
+    - env: TASK=ecs_ec2_instance_tagger-test
+    
+    - stage: reporting
+      env: TASK=reporting_miro_transformer
+    - env: TASK=reporting_miro_inventory_transformer
+    - env: TASK=reporting_sierra_transformer
+    - env: TASK=reporting_calm_transformer
+#    - stage: nginx
+#      env: TASK=nginx-build
 
-    # (not under active development)
+#    - stage: loris
+#      env: TASK=loris-build
+#    - env: TASK=cache_cleaner-build
 
-    # nginx stack
-    # - env: TASK=nginx-build
 
-    # Loris stack
-    # - env: TASK=loris-build
-    # - env: TASK=cache_cleaner-build
 
 stages:
   - quicktest

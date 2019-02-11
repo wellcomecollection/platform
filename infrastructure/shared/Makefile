@@ -1,25 +1,17 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-include $(ROOT)/functions.Makefile
+include $(ROOT)/makefiles/functions.Makefile
 
 STACK_ROOT = infrastructure/shared
 
 SBT_APPS 	 =
 SBT_SSM_APPS =
 
-ACCOUNT_ID =
-PROJECT_ID =
-
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
 PYTHON_APPS     =
 PYTHON_SSM_APPS =
-LAMBDAS 	    = lambdas/drain_ecs_container_instance \
-                  lambdas/ecs_ec2_instance_tagger
-
-TF_NAME = infra_shared
-TF_PATH = $(STACK_ROOT)/terraform
-
-TF_IS_PUBLIC_FACING = false
+LAMBDAS 	    = drain_ecs_container_instance \
+                  ecs_ec2_instance_tagger
 
 $(val $(call stack_setup))

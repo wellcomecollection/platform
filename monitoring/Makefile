@@ -1,25 +1,18 @@
 ROOT = $(shell git rev-parse --show-toplevel)
-include $(ROOT)/functions.Makefile
+include $(ROOT)/makefiles/functions.Makefile
 
 STACK_ROOT  = monitoring
 
 SBT_APPS 	 =
 SBT_SSM_APPS =
 
-ACCOUNT_ID =
-PROJECT_ID =
-
 SBT_DOCKER_LIBRARIES    =
 SBT_NO_DOCKER_LIBRARIES =
 
 PYTHON_APPS     = slack_budget_bot
 PYTHON_SSM_APPS =
-LAMBDAS 	    = post_to_slack terraform_tracker update_service_list
-
-TF_NAME = monitoring
-TF_PATH = $(STACK_ROOT)/terraform
-
-TF_IS_PUBLIC_FACING = true
+LAMBDAS 	    =   post_to_slack terraform_tracker \
+                    update_service_list
 
 $(val $(call stack_setup))
 
