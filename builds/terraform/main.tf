@@ -3,7 +3,7 @@ module "platform" {
   repo_name = "platform"
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-  infra_bucket_arn = "${local.infra_bucket_arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
 }
 
 module "catalogue_repo" {
@@ -11,7 +11,7 @@ module "catalogue_repo" {
   repo_name = "catalogue"
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-  infra_bucket_arn = "${local.infra_bucket_arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
 
   providers = {
     aws = "aws.catalogue"
@@ -23,7 +23,7 @@ module "storage_repo" {
   repo_name = "storage"
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
-  infra_bucket_arn = "${local.infra_bucket_arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
 
   providers = {
     aws = "aws.storage"
