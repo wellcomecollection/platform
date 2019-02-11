@@ -92,23 +92,6 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   )
 
-  val finatraDependencies = Seq(
-    "ch.qos.logback" % "logback-classic" % versions.logback,
-    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "finatra-http" % versions.finatra,
-    "com.twitter" %% "finatra-httpclient" % versions.finatra,
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-app" % versions.finatra % "test",
-    "com.twitter" %% "inject-core" % versions.finatra,
-    "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-server" % versions.finatra % "test"
-  )
-
   val elasticsearchDependencies = Seq(
     "org.apache.logging.log4j" % "log4j-core" % versions.apacheLogging,
     "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
@@ -143,14 +126,6 @@ object Dependencies {
       circeOpticsDependencies ++
       guiceDependencies ++
       scalacheckDependencies ++
-      WellcomeDependencies.fixturesLibrary
-
-  val apiDependencies: Seq[ModuleID] =
-    Seq(
-      "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    ) ++
-      finatraDependencies ++
-      guiceDependencies ++
       WellcomeDependencies.fixturesLibrary
 
   val typesafeDependencies: Seq[ModuleID] = Seq(

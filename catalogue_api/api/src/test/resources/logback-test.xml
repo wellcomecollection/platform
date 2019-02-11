@@ -1,6 +1,0 @@
-<configuration>
-  <include resource="base-logback-test.xml"/>
-
-  <logger name="io.swagger" level="ERROR"/>
-  <logger name="uk.ac.wellcome.platform.api.Server" level="INFO"/>
-</configuration>

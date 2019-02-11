@@ -96,13 +96,6 @@ lazy val config_elasticsearch = setupProject(project, "sbt_common/config/elastic
   localDependencies = Seq(config_core, elasticsearch)
 )
 
-lazy val api = setupProject(project, "catalogue_api/api",
-  localDependencies = Seq(internal_model, display, elasticsearch),
-  externalDependencies = Dependencies.apiDependencies
-)
-  .settings(Search.settings: _*)
-  .settings(Swagger.settings: _*)
-
 // -- Storage
 
 lazy val storage_common = setupProject(project, "storage/common",

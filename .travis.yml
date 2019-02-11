@@ -23,8 +23,6 @@ cache:
     - project/target
     - target
 
-    - catalogue_api/api/target
-
     - sbt_common/common/target
     - sbt_common/config/core/target
     - sbt_common/config/elasticsearch/target
@@ -107,11 +105,6 @@ jobs:
           post_to_slack \
           update_service_list"
         - TASK=travis-lambda-test
-
-    # Catalogue API stack
-    - env: TASK=api-build
-    # (not under active development)
-    # - env: TASK=api_docs-build
 
     # Storage
     - env: TASK=storage_display-test

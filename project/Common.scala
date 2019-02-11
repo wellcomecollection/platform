@@ -27,32 +27,9 @@ object Common {
       "-language:postfixOps",
       "-Ypartial-unification",
       "-Xcheckinit"
-      
+
     ),
     parallelExecution in Test := false,
     libraryDependencies ++= Dependencies.sharedDependencies
-  ) ++
-    Search.settings ++
-    Swagger.settings ++
-    Finatra.settings
-}
-
-object Swagger {
-  val settings: Seq[Def.Setting[_]] = Seq(
-    resolvers +=
-      "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/releases/"
-  )
-}
-
-object Search {
-  val settings: Seq[Def.Setting[_]] = Seq(
-    resolvers += "elasticsearch-releases" at "https://artifacts.elastic.co/maven"
-  )
-}
-
-object Finatra {
-  val settings: Seq[Def.Setting[_]] = Seq(
-    resolvers += "maven.twttr.com" at "https://maven.twttr.com",
-    fork in run := true
   )
 }
