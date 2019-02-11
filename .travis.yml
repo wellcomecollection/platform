@@ -35,8 +35,6 @@ cache:
 
     - data_api/snapshot_generator/target
 
-    - reindexer/reindex_worker/target
-
     - sbt_common/common/target
     - sbt_common/config/core/target
     - sbt_common/config/elasticsearch/target
@@ -136,9 +134,6 @@ jobs:
 
     # Data API stack
     - env: TASK=snapshot_generator-test
-
-    # Reindexer stack
-    - env: TASK=reindex_worker-test
 
     # Storage
     - env: TASK=storage_display-test

@@ -137,10 +137,6 @@ lazy val matcher = setupProject(project, "catalogue_pipeline/matcher",
   externalDependencies = Dependencies.scalaGraphDependencies
 )
 
-lazy val reindex_worker = setupProject(project, "reindexer/reindex_worker",
-  localDependencies = Seq(config_messaging, config_storage)
-)
-
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
   localDependencies = Seq(
     internal_model, display, config_elasticsearch, config_messaging
