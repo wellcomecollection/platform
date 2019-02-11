@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "releases" {
   bucket = "releases.mvn-repo.wellcomecollection.org"
-  acl    = "private"
+  acl    = "public-read"
 
   lifecycle {
     prevent_destroy = true
