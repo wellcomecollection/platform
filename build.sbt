@@ -103,40 +103,6 @@ lazy val api = setupProject(project, "catalogue_api/api",
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
-lazy val ingestor = setupProject(project, "catalogue_pipeline/ingestor",
-  localDependencies = Seq(config_elasticsearch, config_messaging)
-)
-  .settings(Search.settings: _*)
-
-lazy val transformer_miro = setupProject(project,
-  folder = "catalogue_pipeline/transformer/transformer_miro",
-  localDependencies = Seq(internal_model, config_messaging),
-  externalDependencies = Dependencies.miroTransformerDependencies
-)
-
-lazy val transformer_sierra = setupProject(project,
-  folder = "catalogue_pipeline/transformer/transformer_sierra",
-  localDependencies = Seq(internal_model, config_messaging)
-)
-
-lazy val merger = setupProject(project, "catalogue_pipeline/merger",
-  localDependencies = Seq(internal_model, config_messaging)
-)
-
-lazy val id_minter = setupProject(project, "catalogue_pipeline/id_minter",
-  localDependencies = Seq(internal_model, config_messaging),
-  externalDependencies = Dependencies.idminterDependencies
-)
-
-lazy val recorder = setupProject(project, "catalogue_pipeline/recorder",
-  localDependencies = Seq(internal_model, config_messaging, config_storage)
-)
-
-lazy val matcher = setupProject(project, "catalogue_pipeline/matcher",
-  localDependencies = Seq(internal_model, config_messaging, config_storage),
-  externalDependencies = Dependencies.scalaGraphDependencies
-)
-
 lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
   localDependencies = Seq(
     internal_model, display, config_elasticsearch, config_messaging

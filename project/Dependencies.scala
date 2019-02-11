@@ -52,7 +52,6 @@ object Dependencies {
     val scalaCheckShapelessVersion = "1.1.6"
     val scalaCsv = "1.3.5"
     val jaxbVersion = "2.2.11"
-    val scalaGraphVersion = "1.12.5"
     val typesafe = "1.3.2"
     val wiremockVersion = "2.18.0"
     val apacheCommons = "2.6"
@@ -119,10 +118,6 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
-  val scalaGraphDependencies = Seq(
-    "org.scala-graph" %% "graph-core" % versions.scalaGraphVersion
-  )
-
   val testDependencies = Seq(
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
@@ -175,16 +170,6 @@ object Dependencies {
   ) ++ WellcomeDependencies.jsonLibrary
 
   // Application specific dependency groups
-  val idminterDependencies: Seq[ModuleID] = Seq(
-    "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
-    "mysql" % "mysql-connector-java" % "6.0.6",
-    "org.flywaydb" % "flyway-core" % "4.2.0",
-    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
-  ) ++ circeOpticsDependencies
-
-  val miroTransformerDependencies: Seq[ModuleID] = Seq(
-    "org.apache.commons" % "commons-lang3" % "3.1"
-  )
 
   val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka

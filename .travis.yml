@@ -25,14 +25,6 @@ cache:
 
     - catalogue_api/api/target
 
-    - catalogue_pipeline/id_minter/target
-    - catalogue_pipeline/ingestor/target
-    - catalogue_pipeline/matcher/target
-    - catalogue_pipeline/merger/target
-    - catalogue_pipeline/recorder/target
-    - catalogue_pipeline/transformer/transformer_miro/target
-    - catalogue_pipeline/transformer/transformer_sierra/target
-
     - data_api/snapshot_generator/target
 
     - sbt_common/common/target
@@ -122,15 +114,6 @@ jobs:
     - env: TASK=api-build
     # (not under active development)
     # - env: TASK=api_docs-build
-
-    # Catalogue pipeline stack
-    - env: TASK=transformer_miro-test
-    - env: TASK=transformer_sierra-test
-    - env: TASK=ingestor-test
-    - env: TASK=recorder-test
-    - env: TASK=matcher-test
-    - env: TASK=merger-test
-    - env: TASK=id_minter-test
 
     # Data API stack
     - env: TASK=snapshot_generator-test
