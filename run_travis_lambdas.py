@@ -27,7 +27,7 @@ if __name__ == "__main__":
         env["TASK"] = "%s-%s" % (lambda_name, verb)
 
         try:
-            subprocess.check_call(["python3", "run_travis_task.py"], env=env)
+            subprocess.check_call(["run_travis.sh"], env=env)
         except subprocess.CalledProcessError:
             outcome = "FAILED"
         else:
