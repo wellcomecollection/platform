@@ -1,4 +1,4 @@
-# platform
+# Platform
 
 This is documentation for Wellcome Collection developers. Documentation for users of the API can be found at https://developers.wellcomecollection.org.
 
