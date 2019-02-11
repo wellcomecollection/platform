@@ -171,10 +171,6 @@ object Dependencies {
 
   // Application specific dependency groups
 
-  val snapshotGeneratorDependencies = Seq(
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
-  )
-
   val storageCommonDependencies: Seq[ModuleID] = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
     "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,

@@ -25,8 +25,6 @@ cache:
 
     - catalogue_api/api/target
 
-    - data_api/snapshot_generator/target
-
     - sbt_common/common/target
     - sbt_common/config/core/target
     - sbt_common/config/elasticsearch/target
@@ -114,9 +112,6 @@ jobs:
     - env: TASK=api-build
     # (not under active development)
     # - env: TASK=api_docs-build
-
-    # Data API stack
-    - env: TASK=snapshot_generator-test
 
     # Storage
     - env: TASK=storage_display-test

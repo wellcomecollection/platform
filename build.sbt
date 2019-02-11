@@ -103,13 +103,6 @@ lazy val api = setupProject(project, "catalogue_api/api",
   .settings(Search.settings: _*)
   .settings(Swagger.settings: _*)
 
-lazy val snapshot_generator = setupProject(project, "data_api/snapshot_generator",
-  localDependencies = Seq(
-    internal_model, display, config_elasticsearch, config_messaging
-  ),
-  externalDependencies = Dependencies.snapshotGeneratorDependencies
-)
-
 // -- Storage
 
 lazy val storage_common = setupProject(project, "storage/common",

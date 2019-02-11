@@ -7,7 +7,6 @@ include infrastructure/shared/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
-include data_api/Makefile
 include data_science/Makefile
 include catalogue_api/Makefile
 include monitoring/Makefile
