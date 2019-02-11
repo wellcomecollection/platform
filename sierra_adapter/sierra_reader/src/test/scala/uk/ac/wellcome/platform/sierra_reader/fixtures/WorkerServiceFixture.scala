@@ -4,7 +4,10 @@ import uk.ac.wellcome.akka.fixtures.Akka
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.messaging.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_reader.config.models.{ReaderConfig, SierraAPIConfig}
+import uk.ac.wellcome.platform.sierra_reader.config.models.{
+  ReaderConfig,
+  SierraAPIConfig
+}
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.platform.sierra_reader.services.SierraReaderWorkerService
 import uk.ac.wellcome.storage.fixtures.S3
