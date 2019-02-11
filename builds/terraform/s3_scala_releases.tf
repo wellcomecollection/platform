@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "releases" {
 
     principals {
       identifiers = "${local.principals}"
-      type = "AWS"
+      type        = "AWS"
     }
 
     resources = [
@@ -58,12 +58,12 @@ resource "aws_s3_bucket_policy" "infra" {
 data "aws_iam_policy_document" "infra" {
   statement {
     actions = [
-      "s3:*"
+      "s3:*",
     ]
 
     principals {
       identifiers = "${local.principals}"
-      type = "AWS"
+      type        = "AWS"
     }
 
     resources = [

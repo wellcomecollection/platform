@@ -1,10 +1,10 @@
 module "platform" {
-  source = "./platform"
+  source    = "./platform"
   repo_name = "platform"
 }
 
 module "catalogue_repo" {
-  source = "./platform"
+  source    = "./platform"
   repo_name = "catalogue"
 
   providers = {
@@ -13,7 +13,7 @@ module "catalogue_repo" {
 }
 
 module "storage_repo" {
-  source = "./platform"
+  source    = "./platform"
   repo_name = "storage"
 
   providers = {
