@@ -28,10 +28,6 @@ This is an overview of how code for the various Wellcome Collection projects is 
 
     [![Build Status](https://travis-ci.org/wellcometrust/storage-service.svg?branch=master)](https://travis-ci.org/wellcometrust/storage-service)
 
-*   [wellcometrust/storage-service](https://github.com/wellcometrust/storage-service): The archival storage service.
-
-    [![Build Status](https://travis-ci.org/wellcometrust/storage-service.svg?branch=master)](https://travis-ci.org/wellcometrust/storage-service)
-
 *   [wellcometrust/archivematica-infra](https://github.com/wellcometrust/archivematica-infra): Archivematica infrastructure for digital workflow.
 
     [![Build Status](https://travis-ci.org/wellcometrust/archivematica-infra.svg?branch=master)](https://travis-ci.org/wellcometrust/archivematica-infra)
@@ -86,4 +82,4 @@ The bulk of our code is written in Scala. There are a number of cross product li
 
 Most of our build tooling & some application code is written in Python, these libraries are shared across projects.
 
-*   [wellcometrust/aws_utils][awsutils] is a Python library containing AWS-related utilities that we use in our AWS Lambdas
+*   [AWS Utilities][https://github.com/wellcometrust/aws_utils] Is a Python library containing AWS-related utilities that we use in our AWS Lambdas
