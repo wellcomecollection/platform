@@ -1,7 +1,7 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/makefiles/functions.Makefile
 
-STACK_ROOT = infrastructure/critical
+STACK_ROOT = infrastructure
 
 SBT_APPS 	 =
 SBT_SSM_APPS =
@@ -11,6 +11,6 @@ SBT_NO_DOCKER_LIBRARIES =
 
 PYTHON_APPS     =
 PYTHON_SSM_APPS =
-LAMBDAS 	    = dynamo_write_heartbeat
+LAMBDAS 	    = ecs_ec2_instance_tagger
 
 $(val $(call stack_setup))

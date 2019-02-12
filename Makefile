@@ -4,9 +4,7 @@ export REGISTRY_ID  = 975596993436
 include makefiles/functions.Makefile
 include makefiles/formatting.Makefile
 
-include infrastructure/critical/Makefile
-include infrastructure/shared/Makefile
-
+include infrastructure/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile

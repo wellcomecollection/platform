@@ -16,3 +16,5 @@ This includes:
 
     We cannot regenerate this easily (IDs are assigned randomly), so we want
     to protect this from accidental changes.
+
+*   Shared infrastructure used by other projects.

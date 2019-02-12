@@ -21,8 +21,6 @@ jobs:
       env: TASK=travis-format
 
     - stage: shared_lambdas
-      env: TASK=dynamo_write_heartbeat-test
-    - env: TASK=drain_ecs_container_instance-test
     - env: TASK=ecs_ec2_instance_tagger-test
 
     - stage: reporting

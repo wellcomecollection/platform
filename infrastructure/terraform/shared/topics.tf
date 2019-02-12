@@ -3,13 +3,6 @@ module "lambda_error_alarm" {
   name   = "lambda_error_alarm"
 }
 
-# Shared topic for terminating instances
-
-module "ec2_terminating_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "shared_ec2_terminating_topic"
-}
-
 # Alarm topics
 
 module "dlq_alarm" {
