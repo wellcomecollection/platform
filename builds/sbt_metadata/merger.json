@@ -2,7 +2,6 @@
   "id" : "merger",
   "folder" : "catalogue_pipeline/merger",
   "dependencyIds" : [
-    "internal_model",
-    "config_messaging"
+    "internal_model"
   ]
 }

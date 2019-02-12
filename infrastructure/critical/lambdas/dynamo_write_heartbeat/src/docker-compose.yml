@@ -1,4 +1,0 @@
-dynamodb:
-  image: peopleperhour/dynamodb
-  ports:
-    - "8000:8000"

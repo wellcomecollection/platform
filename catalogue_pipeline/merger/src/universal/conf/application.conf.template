@@ -1,6 +1,0 @@
-aws.metrics.namespace="${metrics_namespace}"
-aws.sqs.queue.url="${merger_queue_id}"
-aws.message.writer.sns.topic.arn="${merger_topic_arn}"
-aws.message.writer.s3.bucketName="${messages_bucket_name}"
-aws.vhs.s3.bucketName="${vhs_recorder_bucket_name}"
-aws.vhs.dynamo.tableName="${vhs_recorder_table_name}"

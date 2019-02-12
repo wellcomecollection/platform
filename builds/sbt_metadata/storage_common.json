@@ -2,7 +2,5 @@
   "id" : "storage_common",
   "folder" : "storage/common",
   "dependencyIds" : [
-    "config_messaging",
-    "config_storage"
   ]
 }

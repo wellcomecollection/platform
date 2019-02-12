@@ -1,48 +1,26 @@
 # Developer info
 
-This document contains information for developers working on the platform
-codebases.
+This document contains information for developers working on the platform codebases.
 
-* [Repos](#repos)
 * [Tech stack](#tech-stack)
 * [Development workflow](#our-development-workflow)
 * [How deployment works](#how-deployment-works)
-
-## Repos
-
-There are two main repos for the platform code:
-
-*   [platform-api][api] contains the code for our individual application,
-    and is the starting point for the project.
-*   [platform-infra][infra] contains the Terraform configuration for our
-    AWS infrastructure.
-
-Code that exists as a useful standalone component may be siphoned off into
-other, smaller repos as appropriate.
-
-[api]: https://github.com/wellcometrust/platform-api
-[infra]: https://github.com/wellcometrust/platform-infra
 
 ## Tech stack
 
 Our tech stack uses the following pieces:
 
-*   **Scala, sbt, Java 8** – this is the language in which the majority of
-    our aplications are written.
-*   **Docker** – our applications are usually deployed as Docker containers
-    running in Amazon's EC2 Container Service.
+*   **Scala, sbt, Java 8** – this is the language in which the majority of our aplications are written.
+*   **Docker** – our applications are usually deployed as Docker containers running in Amazon's EC2 Container Service.
 *   The **aws-cli** tool.
 *   **Terraform** – for managing out infrastructure.
 *   **Python 2.7 with boto3** – Our Lambda functions are written in Scala.
 
-If you're working on the platform team, you should install everything on
-this list.  The instructions below assume you're using a relatively modern
-version of Mac OS X.
+If you're working on the platform team, you should install everything on this list.  The instructions below assume you're using a relatively modern version of Mac OS X.
 
 #### Homebrew
 
-[Homebrew][brew] is a package manager for OS X that's used to install
-several of our dependencies.
+[Homebrew][brew] is a package manager for OS X that's used to install several of our dependencies.
 
 Run the following command in a Terminal prompty:
 
@@ -84,8 +62,7 @@ Python 2.7 is already installed on OS X.
 
 #### aws-cli
 
-My preferred approach for installing the AWS command-line tools, which
-doesn't involve faff with virtualenvs, is to use [pipsi][pipsi]:
+My preferred approach for installing the AWS command-line tools, which doesn't involve faff with virtualenvs, is to use [pipsi][pipsi]:
 
 ```console
 $ curl https://raw.githubusercontent.com/mitsuhiko/pipsi/master/get-pipsi.py | python

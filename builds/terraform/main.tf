@@ -1,12 +1,33 @@
 module "platform" {
-  source = "./platform"
-
-  infra_bucket_arn = "${local.infra_bucket_arn}"
+  source    = "./platform"
+  repo_name = "platform"
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
+}
 
-  lambda_pushes_topic_name = "${module.ecr_pushes_topic.name}"
-  ecr_pushes_topic_name    = "${module.lambda_pushes_topic.name}"
+module "catalogue_repo" {
+  source    = "./platform"
+  repo_name = "catalogue"
+
+  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  providers = {
+    aws = "aws.catalogue"
+  }
+}
+
+module "storage_repo" {
+  source    = "./platform"
+  repo_name = "storage"
+
+  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  providers = {
+    aws = "aws.storage"
+  }
 }
 
 module "platform_cli" {
@@ -15,6 +36,13 @@ module "platform_cli" {
   repo_name     = "platform-cli"
   pypi_username = "${var.pypi_username}"
   pypi_password = "${var.pypi_password}"
+}
+
+module "scala_fixtures" {
+  source = "./scala_library"
+
+  name       = "fixtures"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
 }
 
 module "scala_json" {
@@ -42,5 +70,13 @@ module "scala_messaging" {
   source = "./scala_library"
 
   name       = "messaging"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
+}
+
+module "scala_typesafe" {
+  source = "./scala_library"
+
+  name       = "typesafe-app"
+  repo_name  = "wellcome-typesafe-app"
   bucket_arn = "${aws_s3_bucket.releases.arn}"
 }

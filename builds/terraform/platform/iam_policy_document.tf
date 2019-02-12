@@ -1,11 +1,3 @@
-data "aws_sns_topic" "lambda_pushes_topic" {
-  name = "${var.lambda_pushes_topic_name}"
-}
-
-data "aws_sns_topic" "ecr_pushes_topic" {
-  name = "${var.ecr_pushes_topic_name}"
-}
-
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
     actions = [
@@ -57,22 +49,12 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "sns:Publish",
-    ]
-
-    resources = [
-      "${data.aws_sns_topic.lambda_pushes_topic.arn}",
-      "${data.aws_sns_topic.ecr_pushes_topic.arn}",
-    ]
-  }
-
-  statement {
-    actions = [
       "s3:Get*",
       "s3:List*",
     ]
 
     resources = [
+      "${var.sbt_releases_bucket_arn}",
       "${var.sbt_releases_bucket_arn}/*",
     ]
   }
@@ -83,7 +65,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "arn:aws:ssm:eu-west-1:${local.account_id}:parameter/releases/*",
+      "arn:aws:ssm:eu-west-1:${local.account_id}:parameter/*",
     ]
   }
 }

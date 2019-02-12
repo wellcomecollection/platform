@@ -1,4 +1,0 @@
-aws.sqs.queue.url="${transformer_queue_id}"
-aws.metrics.namespace="${metrics_namespace}"
-aws.message.writer.sns.topic.arn="${sns_arn}"
-aws.message.writer.s3.bucketName="${messages_bucket_name}"

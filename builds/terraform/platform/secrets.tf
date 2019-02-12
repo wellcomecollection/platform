@@ -13,7 +13,7 @@ EOF
 
 data "archive_file" "secrets" {
   type        = "zip"
-  output_path = "${path.module}/../../secrets_platform.zip"
+  output_path = "${path.module}/../../secrets_${var.repo_name}.zip"
 
   source {
     content  = "${data.template_file.aws_credentials.rendered}"

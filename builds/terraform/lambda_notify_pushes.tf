@@ -11,7 +11,7 @@ module "lambda_pushes_topic" {
 module "lambda_notify_pushes" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
-  s3_bucket = "${var.infra_bucket}"
+  s3_bucket = "${local.infra_bucket_id}"
   s3_key    = "lambdas/builds/notify_pushes.zip"
 
   name        = "notify_pushes"

@@ -13,7 +13,7 @@ There are 3 kinds of project currently in use:
 
 ## Project structure
 
-- Infrastructure description (`./infra`)
+- Infrastructure description (`./terraform`)
   - Using terraform (separated by stack where appropriate).
     It's expected that some services will share terraform state where there is a high degree of coupling.
   - Making use of shared terraform modules from project root (`ecs_service` etc)

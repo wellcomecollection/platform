@@ -4,7 +4,6 @@
   "dependencyIds" : [
     "internal_model",
     "display",
-    "config_elasticsearch",
-    "config_messaging"
+    "config_elasticsearch"
   ]
 }

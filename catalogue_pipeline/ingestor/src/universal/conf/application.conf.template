@@ -1,8 +1,0 @@
-es.host="${es_host}"
-es.port="${es_port}"
-es.index="${es_index}"
-aws.metrics.namespace="${metrics_namespace}"
-es.username="${es_username}"
-es.password="${es_password}"
-es.protocol="${es_protocol}"
-aws.message.reader.sqs.queue.url="${ingest_queue_id}"
