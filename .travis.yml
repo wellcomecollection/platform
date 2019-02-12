@@ -20,14 +20,15 @@ jobs:
     - stage: preflight
       env: TASK=travis-format
 
-    - stage: shared_lambdas
-    - env: TASK=ecs_ec2_instance_tagger-test
+    - stage: infrastructure
+      env: TASK=ecs_ec2_instance_tagger-test
 
     - stage: reporting
       env: TASK=reporting_miro_transformer
     - env: TASK=reporting_miro_inventory_transformer
     - env: TASK=reporting_sierra_transformer
     - env: TASK=reporting_calm_transformer
+
 #    - stage: nginx
 #      env: TASK=nginx-build
 
@@ -35,8 +36,7 @@ jobs:
 #      env: TASK=loris-build
 #    - env: TASK=cache_cleaner-build
 
-
-
 stages:
-  - quicktest
-  - test
+  - preflight
+  - shared_lambdas
+  - reporting
