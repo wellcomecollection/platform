@@ -21,7 +21,7 @@ endef
 #
 define test_python
 	$(ROOT)/docker_run.py --aws --dind -- \
-		wellcome/build_test_python $(1)
+		wellcome/build_test_python:55 $(1)
 
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
@@ -273,7 +273,7 @@ $(1)-build:
 	$(call build_image,$(1),$(2))
 
 $(1)-test:
-	$(call test_python,$(STACK_ROOT)/$(1))
+	$(call test_python,$(ROOT)/$(1))
 endef
 
 define __python_ssm_target
@@ -281,7 +281,7 @@ $(1)-build:
 	$(call build_image,$(1),$(2))
 
 $(1)-test:
-	$(call test_python,$(STACK_ROOT)/$(1))
+	$(call test_python,$(ROOT)/$(1))
 
 $(1)-publish: $(1)-build
 	$(call publish_service_ssm,$(1),$(3),$(4),$(5))
