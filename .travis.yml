@@ -39,8 +39,3 @@ jobs:
 
 #    - stage: loris
 #      env: TASK=loris-build
-
-stages:
-  - preflight
-  - shared_lambdas
-  - reporting
