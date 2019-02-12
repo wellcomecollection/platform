@@ -19,12 +19,7 @@ format-python:
 		--volume $(ROOT):/repo \
 		wellcome/format_python
 
-format-scala:
-	$(ROOT)/docker_run.py --sbt -- \
-		--volume $(ROOT):/repo \
-		wellcome/scalafmt
-
-format: format-terraform format-scala format-python
+format: format-terraform format-python
 
 lint: lint-python
 	git diff --exit-code
