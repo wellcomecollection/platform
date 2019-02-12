@@ -7,52 +7,61 @@ it pushes a new commit to your pull request and aborts the current build.
 """
 
 import os
+import subprocess
 import sys
 
-from travistooling import branch_name, get_changed_paths, git, make
 
-
-def _run_task_for_extension(extension, task):
-    relevant_paths = [f for f in changed_paths if f.endswith(extension)]
-    if relevant_paths:
-        print("*** Running %s for the following paths:" % task)
-        for p in relevant_paths:
-            print(" - %s" % p)
-        make(task)
+def branch_name():
+    """Return the name of the branch under test."""
+    # See https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
+    if os.environ["TRAVIS_PULL_REQUEST"] == "false":
+        return os.environ["TRAVIS_BRANCH"]
     else:
-        print("*** Skipping %s as there are no affected files" % task)
+        return os.environ["TRAVIS_PULL_REQUEST_BRANCH"]
+
+
+def check_call(cmd):
+    """
+    A wrapped version of subprocess.check_call() that doesn't print a
+    traceback if the command errors.
+    """
+    print("*** Running %r" % " ".join(cmd))
+    try:
+        return subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as err:
+        print(err)
+        sys.exit(err.returncode)
+
+
+def git(*args):
+    """Run a Git command and return its output."""
+    cmd = ["git"] + list(args)
+    try:
+        return subprocess.check_output(cmd).decode("utf8").strip()
+    except subprocess.CalledProcessError as err:
+        print(err)
+        sys.exit(err.returncode)
+
+
+def make(*args):
+    """Run a Make command, and check it completes successfully."""
+    check_call(["make"] + list(args))
+
+
+def get_changed_paths(*args):
+    """
+    Returns a set of changed paths in a given commit range.
+
+    :param commit_range: Arguments to pass to ``git diff``.
+    """
+    diff_output = git("diff", "--name-only", *args)
+
+    return set([line.strip() for line in diff_output.splitlines()])
 
 
 if __name__ == "__main__":
 
-    # First get information about the currently running patch.
-    # In particular, we want to know which files have actually changed.
-    travis_event_type = os.environ["TRAVIS_EVENT_TYPE"]
-
-    if travis_event_type == "pull_request":
-        changed_paths = get_changed_paths("HEAD", "master")
-    else:
-        git("fetch", "origin")
-        changed_paths = get_changed_paths(os.environ["TRAVIS_COMMIT_RANGE"])
-
-    # Then run the 'format' tasks.  These are any tasks which might edit
-    # the code, and for which we might push changes.
-    extension_to_format_task = [
-        (".tf", "format-terraform"),
-        (".py", "format-python"),
-    ]
-
-    for extension, format_task in extension_to_format_task:
-        _run_task_for_extension(extension, format_task)
-
-    # Make any required changes to RFCs.
-    relevant_paths = [
-        f
-        for f in changed_paths
-        if f.endswith("README.md") and f.startswith("docs/rfcs")
-    ]
-    if relevant_paths:
-        make("format-rfcs")
+    make("format")
 
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
@@ -64,7 +73,12 @@ if __name__ == "__main__":
         git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
         git("config", "core.sshCommand", "ssh -i id_rsa")
 
-        git("remote", "add", "ssh-origin", "git@github.com:wellcometrust/platform.git")
+        git(
+            "remote",
+            "add",
+            "ssh-origin",
+            "git@github.com:wellcometrust/storage-service.git",
+        )
 
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.
@@ -81,10 +95,7 @@ if __name__ == "__main__":
     else:
         print("*** There were no changes from auto-formatting")
 
-    # Finally, run the 'lint' tasks.  A failure in these tasks requires
-    # manual intervention, so we run them last to get any automatic fixes
+    # Run the 'lint' tasks.  A failure in these tasks requires
+    # manual intervention, so we run them second to get any automatic fixes
     # out of the way.
-    extension_to_lint_task = [(".py", "lint-python"), (".ttl", "lint-ontologies")]
-
-    for extension, lint_task in extension_to_lint_task:
-        _run_task_for_extension(extension, lint_task)
+    make("lint")
