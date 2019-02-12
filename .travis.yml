@@ -30,12 +30,24 @@ jobs:
     - env: TASK=reporting_calm_transformer-test
 
     - stage: nginx-build
-      if: branch != master
       env: TASK=nginx-build
 
     - stage: nginx-publish
-      if: branch = master
       env: TASK=nginx-publish
 
 #    - stage: loris
 #      env: TASK=loris-build
+
+stages:
+  - name: preflight
+
+  - name: shared_lambdas
+
+  - name: reporting
+
+  - name: nginx-build
+    if: branch != master
+
+  - name: nginx-publish
+    if: branch = master
+
