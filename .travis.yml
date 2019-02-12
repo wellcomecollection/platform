@@ -35,8 +35,8 @@ stages:
   - name: preflight
 
   - name: test
-    if: branch != master
+    if: type != push
 
   - name: publish
-    if: branch = master
+    if: type = push
 
