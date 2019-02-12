@@ -21,7 +21,7 @@ Everything we create will be open-source, under an MIT license. We will package 
 
 Developers who want to create projects within the platform should refer to our [developer docs](docs/README.md).
 
-## Platform Status
+### Platform Status
 
 - [Repository list](docs/repositories.md)
 - [Build status](https://travis-ci.org/wellcometrust)
@@ -29,7 +29,7 @@ Developers who want to create projects within the platform should refer to our [
 - Uptime reports & current status:
     - [api.wellcomecollection.org/v1/works (api)](https://updown.io/hj6w)
     - [api.wellcomecollection.org/v2/works (api)](https://updown.io/qqek)
-    - [iif.wellcomecollection.org/image (api)](https://updown.io/dt4b)
+    - [iiif.wellcomecollection.org/image (api)](https://updown.io/dt4b)
     - [www.wellcomecollection.org (frontend)](https://updown.io/2cep)
     - [www.wellcomecollection.org/works (frontend)](https://updown.io/bhef)
 
