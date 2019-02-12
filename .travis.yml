@@ -12,42 +12,31 @@ branches:
     - master
 
 script:
-  # Wait 45 minutes for the entire build to finish.
-  - travis_wait 45 ./run_travis.sh
+  - ./run_travis.sh
 
 jobs:
   include:
     - stage: preflight
       env: TASK=travis-format
 
-    - stage: infrastructure
-      env: TASK=ecs_ec2_instance_tagger-test
+    - stage: test
+      env: TASK=infrastructure-test
+    - env: TASK=reporting-test
+    - env: TASK=nginx-build
+    - env: TASK=loris-build
 
-    - stage: reporting
-      env: TASK=reporting_miro_transformer-test
-    - env: TASK=reporting_miro_inventory_transformer-test
-    - env: TASK=reporting_sierra_transformer-test
-    - env: TASK=reporting_calm_transformer-test
-
-    - stage: nginx-build
-      env: TASK=nginx-build
-
-    - stage: nginx-publish
-      env: TASK=nginx-publish
-
-#    - stage: loris
-#      env: TASK=loris-build
+    - stage: publish
+      env: TASK=infrastructure-publish
+    - env: TASK=reporting-publish
+    - env: TASK=nginx-publish
+    - env: TASK=loris-publish
 
 stages:
   - name: preflight
 
-  - name: shared_lambdas
-
-  - name: reporting
-
-  - name: nginx-build
+  - name: test
     if: branch != master
 
-  - name: nginx-publish
+  - name: publish
     if: branch = master
 
