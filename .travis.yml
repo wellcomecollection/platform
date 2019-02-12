@@ -24,17 +24,21 @@ jobs:
       env: TASK=ecs_ec2_instance_tagger-test
 
     - stage: reporting
-      env: TASK=reporting_miro_transformer
-    - env: TASK=reporting_miro_inventory_transformer
-    - env: TASK=reporting_sierra_transformer
-    - env: TASK=reporting_calm_transformer
+      env: TASK=reporting_miro_transformer-test
+    - env: TASK=reporting_miro_inventory_transformer-test
+    - env: TASK=reporting_sierra_transformer-test
+    - env: TASK=reporting_calm_transformer-test
 
-#    - stage: nginx
-#      env: TASK=nginx-build
+    - stage: nginx-build
+      if: branch != master
+      env: TASK=nginx-build
+
+    - stage: nginx-publish
+      if: branch = master
+      env: TASK=nginx-publish
 
 #    - stage: loris
 #      env: TASK=loris-build
-#    - env: TASK=cache_cleaner-build
 
 stages:
   - preflight

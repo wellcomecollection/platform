@@ -1,5 +1,5 @@
-FROM nginx
+FROM nginx:1.15.8-alpine
 
-COPY api-gw.nginx.conf /etc/nginx/nginx.conf.template
+COPY apigw.nginx.conf /etc/nginx/nginx.conf.template
 
 CMD /bin/bash -c "envsubst '\$APP_HOST \$APP_PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && nginx -g 'daemon off;'"

@@ -1,45 +1,32 @@
+export ECR_BASE_URI = 760097843905.dkr.ecr.eu-west-1.amazonaws.com/uk.ac.wellcome
+export REGISTRY_ID  = 760097843905
+
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/makefiles/functions.Makefile
 
 
-# Build and tag a Docker image (specifically for nginx).
-#
-# Args:
-#   $1 - Name of the variant.
-#
-define nginx_build_image
-	$(ROOT)/docker_run.py \
-		--dind -- \
-		wellcome/image_builder:23 \
-            --project=nginx \
-            --variant=$(1) \
-            --file=nginx/$(2)
-endef
+nginx_apigw-build:
+	$(call build_image,nginx_apigw,nginx/apigw.Dockerfile)
 
-nginx-build-api-gw:
-	$(call nginx_build_image,api-gw,api-gw.Dockerfile.template)
+nginx_loris-build:
+	$(call build_image,nginx_loris,nginx/loris.Dockerfile)
 
-nginx-build-services:
-	$(call nginx_build_image,services,services.Dockerfile.template)
+nginx_grafana-build:
+	$(call build_image,nginx_grafana,nginx/grafana.Dockerfile)
 
-nginx-build-loris-delta:
-	$(call nginx_build_image,loris-delta,Dockerfile)
+nginx-build:    nginx_apigw-build \
+                nginx_loris-build \
+                nginx_grafana-build
 
-nginx-build-grafana:
-	$(call nginx_build_image,grafana,Dockerfile)
+nginx_apigw-publish: nginx_apigw-build
+	$(call publish_service_ssm,nginx_apigw,nginx,$(ECR_BASE_URI),$(REGISTRY_ID))
 
-nginx-build: nginx-build-loris nginx-build-services nginx-build-loris-delta nginx-build-grafana nginx-build-api-gw
+nginx_loris-publish: nginx_loris-build
+	$(call publish_service_ssm,nginx_loris,nginx,$(ECR_BASE_URI),$(REGISTRY_ID))
 
-nginx-publish-api-gw: nginx-build-api-gw
-	$(call publish_service_ssm,nginx_api-gw,catalogue_api,760097843905)
+nginx_grafana-publish: nginx_grafana-build
+	$(call publish_service_ssm,nginx_grafana,nginx,$(ECR_BASE_URI),$(REGISTRY_ID))
 
-nginx-publish-services: nginx-build-services
-	$(call publish_service,nginx_services)
-
-nginx-publish-loris-delta: nginx-build-loris-delta
-	$(call publish_service_ssm,nginx_loris-delta,loris,760097843905)
-
-nginx-publish-grafana: nginx-build-grafana
-	$(call publish_service,nginx_grafana)
-
-nginx-publish: nginx-publish-loris nginx-publish-services nginx-publish-loris-delta nginx-publish-grafana nginx-publish-api-gw
+nginx-publish:  nginx_apigw-publish \
+                nginx_loris-publish \
+                nginx_grafana-publish
