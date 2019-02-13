@@ -14,3 +14,6 @@ PYTHON_SSM_APPS =
 LAMBDAS 	    =
 
 $(val $(call stack_setup))
+
+include $(ROOT)/makefiles/terraform.Makefile
+$(eval $(call __terraform_target_template,data_science,data_science/terraform))
