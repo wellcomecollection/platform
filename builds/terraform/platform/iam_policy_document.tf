@@ -11,15 +11,14 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "s3:HeadObject",
+      "s3:Put*",
+      "s3:Get*",
       "s3:List*",
     ]
 
     resources = [
-      "${var.infra_bucket_arn}/lambdas/*",
-      "${var.infra_bucket_arn}/releases/*",
+      "${var.infra_bucket_arn}/",
+      "${var.infra_bucket_arn}/*",
     ]
   }
 
