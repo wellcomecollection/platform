@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${var.infra_bucket_arn}/",
+      "${var.infra_bucket_arn}",
       "${var.infra_bucket_arn}/*",
     ]
   }
@@ -29,6 +29,16 @@ data "aws_iam_policy_document" "travis_permissions" {
 
     resources = [
       "*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "${var.publish_topics}",
     ]
   }
 

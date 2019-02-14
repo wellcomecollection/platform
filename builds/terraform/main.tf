@@ -4,6 +4,15 @@ module "platform" {
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
   infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  publish_topics = [
+    "${module.ecr_pushes_topic.arn}",
+    "${module.lambda_pushes_topic.arn}",
+  ]
+
+  providers = {
+    aws = "aws.platform"
+  }
 }
 
 module "catalogue_repo" {
@@ -12,6 +21,11 @@ module "catalogue_repo" {
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
   infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  publish_topics = [
+    "${module.ecr_pushes_topic.arn}",
+    "${module.lambda_pushes_topic.arn}",
+  ]
 
   providers = {
     aws = "aws.catalogue"
@@ -24,6 +38,11 @@ module "storage_repo" {
 
   sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
   infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  publish_topics = [
+    "${module.ecr_pushes_topic.arn}",
+    "${module.lambda_pushes_topic.arn}",
+  ]
 
   providers = {
     aws = "aws.storage"
