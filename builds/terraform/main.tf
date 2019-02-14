@@ -49,6 +49,23 @@ module "storage_repo" {
   }
 }
 
+module "archivematica_repo" {
+  source    = "./platform"
+  repo_name = "archivematica-infra"
+
+  sbt_releases_bucket_arn = "${aws_s3_bucket.releases.arn}"
+  infra_bucket_arn        = "${local.infra_bucket_arn}"
+
+  publish_topics = [
+    "${module.ecr_pushes_topic.arn}",
+    "${module.lambda_pushes_topic.arn}",
+  ]
+
+  providers = {
+    aws = "aws.workflow"
+  }
+}
+
 module "platform_cli" {
   source = "./python_library"
 
