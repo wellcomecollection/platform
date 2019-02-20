@@ -268,3 +268,5 @@ if __name__ == "__main__":
 
     remove_image_from_loris_s3_bucket(miro_id)
     create_cloudfront_invalidations(miro_id)
+
+    print("*** You also need to (manually) create a CloudFront invalidation for the /works page on wellcomecollection.org")
