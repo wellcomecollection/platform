@@ -7,11 +7,19 @@ it from the site and prevent it from reappearing in a reindex.
 
 import datetime as dt
 import getpass
+import hashlib
+import json
 import os
 import sys
 
 import boto3
 import requests
+
+
+def sha256(bs):
+    h = hashlib.sha256()
+    h.update(bs)
+    return h.hexdigest()
 
 
 def platform_client(service_name):
@@ -216,12 +224,11 @@ def remove_image_from_loris_s3_bucket(miro_id):
         return
 
     assert len(matching_keys) == 1, matching_keys
+    key = matching_keys[0]
+    assert key.endswith(".jpg")
 
-    print("··· Detected object in S3 bucket, deleting: %s" % matching_keys[0])
-    s3_client.delete_object(
-        Bucket=bucket,
-        Key=matching_keys[0]
-    )
+    print("··· Detected object in S3 bucket, deleting: %s" % key)
+    s3_client.delete_object(Bucket=bucket, Key=key)
 
 
 def create_cloudfront_invalidations(miro_id):
@@ -256,6 +263,50 @@ def create_cloudfront_invalidations(miro_id):
     assert resp["ResponseMetadata"]["HTTPStatusCode"] == 201
 
 
+def update_miro_inventory(miro_id):
+    print("*** Updating the Miro inventory")
+    dynamodb_client = platform_client("dynamodb")
+    s3_client = platform_client("s3")
+
+    resp = dynamodb_client.get_item(
+        TableName="vhs-miro-migration",
+        Key={"id": {"S": miro_id}}
+    )
+    item = resp["Item"]
+
+    s3_bucket = item["location"]["M"]["namespace"]["S"]
+    s3_key = item["location"]["M"]["key"]["S"]
+    print("··· Detected VHS inventory entry as s3://%s/%s" % (s3_bucket, s3_key))
+
+    inventory_obj = s3_client.get_object(Bucket=s3_bucket, Key=s3_key)
+    inventory_entry = json.load(inventory_obj["Body"])
+
+    inventory_entry["catalogue_api_derivative"] = False
+    inventory_entry["catalogue_api_derivative_bucket"] = None
+    inventory_entry["catalogue_api_derivative_key"] = None
+
+    new_entry = json.dumps(inventory_entry, separators=(",", ":")).encode("utf8")
+    new_key = "%s/%s.json" % (miro_id, sha256(new_entry))
+    if new_key == s3_key:
+        print("··· Inventory is already up to date, skipping")
+        return
+
+    print("··· Updating VHS inventory entry")
+    s3_client.put_object(
+        Bucket=s3_bucket,
+        Key=new_key,
+        Body=new_entry
+    )
+
+    item["location"]["M"]["key"]["S"] = new_key
+    item["version"]["N"] = str(int(item["version"]["N"]) + 1)
+
+    resp = dynamodb_client.put_item(
+        TableName="vhs-miro-migration",
+        Item=item
+    )
+
+
 if __name__ == "__main__":
     catalogue_id = sys.argv[1]
     print("*** Suppressing Miro ID %s" % catalogue_id)
@@ -268,5 +319,6 @@ if __name__ == "__main__":
 
     remove_image_from_loris_s3_bucket(miro_id)
     create_cloudfront_invalidations(miro_id)
+    update_miro_inventory(miro_id)
 
     print("*** You also need to (manually) create a CloudFront invalidation for the /works page on wellcomecollection.org")
