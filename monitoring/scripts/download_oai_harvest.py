@@ -8,6 +8,7 @@ can be useful for doing bulk analysis of the Calm data.
 """
 
 import collections
+import datetime as dt
 import json
 import re
 from urllib.parse import unquote
@@ -57,10 +58,7 @@ def fetch_calm_records():
             del params["metadataPrefix"]
 
 
-all_records = []
-for r in fetch_calm_records():
-    all_records.append(r)
-    if len(all_records) % 1000 == 0:
-        print(f"{len(all_records)}...")
-
-json.dump(all_records, open("calm_records.json", "w"), indent=2, sort_keys=True)
+path = "calm_records--%s.json" % dt.datetime.now().strftime("%Y_%m_%d--%H_%M")
+with open(path, "x") as outfile:
+    for record in fetch_calm_records():
+        outfile.write(json.dumps(record) + "\n")
