@@ -28,8 +28,7 @@ def platform_client(service_name):
     session_name = "%s--%s" % (getpass.getuser(), os.path.basename(__file__))
 
     resp = sts.assume_role(
-        RoleArn="arn:aws:iam::760097843905:role/developer",
-        RoleSessionName=session_name
+        RoleArn="arn:aws:iam::760097843905:role/developer", RoleSessionName=session_name
     )
 
     credentials = resp["Credentials"]
@@ -38,7 +37,7 @@ def platform_client(service_name):
         service_name,
         aws_access_key_id=credentials["AccessKeyId"],
         aws_secret_access_key=credentials["SecretAccessKey"],
-        aws_session_token=credentials["SessionToken"]
+        aws_session_token=credentials["SessionToken"],
     )
 
 
@@ -54,11 +53,11 @@ def remove_image_from_es_indexes(catalogue_id):
     print("··· Reading Elasticsearch config for the ingestor (write credentials)")
     es_username = ssm_client.get_parameter(
         Name="/aws/reference/secretsmanager/catalogue/ingestor/es_username",
-        WithDecryption=True
+        WithDecryption=True,
     )
     es_password = ssm_client.get_parameter(
         Name="/aws/reference/secretsmanager/catalogue/ingestor/es_password",
-        WithDecryption=True
+        WithDecryption=True,
     )
     es_auth = (es_username["Parameter"]["Value"], es_password["Parameter"]["Value"])
 
@@ -67,10 +66,7 @@ def remove_image_from_es_indexes(catalogue_id):
     service_arns = resp["serviceArns"]
     assert len(service_arns) == 2
 
-    resp = ecs_client.describe_services(
-        cluster="catalogue-api",
-        services=service_arns
-    )
+    resp = ecs_client.describe_services(cluster="catalogue-api", services=service_arns)
     services = resp["services"]
     assert len(services) == 2
     task_definitions = [service["taskDefinition"] for service in services]
@@ -86,21 +82,12 @@ def remove_image_from_es_indexes(catalogue_id):
         app_containers = [cd for cd in container_definitions if cd["name"] == "app"]
         assert len(app_containers) == 1
 
-        app_env_vars = {
-            e["name"]: e["value"]
-            for e in app_containers[0]["environment"]
-        }
+        app_env_vars = {e["name"]: e["value"] for e in app_containers[0]["environment"]}
 
-        app_secrets = {
-            s["name"]: s["valueFrom"]
-            for s in app_containers[0]["secrets"]
-        }
+        app_secrets = {s["name"]: s["valueFrom"] for s in app_containers[0]["secrets"]}
 
         for name, value_from in app_secrets.items():
-            resp = ssm_client.get_parameter(
-                Name=value_from,
-                WithDecryption=True
-            )
+            resp = ssm_client.get_parameter(Name=value_from, WithDecryption=True)
             app_secrets[name] = resp["Parameter"]["Value"]
 
         # 3. Once we have the config and password, we can remove the work from
@@ -108,7 +95,7 @@ def remove_image_from_es_indexes(catalogue_id):
         es_host = "%s://%s:%s/" % (
             app_secrets["es_protocol"],
             app_secrets["es_host"],
-            app_secrets["es_port"]
+            app_secrets["es_port"],
         )
 
         for index_name in (app_env_vars["es_index_v1"], app_env_vars["es_index_v2"]):
@@ -116,7 +103,7 @@ def remove_image_from_es_indexes(catalogue_id):
             print("··· Looking up %s in index %s" % (catalogue_id, index_name))
             resp = requests.get(
                 "%s%s/%s/%s" % (es_host, index_name, index_name, catalogue_id),
-                auth=es_auth
+                auth=es_auth,
             )
 
             if resp.status_code == 404:
@@ -128,11 +115,15 @@ def remove_image_from_es_indexes(catalogue_id):
             existing_work = resp.json()["_source"]
 
             if existing_work["type"] == "IdentifiedInvisibleWork":
-                print("··· Work is already suppressed as an IdentifiedInvisibleWork, skipping")
+                print(
+                    "··· Work is already suppressed as an IdentifiedInvisibleWork, skipping"
+                )
                 continue
 
             # While we're looking at API responses, try to get the Miro ID.
-            identifiers = [existing_work["sourceIdentifier"]] + existing_work["otherIdentifiers"]
+            identifiers = [existing_work["sourceIdentifier"]] + existing_work[
+                "otherIdentifiers"
+            ]
             miro_identifiers = [
                 idf
                 for idf in identifiers
@@ -144,7 +135,8 @@ def remove_image_from_es_indexes(catalogue_id):
                 miro_id = miro_identifier
             else:
                 assert miro_id == miro_identifier, "Multiple Miro IDs? %s, %s" % (
-                    miro_id, miro_identifier
+                    miro_id,
+                    miro_identifier,
                 )
 
             assert existing_work["type"] == "IdentifiedWork"
@@ -153,22 +145,21 @@ def remove_image_from_es_indexes(catalogue_id):
                 "canonicalId": existing_work["canonicalId"],
                 "sourceIdentifier": existing_work["sourceIdentifier"],
                 "type": "IdentifiedInvisibleWork",
-
                 # We bump the version so any in-flight works won't overwrite
                 # this one.
-                "version": existing_work["version"] + 1
+                "version": existing_work["version"] + 1,
             }
             print("··· Replacing work with an IdentifiedInvisibleWork")
             resp = requests.put(
                 "%s%s/%s/%s" % (es_host, index_name, index_name, catalogue_id),
                 auth=es_auth,
-                json=new_work
+                json=new_work,
             )
             resp.raise_for_status()
 
             resp = requests.get(
                 "%s%s/%s/%s" % (es_host, index_name, index_name, catalogue_id),
-                auth=es_auth
+                auth=es_auth,
             )
             assert resp.json()["_source"]["type"] == "IdentifiedInvisibleWork"
 
@@ -180,8 +171,7 @@ def suppress_work_in_miro_vhs(miro_id):
     dynamodb_client = platform_client("dynamodb")
 
     resp = dynamodb_client.get_item(
-        TableName="vhs-sourcedata-miro",
-        Key={"id": {"S": miro_id}}
+        TableName="vhs-sourcedata-miro", Key={"id": {"S": miro_id}}
     )
     item = resp["Item"]
 
@@ -194,14 +184,10 @@ def suppress_work_in_miro_vhs(miro_id):
 
     # AWLC: I should do a conditional PutItem here because it's a VHS, but I CBA.
     # This table isn't usually changing much.
-    resp = dynamodb_client.put_item(
-        TableName="vhs-sourcedata-miro",
-        Item=item
-    )
+    resp = dynamodb_client.put_item(TableName="vhs-sourcedata-miro", Item=item)
 
     resp = dynamodb_client.get_item(
-        TableName="vhs-sourcedata-miro",
-        Key={"id": {"S": miro_id}}
+        TableName="vhs-sourcedata-miro", Key={"id": {"S": miro_id}}
     )
     assert not resp["Item"]["isClearedForCatalogueAPI"]["BOOL"]
 
@@ -239,7 +225,8 @@ def create_cloudfront_invalidations(miro_id):
     matching = [
         item
         for item in resp["DistributionList"]["Items"]
-        if item["Origins"]["Items"][0]["DomainName"] == "iiif-origin.wellcomecollection.org"
+        if item["Origins"]["Items"][0]["DomainName"]
+        == "iiif-origin.wellcomecollection.org"
     ]
     assert len(matching) == 1
     distribution_id = matching[0]["Id"]
@@ -251,12 +238,9 @@ def create_cloudfront_invalidations(miro_id):
     resp = cloudfront_client.create_invalidation(
         DistributionId=distribution_id,
         InvalidationBatch={
-            "Paths": {
-                "Quantity": 1,
-                "Items": [url],
-            },
-            "CallerReference": dt.datetime.now().isoformat()
-        }
+            "Paths": {"Quantity": 1, "Items": [url]},
+            "CallerReference": dt.datetime.now().isoformat(),
+        },
     )
     assert resp["ResponseMetadata"]["HTTPStatusCode"] == 201
 
@@ -267,8 +251,7 @@ def update_miro_inventory(miro_id):
     s3_client = platform_client("s3")
 
     resp = dynamodb_client.get_item(
-        TableName="vhs-miro-migration",
-        Key={"id": {"S": miro_id}}
+        TableName="vhs-miro-migration", Key={"id": {"S": miro_id}}
     )
     item = resp["Item"]
 
@@ -290,19 +273,12 @@ def update_miro_inventory(miro_id):
         return
 
     print("··· Updating VHS inventory entry")
-    s3_client.put_object(
-        Bucket=s3_bucket,
-        Key=new_key,
-        Body=new_entry
-    )
+    s3_client.put_object(Bucket=s3_bucket, Key=new_key, Body=new_entry)
 
     item["location"]["M"]["key"]["S"] = new_key
     item["version"]["N"] = str(int(item["version"]["N"]) + 1)
 
-    resp = dynamodb_client.put_item(
-        TableName="vhs-miro-migration",
-        Item=item
-    )
+    resp = dynamodb_client.put_item(TableName="vhs-miro-migration", Item=item)
 
 
 if __name__ == "__main__":
@@ -319,4 +295,6 @@ if __name__ == "__main__":
     create_cloudfront_invalidations(miro_id)
     update_miro_inventory(miro_id)
 
-    print("*** You also need to (manually) create a CloudFront invalidation for the /works page on wellcomecollection.org")
+    print(
+        "*** You also need to (manually) create a CloudFront invalidation for the /works page on wellcomecollection.org"
+    )
