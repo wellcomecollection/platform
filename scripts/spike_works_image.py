@@ -132,7 +132,6 @@ def remove_image_from_es_indexes(catalogue_id):
                 continue
 
             # While we're looking at API responses, try to get the Miro ID.
-            source_identifier = existing_work["sourceIdentifier"]
             identifiers = [existing_work["sourceIdentifier"]] + existing_work["otherIdentifiers"]
             miro_identifiers = [
                 idf
@@ -246,7 +245,6 @@ def create_cloudfront_invalidations(miro_id):
     distribution_id = matching[0]["Id"]
     print("··· Detected Loris CloudFront distribution as %s" % distribution_id)
 
-    shard = miro_id[:-3] + "000"
     url = "/image/%s.jpg/*" % miro_id
     print("··· Issuing an invalidation for %s" % url)
 
