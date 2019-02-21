@@ -54,6 +54,8 @@ resource "aws_cognito_user_pool_client" "goobi" {
 
   allowed_oauth_scopes = [
     "${aws_cognito_resource_server.storage_api.scope_identifiers}",
+    "https://api-stage.wellcomecollection.org/storage/v1/ingests",
+    "https://api-stage.wellcomecollection.org/storage/v1/bags",
   ]
 
   allowed_oauth_flows_user_pool_client = true
