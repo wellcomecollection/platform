@@ -1,10 +1,10 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 06 February 2019.**
+**Last updated: 18 February 2019.**
 
 ## Problem statement
 
-We need to provide a service for storing digital assets.
+We need to provide a service for storing archival and asset copies of digital assets.
 
 This service should:
 
@@ -19,16 +19,15 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 
 ![archival storage service - page 1](storageservice-20190702.png)
 
--   New assets are uploaded to an Ingest bucket in S3.
+-   Assets are uploaded to an Ingest bucket in S3.
     These assets are zip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
 
 -   The event stream from S3 triggers the Archival Storage Service, which:
 
     1.  Retrieves a copy of the BagIt file from the Ingest bucket
     2.  Decompresses the BagIt file and copies it to a short-term Processing bucket
-    3.  Validates the file -- i.e., checks that the contents match those described by the BagIt metadata
-    4.  Assuming the contents are valid, copies the files to a long-term storage location
-    4.  Replicates the content into a second long-term storage location
+    3.  Validates the bag -- i.e., checks that the contents match those described by the BagIt metadata
+    4.  Assuming the contents are valid, stores the bag in long-term storage
     5.  Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
 
 [bagit]: https://en.wikipedia.org/wiki/BagIt
@@ -40,15 +39,17 @@ We'll need to integrate with other services such as:
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
 - [Archivematica](https://archivematica.org) - for born-digital archives workflow
 
-These services will need to provide accessions in the BagIt format, zip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
+These services will need to provide assets in the BagIt format, zip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
+
+When there is a distinction between archival and access assets, these should be submitted as separate bags. This allows storing archival assets and access assets in different kinds of storage.
 
 ### Storage
 
-All assets will be stored in S3 Infrequent Access and replicated to S3 Glacier. We will store a second replica in Azure Blob Storage with the Archive storage class.
+Archival bags will be stored in S3 with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. Access bags will be stored in S3 with an Infrequent Access storage class.
 
-S3 Glacier storage will have versioning enabled, but we will only keep the most recent version in S3 Infrequent Access.
+AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
 
-The S3 Glacier version should be stored for every file. The S3 Glacier version of the tagmanifest should be used as the overall version of the bag.
+The underlying storage provider version should be stored for every file. The underlying storage provider version of the tagmanifest should be used as the overall version of the bag.
 
 #### Locations
 
@@ -63,9 +64,11 @@ Within each location, assets will be grouped into related spaces of content and 
 - `/digitised/b0000000/{bag contents}`
 - `/born-digital/0000-0000-0000-0000/{bag contents}`
 
+Spaces will be associated with one or more locations, so that ingesting into a space will store the content in all locations configured for that space.
+
 #### Assets
 
-Assets will be stored in the above locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above spaces inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -133,6 +136,46 @@ This token must be provided on all subsequent requests in the Authorization head
 
 ```http
 Authorization: Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
+```
+
+### Spaces
+
+Request:
+
+```http
+GET /spaces/{id}
+```
+
+Response:
+
+```json
+{
+  "type": "Space",
+  "id": "{id}",
+  "label": "Description of the purpose of this space",
+  "locations": [
+    {
+        "type": "Location",
+        "provider": {
+            "type": "Provider",
+            "id": "aws-s3-glacier",
+            "label": "AWS S3 Glacier"
+        },
+        "bucket": "{bucket}",
+        "path": "{path}"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
+      "bucket": "{bucket}",
+      "path": "{path}"
+    }
+  ]
+}
 ```
 
 ### Ingests
@@ -301,7 +344,7 @@ See examples below
 
 ### Digitised content
 
-Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
+Digitised content will be ingested using Goobi, which should provide the bag layout defined below. Initially there will be no distinction between archive and access bags, so the same space should be configured to write to all three storage locations.
 
 #### Complete bag
 
@@ -531,7 +574,7 @@ Response:
       }
     ]
   },
-  "storageLocations": [
+  "locations": [
     {
       "type": "Location",
       "provider": {
@@ -572,9 +615,9 @@ Response:
 }
 ```
 
-### Born-digital archives
+### Born-digital archives (AIPs)
 
-Born-digital archives will be ingested using Archivematica, which has a pre-existing bag layout that we have to adopt.
+Born-digital archives will be ingested using Archivematica, which has a pre-existing bag layout for AIPs that we have to adopt.
 
 #### Bag
 
@@ -677,18 +720,7 @@ Response:
       }
     ]
   },
-  "storageLocations": [
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "aws-s3-ia",
-        "label": "AWS S3 - Infrequent Access"
-      },
-      "bucket": "bucketname",
-      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-    },
+  "locations": [
     {
       "type": "Location",
       "provider": {
@@ -710,6 +742,130 @@ Response:
       "bucket": "bucketname",
       "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
       "url": "https://accountname.blob.core.windows.net/bucketname/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    }
+  ],
+  "createdDate": "2016-08-07T00:00:00Z",
+  "lastModifiedDate": "2016-08-07T00:00:00Z",
+  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+}
+```
+
+### Born-digital access (DIPs)
+
+Access copies for born-digital archives will also be ingested using Archivematica. We will wrap the DIPs produced by Archivematica in bags before upload.
+
+#### Bag
+
+```
+GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
+|-- data
+|   |-- METS.a2870a2d-5111-403f-b092-45c569ef9476.xml    // mets file
+|   \-- objects
+|       \-- Disc_1/HEART.WRI
+|           ...
+|   \-- logs
+|       \-- ...
+|-- manifest-sha256.txt
+|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml
+|     4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4 data/objects/Disc_1/HEART.WRI
+|     ...
+|-- tagmanifest-md5.txt
+|     452ad4b7d28249102dcac5d5bafe834e bag-info.txt
+|     9e5ad981e0d29adc278f6a294b8c2aca bagit.txt
+|     3148319ddaf49214944ec357405a8189 manifest-sha256.txt
+|-- bag-info.txt
+|     External-Identifier: a2870a2d-5111-403f-b092-45c569ef9476
+|     External-Description: AIP title
+|     Bagging-Date: 2016-08-07
+|     Payload-Oxum: 435255.8
+\-- bagit.txt
+      BagIt-Version: 0.97
+      Tag-File-Character-Encoding: UTF-8
+```
+
+#### METS
+
+The METS file will be as provided out of the box by Archivematica.
+
+#### API
+
+Request:
+
+```http
+GET /bags/born-digital-access/yy-yy-yy-yy
+```
+
+Response:
+
+```json
+{
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
+  "type": "Bag",
+  "id": "born-digital-access/yy-yy-yy-yy",
+  "space": {
+    "id": "born-digital-access",
+    "type": "Space"
+  },
+  "info": {
+    "type": "BagInfo",
+    "externalIdentifier": "a2870a2d-5111-403f-b092-45c569ef9476",
+    "externalDescription": "AIP title",
+    "payloadOxum": 435255.2,
+    "baggingDate": "2016-08-07",    
+  },
+  "manifest": {
+    "type": "BagManifest",
+    "checksumAlgorithm": "sha256",
+    "files": [
+      {
+        "type": "File",
+        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
+        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+      },
+      {
+        "type": "File",
+        "path": "data/objects/Disc_1/HEART.WRI",
+        "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+      }
+    ]
+  },
+  "tagManifest": {
+    "type": "BagManifest",
+    "checksumAlgorithm": "md5",
+    "files": [
+      {
+        "type": "File",
+        "path": "bagit.txt",
+        "checksum": "452ad4b7d28249102dcac5d5bafe834e",
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+      },
+      {
+        "type": "File",
+        "path": "bag-info.txt",
+        "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+      },
+      {
+        "type": "File",
+        "path": "manifest-256.txt",
+        "checksum": "3148319ddaf49214944ec357405a8189",
+        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+      }
+    ]
+  },
+  "locations": [
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-ia",
+        "label": "AWS S3 - Infrequent Access"
+      },
+      "bucket": "bucketname",
+      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
