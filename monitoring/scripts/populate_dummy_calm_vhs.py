@@ -5,7 +5,7 @@ import os
 import json
 import boto3
 import hashlib
-#from download_oai_harvest import fetch_calm_records
+from download_oai_harvest import fetch_calm_records
 
 CALM_TABLE = "vhs-calm"
 CALM_BUCKET = "wellcomecollection-vhs-calm"
@@ -30,8 +30,8 @@ def calm_records():
             "Can't find calm_records.json locally. "
             "Using data downloaded from source instead. "
         )
-        # for record in fetch_calm_records():
-        #    yield record
+        for record in fetch_calm_records():
+            yield record
 
 
 if __name__ == "__main__":
@@ -70,7 +70,10 @@ if __name__ == "__main__":
 
     print("Done with s3. Adding pointer records to VHS in batches")
     with dynamodb_table.batch_writer() as batch:
-        for vhs_record in vhs_records_to_store:
+        for i, vhs_record in enumerate(vhs_records_to_store):
             batch.put_item(Item=vhs_record)
+
+            if i % 100 == 0:
+                print(f"Processed {i} records")
 
     print("Complete")
