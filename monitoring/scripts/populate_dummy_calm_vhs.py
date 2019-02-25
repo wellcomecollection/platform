@@ -5,7 +5,7 @@ import os
 import json
 import boto3
 import hashlib
-from download_oai_harvest import fetch_calm_records
+#from download_oai_harvest import fetch_calm_records
 
 CALM_TABLE = "vhs-calm"
 CALM_BUCKET = "wellcomecollection-vhs-calm"
@@ -18,30 +18,35 @@ def calm_records():
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
     file_path = os.path.join(dir_path, "calm_records.json")
-    print(file_path)
 
-    if os.path.exists(file_path):
+    try:
         with open(file_path) as f:
+            print("Loading data from", file_path)
             for record in json.load(f):
                 yield record
-    else:
+
+    except FileNotFoundError:
         print(
             "Can't find calm_records.json locally. "
             "Using data downloaded from source instead. "
         )
-        for record in fetch_calm_records():
-            yield record
+        # for record in fetch_calm_records():
+        #    yield record
 
 
 if __name__ == "__main__":
-    dynamodb_client = boto3.client("dynamodb")
+    vhs_records_to_store = []
+
+    dynamodb_client = boto3.resource("dynamodb")
+    dynamodb_table = dynamodb_client.Table(CALM_TABLE)
     s3_client = boto3.client("s3")
 
+    print("Loading calm data and pushing to s3 bucket")
     for i, record in enumerate(calm_records()):
         record_id = record["RecordID"][0]
         binary_record = json.dumps(record)
-        string_record = str(record).encode('utf-8')
-        s3_key = hashlib.sha256(string_record).hexdigest() + '.json'
+        string_record = str(record).encode("utf-8")
+        s3_key = hashlib.sha256(string_record).hexdigest() + ".json"
 
         s3_client.put_object(
             Body=binary_record,
@@ -50,20 +55,22 @@ if __name__ == "__main__":
         )
 
         vhs_record = {
-            "id": {"S": record_id},
+            "id": record_id,
             "location": {
-                "M": {
-                    "key": {"S": s3_key},
-                    "namespace": {"S": CALM_BUCKET}
-                }
+                "key": s3_key,
+                "namespace": CALM_BUCKET
             },
-            "version": {"N": "1"}
+            "version": 1
         }
 
-        dynamodb_client.put_item(
-            TableName=CALM_TABLE,
-            Item=vhs_record
-        )
+        vhs_records_to_store.append(vhs_record)
 
         if i % 100 == 0:
-            print(i)
+            print(f"Processed {i} records")
+
+    print("Done with s3. Adding pointer records to VHS in batches")
+    with dynamodb_table.batch_writer() as batch:
+        for vhs_record in vhs_records_to_store:
+            batch.put_item(Item=vhs_record)
+
+    print("Complete")
