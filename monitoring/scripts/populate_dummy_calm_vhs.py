@@ -10,9 +10,10 @@ from download_oai_harvest import fetch_calm_records
 CALM_TABLE = "vhs-calm"
 CALM_BUCKET = "wellcomecollection-vhs-calm"
 
+
 def calm_records():
     """
-    Yields calm records line by line, either from a local file downloaded 
+    Yields calm records line by line, either from a local file downloaded
     previously, or by downloading the records individually from the source.
     """
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -24,12 +25,12 @@ def calm_records():
             for record in json.load(f):
                 yield record
     else:
-       print(
-           "Can't find calm_records.json locally. "
-           "Using data downloaded from source instead. "
-       )
-       for record in fetch_calm_records():
-           yield record
+        print(
+            "Can't find calm_records.json locally. "
+            "Using data downloaded from source instead. "
+        )
+        for record in fetch_calm_records():
+            yield record
 
 
 if __name__ == "__main__":
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 
         vhs_record = {
             "id": {"S": record_id},
-            "location": { 
+            "location": {
                 "M": {
                     "key": {"S": s3_key},
                     "namespace": {"S": CALM_BUCKET}
@@ -58,11 +59,11 @@ if __name__ == "__main__":
             },
             "version": {"N": "1"}
         }
-        
+
         dynamodb_client.put_item(
-            TableName=CALM_TABLE, 
+            TableName=CALM_TABLE,
             Item=vhs_record
         )
 
-        if i % 100 == 0: 
+        if i % 100 == 0:
             print(i)
