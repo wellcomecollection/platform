@@ -39,7 +39,7 @@ def main():
     args = docopt.docopt(__doc__)
 
     key_path = args["--key"] or _default_ssh_key_path()
-    namespace = args["--namespace"] or "notebook"
+    namespace = args["--namespace"] or "datascience-281118-notebook"
 
     print("Using SSH key at path %r" % key_path)
 

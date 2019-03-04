@@ -108,7 +108,7 @@ if __name__ == "__main__":
     args = docopt.docopt(__doc__)
 
     instance_type = args["--type"] or "t2"
-    namespace = args["--namespace"] or "notebook"
+    namespace = args["--namespace"] or "datascience-281118-notebook"
     tag_name = "jupyter-%s-%s" % (instance_type, namespace)
     scheduled_action_name = "ensure_down"
 

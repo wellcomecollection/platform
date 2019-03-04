@@ -6,7 +6,7 @@ module "p2_compute" {
   bucket_name = "${var.s3_bucket_name}"
 
   instance_type = "p2.xlarge"
-  spot_price    = "0.5"
+  spot_price    = "1"
 
   default_environment = "pytorch_p36"
 
@@ -29,7 +29,8 @@ module "t2_compute" {
   key_name    = "${var.key_name}"
   bucket_name = "${var.s3_bucket_name}"
 
-  spot_price = "0.4"
+  instance_type = "t2.xlarge"
+  spot_price    = "0.4"
 
   default_environment = "pytorch_p36"
 
