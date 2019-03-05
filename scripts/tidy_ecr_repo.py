@@ -41,7 +41,7 @@ def main(repo_name, account_id, older_than):
     full_repo_name = "uk.ac.wellcome/%s" % repo_name
     for image in describe_images(ecr_client, repo_name=full_repo_name):
         when_pushed = dt.datetime.now(dt.timezone.utc) - image["imagePushedAt"]
-        if when_pushed.days > 500:
+        if when_pushed.days > older_than:
             images_to_delete.append({"imageDigest": image["imageDigest"]})
 
     click.confirm("About to delete %d images" % len(images_to_delete))
