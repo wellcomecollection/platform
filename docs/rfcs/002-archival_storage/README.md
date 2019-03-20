@@ -1,10 +1,10 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 18 February 2019.**
+**Last updated: 20 March 2019.**
 
 ## Problem statement
 
-We need to provide a service for storing archival and asset copies of digital assets.
+We need to provide a service for storing archival and access copies of digital assets.
 
 This service should:
 
@@ -17,18 +17,15 @@ This service should:
 
 We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](storageservice-20190702.png)
+![architecture diagram](storageservice-20190320.png)
 
--   Assets are uploaded to an Ingest bucket in S3.
-    These assets are zip-compressed files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files.
-
--   The event stream from S3 triggers the Archival Storage Service, which:
-
-    1.  Retrieves a copy of the BagIt file from the Ingest bucket
-    2.  Decompresses the BagIt file and copies it to a short-term Processing bucket
-    3.  Validates the bag -- i.e., checks that the contents match those described by the BagIt metadata
-    4.  Assuming the contents are valid, stores the bag in long-term storage
-    5.  Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
+- Assets are first uploaded to an ingest bucket in S3
+  - These assets are packaged in `.tar.gz` files in the [BagIt format][bagit], a Library of Congress standard for storing collections of digital files
+- The supplying system then initiates an ingest using an API, which:
+    1. Retrieves a copy of the bag from the ingest bucket
+    2. Unpacks and validates the bag, checking that the contents match those described by the BagIt metadata
+    4. Stores the bag in long-term storage and verifies it has been stored correctly
+    5. Creates a description of the stored bag and saves it to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB)
 
 [bagit]: https://en.wikipedia.org/wiki/BagIt
 
@@ -39,17 +36,17 @@ We'll need to integrate with other services such as:
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
 - [Archivematica](https://archivematica.org) - for born-digital archives workflow
 
-These services will need to provide assets in the BagIt format, zip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
+These services will need to provide assets in the BagIt format, compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
 
 When there is a distinction between archival and access assets, these should be submitted as separate bags. This allows storing archival assets and access assets in different kinds of storage.
 
 ### Storage
 
-Archival bags will be stored in S3 with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. Access bags will be stored in S3 with an Infrequent Access storage class.
+Two copies of every bag will be stored in S3, one using the Glacier storage class and the other using the Infrequent Access storage class. A copy of every bag will also be stored in Azure Blob Storage using the Archive storage class.
 
-AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
+Bags will be versioned in storage and all previous versions will be kept indefinitely. We will adopt a forward delta versioning model, where files in more recent versions of bags can refer to files in earlier versions.
 
-The underlying storage provider version should be stored for every file. The underlying storage provider version of the tagmanifest should be used as the overall version of the bag.
+In conjunction with worfklow systems that provide only changed files, this model will enable us to reduce our storage costs and the amount of unneccesary reprocessing of unchanged files.
 
 #### Locations
 
@@ -63,8 +60,6 @@ Within each location, assets will be grouped into related spaces of content and 
 
 - `/digitised/b0000000/{bag contents}`
 - `/born-digital/0000-0000-0000-0000/{bag contents}`
-
-Spaces will be associated with one or more locations, so that ingesting into a space will store the content in all locations configured for that space.
 
 #### Assets
 
@@ -82,7 +77,7 @@ Any additional preservation formats created during the ingest workflow will be t
 
 #### Bag description
 
-The bag description created by the storage service provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
+The bag description created by the storage service provides a pointer to the stored bag and enough other metadata to provide a consumer with a comprehensive view of the contents of the bag. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
 
 This description does not contain metadata from the METS files within a bag, it is purely a storage level index. It will contain data from the `bag-info.txt` file and information about where the assets have been stored. METS files will be separately ingested in the catalogue and reporting pipelines.
 
@@ -92,8 +87,8 @@ The Versioned Hybrid Store which holds the bag descriptions provides an event st
 
 This event stream can be used to trigger downstream tasks, for example:
 
-*   Sending a file for processing in our catalogue pipeline
-*   Feeding other indexes (e.g. Elasticsearch) for reporting
+* Sending a file for processing in our catalogue pipeline
+* Feeding other indexes (e.g. Elasticsearch) for reporting
 
 The Versioned Hybrid Store also includes the ability to "reindex" the entire data store. This triggers an update event for every item in the data store, allowing you to re-run a downstream pipeline.
 
@@ -138,46 +133,6 @@ This token must be provided on all subsequent requests in the Authorization head
 Authorization: Bearer MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3
 ```
 
-### Spaces
-
-Request:
-
-```http
-GET /spaces/{id}
-```
-
-Response:
-
-```json
-{
-  "type": "Space",
-  "id": "{id}",
-  "label": "Description of the purpose of this space",
-  "locations": [
-    {
-        "type": "Location",
-        "provider": {
-            "type": "Provider",
-            "id": "aws-s3-glacier",
-            "label": "AWS S3 Glacier"
-        },
-        "bucket": "{bucket}",
-        "path": "{path}"
-    },
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "azure-blob-archive",
-        "label": "Azure Blob Storage - Archive"
-      },
-      "bucket": "{bucket}",
-      "path": "{path}"
-    }
-  ]
-}
-```
-
 ### Ingests
 
 #### Storing a new bag
@@ -195,8 +150,15 @@ Content-Type: application/json
     "type": "IngestType"
   },
   "space": {
-    "id": "space-id",
+    "id": "{spaceId}",
     "type": "Space"
+  },
+  "bag": {
+    "type": "Bag",
+    "info": {
+      "type": "BagInfo",
+      "externalIdentifier": "{externalId}" 
+    }
   },
   "sourceLocation": {
     "type": "Location",
@@ -205,11 +167,11 @@ Content-Type: application/json
       "id": "aws-s3-standard"
     },
     "bucket": "source-bucket",
-    "path": "/source-path/source-bag.zip"
+    "path": "source-path/source-bag.tar.gz"
   },
   "callback": {
     "type": "Callback",
-    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+    "url": "https://workflow.wellcomecollection.org/callback?id={id}"
   }
 }
 ```
@@ -239,12 +201,17 @@ Response:
     "type": "IngestType"
   },
   "space": {
-    "id": "space-id",
+    "id": "{spaceId}",
     "type": "Space"
   },
   "bag": {
-    "id": "{id}",
-    "type": "Bag"
+    "id": "{bagId}",
+    "type": "Bag",
+    "info": {
+      "type": "BagInfo",
+      "externalIdentifier": "{externalId}" 
+    },
+    "version": "v1"
   },
   "status": {
     "id": "accepted|processing|failed|succeeded",
@@ -257,11 +224,11 @@ Response:
       "id": "aws-s3-standard"
     },
     "bucket": "source-bucket",
-    "path": "/source-path/source-bag.zip"
+    "path": "source-path/source-bag.tar.gz"
   },
   "callback": {
     "type": "Callback",
-    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567",
+    "url": "https://workflow.wellcomecollection.org/callback?id={id}",
     "status": {
       "id": "accepted|processing|failed|succeeded",
       "type": "Status"
@@ -279,7 +246,7 @@ Response:
 
 #### Updating an existing bag
 
-As above, but use an `ingestType` of `update`:
+As above, but use an `ingestType` of `update`. You must also supply the `id` and `version` of the bag being updated.
 
 ```http
 POST /ingests
@@ -292,8 +259,17 @@ Content-Type: application/json
     "type": "IngestType"
   },
   "space": {
-    "id": "space-id",
+    "id": "{spaceId}",
     "type": "Space"
+  },
+  "bag": {
+    "id": "{bagId}",
+    "type": "Bag",
+    "info": {
+      "type": "BagInfo",
+      "externalIdentifier": "{externalId}" 
+    },
+    "version": "v1"
   },
   "sourceLocation": {
     "type": "Location",
@@ -302,27 +278,27 @@ Content-Type: application/json
       "id": "aws-s3-standard"
     },
     "bucket": "source-bucket",
-    "path": "/source-path/source-bag.zip"
+    "path": "source-path/source-bag.tar.gz"
   },
   "callback": {
     "type": "Callback",
-    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+    "url": "https://workflow.wellcomecollection.org/callback?id={id}"
   }
 }
 ```
 
-Updates should be processed as follows:
+When storing an update, the service will:
 
-- Compare existing file checksums to those in the new bag
-- Do nothing for files that have not changed
-- Update existing files that have changed
-- Remove existing files not present in the new bag
-- File versions should be updated to reflect their new underlying storage provider version
-- Bag version should be updated to reflect the new underlying storage version of the tagmanifest
+- Check that the supplied version matches the current version
+- Validate and unpack the supplied bag
+- Store the supplied bag as a new version
+- Update the current version of the bag
 
-Partial updates, where files that are not changed are not resupplied, are supported through the use of `fetch.txt` in the supplied bag. These should be processed as follows:
+Partial updates, where files that are not changed are not resupplied, are supported through the use of `fetch.txt` in the supplied bag. File references must include the bag version in which the file was previously supplied.
 
-- Construct a complete bag from the supplied files and `fetch.txt`
+Updates with fetch files should be processed as follows:
+
+- Check that files in `fetch.txt` exist
 - Process as for a complete update
 
 An example of a bag that uses `fetch.txt` for updating digitised content is provided in later in this document.
@@ -332,7 +308,7 @@ An example of a bag that uses `fetch.txt` for updating digitised content is prov
 Request:
 
 ```http
-GET /bags/{space}/{source-id}
+GET /bags/{spaceId}/{externalId}[?version={version}]
 
 ```
 
@@ -344,7 +320,7 @@ See examples below
 
 ### Digitised content
 
-Digitised content will be ingested using Goobi, which should provide the bag layout defined below. Initially there will be no distinction between archive and access bags, so the same space should be configured to write to all three storage locations.
+Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
 
 #### Complete bag
 
@@ -400,8 +376,8 @@ b24923333/
 |-- data
 |   |-- b24923333.xml
 |-- fetch.txt
-|     s3://wellcomecollection-storage-archive/digitised/b24923333/data/objects/b24923333_001.jp2 - data/objects/b24923333_001.jp2
-|     s3://wellcomecollection-storage-archive/digitised/b24923333/data/alto/b24923333_001.xml - data/alto/b24923333_001.xml
+|     s3://wellcomecollection-storage-access/digitised/b24923333/v1/data/objects/b24923333_001.jp2 - data/objects/b24923333_001.jp2
+|     s3://wellcomecollection-storage-access/digitised/b24923333/v2/data/alto/b24923333_001.xml - data/alto/b24923333_001.xml
 |     ...
 |-- manifest-sha256.txt
 |     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b24923333.xml
@@ -524,7 +500,7 @@ Response:
     "internalSenderDescription": "12324_b_b24923333",
     "sourceOrganisation": "Intranda GmbH",
     "payloadOxum": 435255.3,
-    "baggingDate": "2016-08-07",    
+    "baggingDate": "2016-08-07"
   },
   "manifest": {
     "type": "BagManifest",
@@ -534,19 +510,19 @@ Response:
         "type": "File",
         "path": "data/b24923333.xml",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v3"
       },
       {
         "type": "File",
         "path": "data/objects/b24923333_001.jp2",
         "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       },
       {
         "type": "File",
         "path": "data/alto/b24923333_001.xml",
         "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v2"
       }
     ]
   },
@@ -558,19 +534,19 @@ Response:
         "type": "File",
         "path": "manifest-256.txt",
         "checksum": "791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v3"
       },
       {
         "type": "File",
         "path": "bag-info.txt",
         "checksum": "13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v3"
       },
       {
         "type": "File",
         "path": "bagit.txt",
         "checksum": "a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v3"
       }
     ]
   },
@@ -582,9 +558,9 @@ Response:
         "id": "aws-s3-ia",
         "label": "AWS S3 - Infrequent Access"
       },
-      "bucket": "bucketname",
-      "path": "/digitised/b24923333",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+      "bucket": "bucketname-access",
+      "path": "digitised/b24923333",
+      "url": "http://bucketname-access.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
     {
       "type": "Location",
@@ -593,9 +569,9 @@ Response:
         "id": "aws-s3-glacier",
         "label": "AWS S3 - Glacier"
       },
-      "bucket": "bucketname",
-      "path": "/digitised/b24923333",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+      "bucket": "bucketname-archive",
+      "path": "digitised/b24923333",
+      "url": "http://bucketname-archive.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
     {
       "type": "Location",
@@ -605,13 +581,33 @@ Response:
         "label": "Azure Blob Storage - Archive"
       },
       "bucket": "bucketname",
-      "path": "/digitised/b24923333",
+      "path": "digitised/b24923333",
       "url": "https://accountname.blob.core.windows.net/bucketname/digitised/b24923333"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z",
-  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+  "version": "v3",
+  "versions": [
+    {
+      "type": "Bag",
+      "id": "digitised/b24923333",
+      "version": "v1",
+      "createdDate": "2016-08-07T00:00:00Z"
+    },
+    {
+      "type": "Bag",
+      "id": "digitised/b24923333",
+      "version": "v2",
+      "createdDate": "2016-08-07T00:00:00Z"
+    },
+    {
+      "type": "Bag",
+      "id": "digitised/b24923333",
+      "version": "v3",
+      "createdDate": "2016-08-07T00:00:00Z",
+      "latest": true
+    }
+  ]
 }
 ```
 
@@ -657,7 +653,7 @@ The METS file will be as provided out of the box by Archivematica.
 Request:
 
 ```http
-GET /bags/born-digital/yy-yy-yy-yy
+GET /bags/born-digital/a2870a2d-5111-403f-b092-45c569ef9476
 ```
 
 Response:
@@ -666,7 +662,7 @@ Response:
 {
   "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
   "type": "Bag",
-  "id": "born-digital/yy-yy-yy-yy",
+  "id": "born-digital/a2870a2d-5111-403f-b092-45c569ef9476",
   "space": {
     "id": "born-digital",
     "type": "Space"
@@ -676,7 +672,7 @@ Response:
     "externalIdentifier": "a2870a2d-5111-403f-b092-45c569ef9476",
     "externalDescription": "AIP title",
     "payloadOxum": 435255.2,
-    "baggingDate": "2016-08-07",    
+    "baggingDate": "2016-08-07"
   },
   "manifest": {
     "type": "BagManifest",
@@ -686,13 +682,13 @@ Response:
         "type": "File",
         "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       },
       {
         "type": "File",
         "path": "data/objects/Disc_1/HEART.WRI",
         "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       }
     ]
   },
@@ -704,154 +700,19 @@ Response:
         "type": "File",
         "path": "bagit.txt",
         "checksum": "452ad4b7d28249102dcac5d5bafe834e",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       },
       {
         "type": "File",
         "path": "bag-info.txt",
         "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       },
       {
         "type": "File",
         "path": "manifest-256.txt",
         "checksum": "3148319ddaf49214944ec357405a8189",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-      }
-    ]
-  },
-  "locations": [
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "aws-s3-glacier",
-        "label": "AWS S3 - Glacier"
-      },
-      "bucket": "bucketname",
-      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-    },
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "azure-blob-archive",
-        "label": "Azure Blob Storage - Archive"
-      },
-      "bucket": "bucketname",
-      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "https://accountname.blob.core.windows.net/bucketname/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
-    }
-  ],
-  "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z",
-  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-}
-```
-
-### Born-digital access (DIPs)
-
-Access copies for born-digital archives will also be ingested using Archivematica. We will wrap the DIPs produced by Archivematica in bags before upload.
-
-#### Bag
-
-```
-GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
-|-- data
-|   |-- METS.a2870a2d-5111-403f-b092-45c569ef9476.xml    // mets file
-|   \-- objects
-|       \-- Disc_1/HEART.WRI
-|           ...
-|   \-- logs
-|       \-- ...
-|-- manifest-sha256.txt
-|     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml
-|     4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4 data/objects/Disc_1/HEART.WRI
-|     ...
-|-- tagmanifest-md5.txt
-|     452ad4b7d28249102dcac5d5bafe834e bag-info.txt
-|     9e5ad981e0d29adc278f6a294b8c2aca bagit.txt
-|     3148319ddaf49214944ec357405a8189 manifest-sha256.txt
-|-- bag-info.txt
-|     External-Identifier: a2870a2d-5111-403f-b092-45c569ef9476
-|     External-Description: AIP title
-|     Bagging-Date: 2016-08-07
-|     Payload-Oxum: 435255.8
-\-- bagit.txt
-      BagIt-Version: 0.97
-      Tag-File-Character-Encoding: UTF-8
-```
-
-#### METS
-
-The METS file will be as provided out of the box by Archivematica.
-
-#### API
-
-Request:
-
-```http
-GET /bags/born-digital-access/yy-yy-yy-yy
-```
-
-Response:
-
-```json
-{
-  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
-  "type": "Bag",
-  "id": "born-digital-access/yy-yy-yy-yy",
-  "space": {
-    "id": "born-digital-access",
-    "type": "Space"
-  },
-  "info": {
-    "type": "BagInfo",
-    "externalIdentifier": "a2870a2d-5111-403f-b092-45c569ef9476",
-    "externalDescription": "AIP title",
-    "payloadOxum": 435255.2,
-    "baggingDate": "2016-08-07",    
-  },
-  "manifest": {
-    "type": "BagManifest",
-    "checksumAlgorithm": "sha256",
-    "files": [
-      {
-        "type": "File",
-        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
-        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-      },
-      {
-        "type": "File",
-        "path": "data/objects/Disc_1/HEART.WRI",
-        "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-      }
-    ]
-  },
-  "tagManifest": {
-    "type": "BagManifest",
-    "checksumAlgorithm": "md5",
-    "files": [
-      {
-        "type": "File",
-        "path": "bagit.txt",
-        "checksum": "452ad4b7d28249102dcac5d5bafe834e",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-      },
-      {
-        "type": "File",
-        "path": "bag-info.txt",
-        "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
-      },
-      {
-        "type": "File",
-        "path": "manifest-256.txt",
-        "checksum": "3148319ddaf49214944ec357405a8189",
-        "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+        "bagVersion": "v1"
       }
     ]
   },
@@ -863,13 +724,43 @@ Response:
         "id": "aws-s3-ia",
         "label": "AWS S3 - Infrequent Access"
       },
+      "bucket": "bucketname-access",
+      "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname-access.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 - Glacier"
+      },
+      "bucket": "bucketname-archive",
+      "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "http://bucketname-archive.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Location",
+      "provider": {
+        "type": "Provider",
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage - Archive"
+      },
       "bucket": "bucketname",
-      "path": "/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+      "url": "https://accountname.blob.core.windows.net/bucketname/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
-  "lastModifiedDate": "2016-08-07T00:00:00Z",
-  "version": "3/L4kqtJlcpXroDTDmJ+rmSpXd3dIbrHY+MTRCxf3vjVBH40Nr8X8gdRQBpUMLUo"
+  "version": "v1",
+  "versions": [
+    {
+      "type": "Bag",
+      "id": "born-digital/a2870a2d-5111-403f-b092-45c569ef9476",
+      "version": "v1",
+      "createdDate": "2016-08-07T00:00:00Z",
+      "latest": true
+    }
+  ]
 }
 ```
