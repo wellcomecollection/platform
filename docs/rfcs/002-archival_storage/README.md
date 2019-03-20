@@ -98,7 +98,7 @@ The storage service will provide an API that can be used to ingest bags and retr
 
 API base path: `https://api.wellcomecollection.org/storage/v1`
 
-### Authentication
+### Authentication
 
 All API endpoints must require authentication using OAuth 2.0. In the first instance, the only supported OAuth grant type will be client credentials.
 
