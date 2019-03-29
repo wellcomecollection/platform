@@ -5,9 +5,9 @@ module "lambda_miro_transformer" {
   description = "Transform miro source data and send to ES."
 
   environment_variables = {
-    ES_URL      = "${var.reporting_es_url}"
-    ES_USER     = "${var.reporting_es_user}"
-    ES_PASS     = "${var.reporting_es_pass}"
+    ES_URL      = "${local.es_url}"
+    ES_USER     = "${local.es_username}"
+    ES_PASS     = "${local.es_password}"
     ES_INDEX    = "miro"
     ES_DOC_TYPE = "miro_record"
   }
@@ -30,9 +30,9 @@ module "lambda_miro_inventory_transformer" {
   description = "Transform miro inventory source data and send to ES."
 
   environment_variables = {
-    ES_URL      = "${var.reporting_es_url}"
-    ES_USER     = "${var.reporting_es_user}"
-    ES_PASS     = "${var.reporting_es_pass}"
+    ES_URL      = "${local.es_url}"
+    ES_USER     = "${local.es_username}"
+    ES_PASS     = "${local.es_password}"
     ES_INDEX    = "miro_inventory"
     ES_DOC_TYPE = "miro_inventory_record"
   }
@@ -52,9 +52,9 @@ module "lambda_sierra_transformer" {
   description = "Transform sierra source data and send to ES."
 
   environment_variables = {
-    ES_URL      = "${var.reporting_es_url}"
-    ES_USER     = "${var.reporting_es_user}"
-    ES_PASS     = "${var.reporting_es_pass}"
+    ES_URL      = "${local.es_url}"
+    ES_USER     = "${local.es_username}"
+    ES_PASS     = "${local.es_password}"
     ES_INDEX    = "sierra"
     ES_DOC_TYPE = "sierra_record"
   }
