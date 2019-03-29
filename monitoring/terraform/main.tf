@@ -5,7 +5,6 @@ module "monitoring-271118" {
 
   monitoring_bucket          = "${aws_s3_bucket.monitoring.bucket}"
   account_id                 = "${data.aws_caller_identity.current.account_id}"
-  non_critical_slack_webhook = "${var.non_critical_slack_webhook}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   vpc_id       = "${local.vpc_id}"
@@ -18,10 +17,10 @@ module "monitoring-271118" {
   public_subnets  = "${local.public_subnets}"
   private_subnets = "${local.private_subnets}"
 
-  infra_bucket       = "${var.infra_bucket}"
-  key_name           = "${var.key_name}"
+  infra_bucket       = "${local.infra_bucket}"
+  key_name           = "${local.key_name}"
   aws_region         = "${var.aws_region}"
-  admin_cidr_ingress = "${var.admin_cidr_ingress}"
+  admin_cidr_ingress = "${local.admin_cidr_ingress}"
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
@@ -35,10 +34,10 @@ module "monitoring-271118" {
 
   # grafana
 
-  grafana_admin_user        = "${var.grafana_admin_user}"
-  grafana_anonymous_role    = "${var.grafana_anonymous_role}"
-  grafana_admin_password    = "${var.grafana_admin_password}"
-  grafana_anonymous_enabled = "${var.grafana_anonymous_enabled}"
+  grafana_admin_user        = "${local.grafana_admin_user}"
+  grafana_anonymous_role    = "${local.grafana_anonymous_role}"
+  grafana_admin_password    = "${local.grafana_admin_password}"
+  grafana_anonymous_enabled = "${local.grafana_anonymous_enabled}"
 
   # update_service_list
 
@@ -62,8 +61,9 @@ module "monitoring-271118" {
   dlq_alarm_arn                  = "${local.dlq_alarm_arn}"
   gateway_server_error_alarm_arn = "${local.gateway_server_error_alarm_arn}"
   cloudfront_errors_topic_arn    = "${local.cloudfront_errors_topic_arn}"
-  critical_slack_webhook         = "${var.critical_slack_webhook}"
-  bitly_access_token             = "${var.bitly_access_token}"
+  critical_slack_webhook         = "${local.critical_slack_webhook}"
+  non_critical_slack_webhook     = "${local.noncritical_slack_webhook}"
+  bitly_access_token             = "${local.bitly_access_token}"
 
   # terraform_tracker
 

@@ -15,5 +15,6 @@ locals {
   private_subnets = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_private_subnets}"
   public_subnets  = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_public_subnets}"
 
-  slack_budget_bot_container_uri = "${module.ecr_repository_slack_budget_bot.repository_url}:${var.release_ids["slack_budget_bot"]}"
+  # TODO: Update the budget bot to use SSM
+  slack_budget_bot_container_uri = "${module.ecr_repository_slack_budget_bot.repository_url}:6a0141109bbfda0380aeeb0223b161b291533631"
 }
