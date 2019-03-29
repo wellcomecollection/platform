@@ -10,14 +10,6 @@ output "gateway_server_error_alarm_arn" {
   value = "${module.gateway_server_error_alarm.arn}"
 }
 
-output "ec2_terminating_topic_arn" {
-  value = "${module.ec2_terminating_topic.arn}"
-}
-
-output "ec2_terminating_topic_publish_policy" {
-  value = "${module.ec2_terminating_topic.publish_policy}"
-}
-
 output "bucket_alb_logs_id" {
   value = "${aws_s3_bucket.alb_logs.id}"
 }
