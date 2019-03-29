@@ -16,5 +16,5 @@ module "stack-281118" {
   efs_id                = "${module.efs.efs_id}"
   efs_security_group_id = "${aws_security_group.efs_security_group.id}"
 
-  admin_cidr_ingress = "${var.admin_cidr_ingress}"
+  admin_cidr_ingress = "${local.admin_cidr_ingress}"
 }
