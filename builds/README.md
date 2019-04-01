@@ -45,3 +45,8 @@ If they had SSH key access, check if it was revoked by GitHub or needs to be rev
 Check the repo for unexpected commits.
 
 If it included the PyPI password, rotate that and check for unexpected releases.
+
+### Settings
+
+The GitHub OAuth token is created at <https://github.com/settings/tokens>.
+It uses the `repo:public_repo` scope.

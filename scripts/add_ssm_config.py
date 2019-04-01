@@ -46,7 +46,7 @@ You can reference this config value in Terraform:
 }}
 
 locals {{
-  {config_key}_value = "${{data.aws_ssm_parameter.{config_key}.value}}"
+  {config_key} = "${{data.aws_ssm_parameter.{config_key}.value}}"
 }}
 """.strip()
         )

@@ -56,10 +56,20 @@ def store_config_key(project_id, config_key):
 You can reference this secret in an ECS task definition in Terraform:
 
 \033[91msecret_app_env_vars = {{
-  {config_key} = "{name}
+  {config_key} = "{name}"
 }}
 
-secret_app_env_vars_length = 1
+secret_app_env_vars_length = 1\033[0m
+
+or as an inline variable:
+
+\033[91mdata "aws_ssm_parameter" "{config_key}" {{
+  name = "/aws/reference/secretsmanager/{name}"
+}}
+
+locals {{
+  {config_key} = "${{data.aws_ssm_parameter.{config_key}.value}}"
+}}
 """.strip()
     )
 
