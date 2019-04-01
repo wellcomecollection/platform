@@ -11,49 +11,6 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "s3:Put*",
-      "s3:Get*",
-      "s3:List*",
-    ]
-
-    resources = [
-      "${var.infra_bucket_arn}",
-      "${var.infra_bucket_arn}/*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "sns:ListTopic",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    actions = [
-      "sns:Publish",
-    ]
-
-    resources = [
-      "${var.publish_topics}",
-    ]
-  }
-
-  statement {
-    actions = [
-      "iam:GetUser",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-
-  statement {
-    actions = [
       "s3:Get*",
       "s3:List*",
     ]
