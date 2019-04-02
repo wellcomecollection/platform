@@ -46,7 +46,7 @@ Two copies of every bag will be stored in S3, one using the Glacier storage clas
 
 Bags will be versioned in storage and all previous versions will be kept indefinitely. We will adopt a forward delta versioning model, where files in more recent versions of bags can refer to files in earlier versions.
 
-In conjunction with worfklow systems that provide only changed files, this model will enable us to reduce our storage costs and the amount of unneccesary reprocessing of unchanged files.
+In conjunction with workflow systems that provide only changed files, this model will enable us to reduce our storage costs and the amount of unneccesary reprocessing of unchanged files.
 
 #### Locations
 
@@ -63,7 +63,7 @@ Within each location, assets will be grouped into related spaces of content and 
 
 #### Assets
 
-Assets will be stored in the above spaces inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above spaces inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/rfc8493
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -290,15 +290,16 @@ Content-Type: application/json
 When storing an update, the service will:
 
 - Check that the supplied version matches the current version
-- Validate and unpack the supplied bag
+- Unpack the supplied bag
 - Store the supplied bag as a new version
-- Update the current version of the bag
+- Register the new version of the bag as the current version
 
-Partial updates, where files that are not changed are not resupplied, are supported through the use of `fetch.txt` in the supplied bag. File references must include the bag version in which the file was previously supplied.
+Partial updates, where files that are not changed are not resupplied, are supported through the use of `fetch.txt` in the supplied bag. File references must specify the full storage location of the previously supplied file, including the version number of the bag in which it was last supplied in the path.
 
 Updates with fetch files should be processed as follows:
 
-- Check that files in `fetch.txt` exist
+- Check that files in `fetch.txt` reference files in the correct bag
+- Check that files in `fetch.txt` exist most recently at the specified version
 - Process as for a complete update
 
 An example of a bag that uses `fetch.txt` for updating digitised content is provided in later in this document.
@@ -508,21 +509,21 @@ Response:
     "files": [
       {
         "type": "File",
-        "path": "data/b24923333.xml",
-        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "bagVersion": "v3"
+        "name": "data/b24923333.xml",
+        "path": "v3/data/b24923333.xml",
+        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f"
       },
       {
         "type": "File",
-        "path": "data/objects/b24923333_001.jp2",
-        "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e",
-        "bagVersion": "v1"
+        "name": "data/objects/b24923333_001.jp2",
+        "path": "v1/data/objects/b24923333_001.jp2",
+        "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e"
       },
       {
         "type": "File",
-        "path": "data/alto/b24923333_001.xml",
-        "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502",
-        "bagVersion": "v2"
+        "name": "data/alto/b24923333_001.xml",
+        "path": "v2/data/alto/b24923333_001.xml",
+        "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502"
       }
     ]
   },
@@ -532,21 +533,21 @@ Response:
     "files": [
       {
         "type": "File",
-        "path": "manifest-256.txt",
-        "checksum": "791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e",
-        "bagVersion": "v3"
+        "name": "manifest-256.txt",
+        "path": "v3/manifest-256.txt",
+        "checksum": "791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e"
       },
       {
         "type": "File",
-        "path": "bag-info.txt",
-        "checksum": "13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7",
-        "bagVersion": "v3"
+        "name": "bag-info.txt",
+        "path": "v3/bag-info.txt",
+        "checksum": "13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7"
       },
       {
         "type": "File",
-        "path": "bagit.txt",
-        "checksum": "a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37",
-        "bagVersion": "v3"
+        "name": "bagit.txt",
+        "path": "v3/bagit.txt",
+        "checksum": "a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37"
       }
     ]
   },
@@ -680,15 +681,15 @@ Response:
     "files": [
       {
         "type": "File",
-        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
-        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
-        "bagVersion": "v1"
+        "name": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
+        "path": "v1/data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml",
+        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f"
       },
       {
         "type": "File",
-        "path": "data/objects/Disc_1/HEART.WRI",
-        "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
-        "bagVersion": "v1"
+        "name": "data/objects/Disc_1/HEART.WRI",
+        "path": "v1/data/objects/Disc_1/HEART.WRI",
+        "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4"
       }
     ]
   },
@@ -698,21 +699,21 @@ Response:
     "files": [
       {
         "type": "File",
-        "path": "bagit.txt",
-        "checksum": "452ad4b7d28249102dcac5d5bafe834e",
-        "bagVersion": "v1"
+        "name": "bagit.txt",
+        "path": "v1/bagit.txt",
+        "checksum": "452ad4b7d28249102dcac5d5bafe834e"
       },
       {
         "type": "File",
-        "path": "bag-info.txt",
-        "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
-        "bagVersion": "v1"
+        "name": "bag-info.txt",
+        "path": "v1/bag-info.txt",
+        "checksum": "9e5ad981e0d29adc278f6a294b8c2aca"
       },
       {
         "type": "File",
-        "path": "manifest-256.txt",
-        "checksum": "3148319ddaf49214944ec357405a8189",
-        "bagVersion": "v1"
+        "name": "manifest-256.txt",
+        "path": "v1/manifest-256.txt",
+        "checksum": "3148319ddaf49214944ec357405a8189"
       }
     ]
   },
