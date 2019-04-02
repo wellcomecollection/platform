@@ -3,8 +3,6 @@ module "slack_budget_bot" {
   task_name = "slack_budget_bot"
   app_uri   = "${var.slack_budget_bot_container_uri}"
 
-  #"${module.ecr_repository_slack_budget_bot.repository_url}:${var.release_ids["slack_budget_bot"]}"
-
   task_role_arn = "${module.ecs_slack_budget_bot_iam.task_role_arn}"
   env_vars = [
     "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket}\"}",

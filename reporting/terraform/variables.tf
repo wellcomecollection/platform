@@ -5,7 +5,3 @@ variable "reporting_kibana_domain_name" {
 variable "aws_region" {
   default = "eu-west-1"
 }
-
-variable "reporting_es_url" {}
-variable "reporting_es_user" {}
-variable "reporting_es_pass" {}

@@ -1,7 +1,7 @@
-variable "key_name" {}
+variable "key_name" {
+  default = "wellcomedigitalplatform"
+}
 
 variable "aws_region" {
   default = "eu-west-1"
 }
-
-variable "admin_cidr_ingress" {}
