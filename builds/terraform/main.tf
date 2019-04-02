@@ -70,8 +70,8 @@ module "platform_cli" {
   source = "./python_library"
 
   repo_name     = "platform-cli"
-  pypi_username = "${var.pypi_username}"
-  pypi_password = "${var.pypi_password}"
+  pypi_username = "${local.pypi_username}"
+  pypi_password = "${local.pypi_password}"
 }
 
 module "scala_fixtures" {

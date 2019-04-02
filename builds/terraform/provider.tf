@@ -52,6 +52,6 @@ provider "aws" {
 }
 
 provider "github" {
-  token        = "${var.github_api_token}"
+  token        = "${local.github_oauth_token}"
   organization = "wellcometrust"
 }

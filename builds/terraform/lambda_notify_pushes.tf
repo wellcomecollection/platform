@@ -19,7 +19,7 @@ module "lambda_notify_pushes" {
   timeout     = 10
 
   environment_variables = {
-    SLACK_WEBHOOK = "${var.non_critical_slack_webhook}"
+    SLACK_WEBHOOK = "${local.non_critical_slack_webhook}"
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
