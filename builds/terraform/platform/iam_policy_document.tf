@@ -23,6 +23,36 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "${var.infra_bucket_arn}/lambdas/*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "iam:GetUser",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    actions = [
+      "sns:Publish",
+    ]
+
+    resources = [
+      "arn:aws:sns:eu-west-1:760097843905:lambda_pushes",
+    ]
+  }
+
+  statement {
+    actions = [
       "ssm:PutParameter",
     ]
 
