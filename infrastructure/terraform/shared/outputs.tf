@@ -103,6 +103,16 @@ output "catalogue_sierra_items_reindex_topic_name" {
   value = "${module.catalogue_sierra_items_reindex_topic.name}"
 }
 
+## Inference - calm
+
+output "inference_calm_reindex_topic_arn" {
+  value = "${module.inference_calm_reindex_topic.arn}"
+}
+
+output "inference_calm_reindex_topic_name" {
+  value = "${module.inference_calm_reindex_topic.name}"
+}
+
 # Catalogue VPC
 
 output "catalogue_vpc_delta_private_subnets" {
