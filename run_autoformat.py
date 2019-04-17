@@ -71,7 +71,6 @@ if __name__ == "__main__":
 
         git("config", "user.name", "Travis CI on behalf of Wellcome")
         git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
-        git("config", "core.sshCommand", "ssh -i id_rsa")
 
         git(
             "remote",
