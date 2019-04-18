@@ -77,7 +77,7 @@ if __name__ == "__main__":
             "remote",
             "add",
             "ssh-origin",
-            "git@github.com:wellcometrust/storage-service.git",
+            "git@github.com:wellcometrust/platform.git",
         )
 
         # We checkout the branch before we add the commit, so we don't
