@@ -4,11 +4,13 @@ module "slack_budget_bot" {
   app_uri   = "${var.slack_budget_bot_container_uri}"
 
   task_role_arn = "${module.ecs_slack_budget_bot_iam.task_role_arn}"
+
   env_vars = [
     "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket}\"}",
     "{\"name\": \"ACCOUNT_ID\", \"value\": \"${var.account_id}\"}",
     "{\"name\": \"SLACK_WEBHOOK\", \"value\": \"${var.non_critical_slack_webhook}\"}",
   ]
+
   log_retention_in_days = 30
 }
 

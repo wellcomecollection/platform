@@ -73,12 +73,7 @@ if __name__ == "__main__":
         git("config", "user.email", "wellcomedigitalplatform@wellcome.ac.uk")
         git("config", "core.sshCommand", "ssh -i id_rsa")
 
-        git(
-            "remote",
-            "add",
-            "ssh-origin",
-            "git@github.com:wellcometrust/platform.git",
-        )
+        git("remote", "add", "ssh-origin", "git@github.com:wellcometrust/platform.git")
 
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.

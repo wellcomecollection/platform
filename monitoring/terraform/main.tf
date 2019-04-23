@@ -3,8 +3,8 @@ module "monitoring-271118" {
 
   namespace = "monitoring-271118"
 
-  monitoring_bucket          = "${aws_s3_bucket.monitoring.bucket}"
-  account_id                 = "${data.aws_caller_identity.current.account_id}"
+  monitoring_bucket = "${aws_s3_bucket.monitoring.bucket}"
+  account_id        = "${data.aws_caller_identity.current.account_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   vpc_id       = "${local.vpc_id}"
