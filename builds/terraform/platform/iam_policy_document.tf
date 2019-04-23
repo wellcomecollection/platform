@@ -41,6 +41,16 @@ data "aws_iam_policy_document" "travis_permissions" {
       "arn:aws:ssm:eu-west-1:${local.account_id}:parameter/*",
     ]
   }
+
+  statement {
+    actions = [
+      "iam:GetUser",
+    ]
+
+    resources = [
+      "*",
+    ]
+  }
 }
 
 locals {
