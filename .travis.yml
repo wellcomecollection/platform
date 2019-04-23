@@ -1,15 +1,15 @@
-language: sh
+language: "sh"
 
-sudo: required
+sudo: "required"
 
 services:
-  - docker
+  - "docker"
 
-dist: trusty
+dist: "trusty"
 
 branches:
   only:
-    - master
+    - "master"
 
 script:
   - ./run_travis.sh
