@@ -11,6 +11,17 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
+      "s3:*",
+    ]
+
+    resources = [
+      "${var.infra_bucket_arn}",
+      "${var.infra_bucket_arn}/*",
+    ]
+  }
+
+  statement {
+    actions = [
       "s3:Get*",
       "s3:List*",
     ]
