@@ -23,7 +23,7 @@ Developers who want to create projects within the platform should refer to our [
 
 ## Runbook
 
-Incident checklist [https://gist.github.com/pollecuttn/ea32539d761288480cce3bbd6450a0ff]
+[Incident checklist] (https://gist.github.com/pollecuttn/ea32539d761288480cce3bbd6450a0ff)
 
 ### Platform Status
 
