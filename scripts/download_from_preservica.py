@@ -70,7 +70,7 @@ def download_from_preservica(preservica_guid):
 
     if len(manifestation_links) == 1:
         manifest_link = manifestation_links[0]
-        manifest_guid = manifest_link.split('/')[-1]
+        manifest_guid = manifest_link.split("/")[-1]
         print_message("*** Detected manifestation ID:", manifest_guid)
     else:
         sys.exit(f"*** Could not detect a manifestation link: {manifestation_links}")
@@ -94,16 +94,23 @@ def download_from_preservica(preservica_guid):
     for i, entry in enumerate(all_entries, start=1):
         entry_guid = entry.find("id").text
 
-        entry_url = entry.find(
-            "link", attrs={"rel": "digital-file-content"}).attrs["href"]
+        entry_url = entry.find("link", attrs={"rel": "digital-file-content"}).attrs[
+            "href"
+        ]
         entry_title = entry.find("title").text
 
         if (working_dir / entry_title).exists():
-            print_message(f"··· {str(i).rjust(len(str(entry_count)))}/{entry_count} Already downloaded asset:", entry_guid)
+            print_message(
+                f"··· {str(i).rjust(len(str(entry_count)))}/{entry_count} Already downloaded asset:",
+                entry_guid,
+            )
             continue
         else:
-            print_message(f"*** {str(i).rjust(len(str(entry_count)))}/{entry_count} Fetching asset:", entry_guid)
-            download_file(sess, entry_url, path = working_dir / entry_title)
+            print_message(
+                f"*** {str(i).rjust(len(str(entry_count)))}/{entry_count} Fetching asset:",
+                entry_guid,
+            )
+            download_file(sess, entry_url, path=working_dir / entry_title)
 
 
 if __name__ == "__main__":
