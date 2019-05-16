@@ -2,7 +2,9 @@
 # -*- encoding: utf-8
 
 import getpass
+import os.path
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 
@@ -15,17 +17,10 @@ from requests.auth import HTTPBasicAuth
 API_URL = "http://sdb.wellcome.ac.uk/sdb/rest"
 
 
-def get_xml(sess, path, url):
-    try:
-        return bs4.BeautifulSoup(path.read_bytes(), "xml")
-    except FileNotFoundError:
-        resp = sess.get(url)
-        resp.raise_for_status()
-
-        _, tmp_path = tempfile.mkstemp()
-        Path(tmp_path).write_bytes(resp.content)
-        Path(tmp_path).rename(path)
-        return bs4.BeautifulSoup(resp.content, "xml")
+def get_xml(sess, url):
+    resp = sess.get(url)
+    resp.raise_for_status()
+    return bs4.BeautifulSoup(resp.content, "xml")
 
 
 def download_file(sess, url, path):
@@ -45,6 +40,17 @@ def print_message(message, guid):
     print(message.ljust(45) + " " + guid)
 
 
+def exclude_from_git(dirname):
+    try:
+        rev_parse = subprocess.check_output(["git", "rev-parse", "--show-toplevel"])
+    except subprocess.CalledProcessError:
+        return
+    else:
+        root = rev_parse.decode("utf-8").strip()
+        with (Path(root) / ".git/info/exclude").open("a") as gitexclude:
+            gitexclude.write(dirname + "\n")
+
+
 @click.command()
 @click.argument("PRESERVICA_GUID")
 def download_from_preservica(preservica_guid):
@@ -53,15 +59,8 @@ def download_from_preservica(preservica_guid):
     sess = requests.Session()
     sess.auth = HTTPBasicAuth(getpass.getuser(), password)
 
-    working_dir = Path(preservica_guid)
-    working_dir.mkdir(exist_ok=True)
-
     # Get the initial deliverable unit
-    du_xml = get_xml(
-        sess,
-        path=working_dir / "deliverable_unit.xml",
-        url=f"{API_URL}/deliverableUnits/{preservica_guid}"
-    )
+    du_xml = get_xml(sess, url=f"{API_URL}/deliverableUnits/{preservica_guid}")
     print_message("*** Fetched deliverable XML for:", preservica_guid)
 
     manifestation_links = [
@@ -76,15 +75,21 @@ def download_from_preservica(preservica_guid):
     else:
         sys.exit(f"*** Could not detect a manifestation link: {manifestation_links}")
 
-    manifest_xml = get_xml(
-        sess,
-        path=working_dir / "manifestation.xml",
-        url=manifest_link
-    )
+    manifest_xml = get_xml(sess, url=manifest_link)
     print_message("*** Fetched manifestation XML for:", manifest_guid)
 
     all_entries = manifest_xml.find_all("entry")
     entry_count = len(all_entries)
+
+    jp2_names = [entry.find("title").text for entry in all_entries]
+    common_prefix = os.path.commonprefix(jp2_names).split("_")[0]
+    assert len(common_prefix) > 0
+    print(f"*** Using common prefix {common_prefix} for working directory")
+
+    exclude_from_git(common_prefix)
+
+    working_dir = Path(common_prefix)
+    working_dir.mkdir(exist_ok=True)
 
     for i, entry in enumerate(all_entries, start=1):
         entry_guid = entry.find("id").text
