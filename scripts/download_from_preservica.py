@@ -4,6 +4,7 @@
 import getpass
 from pathlib import Path
 import sys
+import tempfile
 
 import click
 import bs4
@@ -20,19 +21,28 @@ def get_xml(sess, path, url):
     except FileNotFoundError:
         resp = sess.get(url)
         resp.raise_for_status()
-        path.write_bytes(resp.content)
+
+        _, tmp_path = tempfile.mkstemp()
+        Path(tmp_path).write_bytes(resp.content)
+        Path(tmp_path).rename(path)
         return bs4.BeautifulSoup(resp.content, "xml")
 
 
 def download_file(sess, url, path):
     # https://stackoverflow.com/q/16694907/1558022
+    _, tmp_path = tempfile.mkstemp()
     with sess.get(url, stream=True) as r:
         r.raise_for_status()
-        with open(path, 'wb') as f:
+        with open(tmp_path, "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
 
+    Path(tmp_path).rename(path)
+
+
+def print_message(message, guid):
+    print(message.ljust(45) + " " + guid)
 
 
 @click.command()
@@ -52,7 +62,7 @@ def download_from_preservica(preservica_guid):
         path=working_dir / "deliverable_unit.xml",
         url=f"{API_URL}/deliverableUnits/{preservica_guid}"
     )
-    print(f"*** Fetched deliverable unit XML for: {preservica_guid}")
+    print_message("*** Fetched deliverable XML for:", preservica_guid)
 
     manifestation_links = [
         link_tag.attrs["href"]
@@ -62,7 +72,7 @@ def download_from_preservica(preservica_guid):
     if len(manifestation_links) == 1:
         manifest_link = manifestation_links[0]
         manifest_guid = manifest_link.split('/')[-1]
-        print(f"*** Detected manifestation ID:        {manifest_guid}")
+        print_message("*** Detected manifestation ID:", manifest_guid)
     else:
         sys.exit(f"*** Could not detect a manifestation link: {manifestation_links}")
 
@@ -71,9 +81,12 @@ def download_from_preservica(preservica_guid):
         path=working_dir / "manifestation.xml",
         url=manifest_link
     )
-    print(f"*** Fetched manifestation XML for:    {manifest_guid}")
+    print_message("*** Fetched manifestation XML for:", manifest_guid)
 
-    for entry in manifest_xml.find_all("entry"):
+    all_entries = manifest_xml.find_all("entry")
+    entry_count = len(all_entries)
+
+    for i, entry in enumerate(all_entries, start=1):
         entry_guid = entry.find("id").text
 
         entry_url = entry.find(
@@ -81,10 +94,10 @@ def download_from_preservica(preservica_guid):
         entry_title = entry.find("title").text
 
         if (working_dir / entry_title).exists():
-            print(f"··· Already downloaded asset:         {entry_guid}")
+            print_message(f"··· {str(i).rjust(len(str(entry_count)))}/{entry_count} Already downloaded asset:", entry_guid)
             continue
         else:
-            print(f"*** Fetching asset:                   {entry_guid}")
+            print_message(f"*** {str(i).rjust(len(str(entry_count)))}/{entry_count} Fetching asset:", entry_guid)
             download_file(sess, entry_url, path = working_dir / entry_title)
 
 
