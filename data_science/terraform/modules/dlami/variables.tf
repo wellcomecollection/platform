@@ -28,7 +28,7 @@ variable "custom_security_groups" {
 # DLAMI specific variables
 
 variable "instance_type" {
-  default     = "t2.large"
+  default     = "t2.xlarge"
   description = "AWS instance type"
 }
 
