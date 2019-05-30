@@ -10,6 +10,6 @@ output "ssh_controlled_ingress_sg" {
   value = "${module.security_groups.ssh_controlled_ingress}"
 }
 
-output "public_ip" {
-  value = "${aws_instance.data.public_ip}"
+output "public_dns" {
+  value = "${aws_instance.data.public_dns}"
 }

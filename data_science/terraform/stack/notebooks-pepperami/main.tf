@@ -5,23 +5,9 @@ resource "aws_route53_zone" "wecodev" {
 resource "aws_route53_record" "notebook" {
   zone_id = "${aws_route53_zone.wecodev.zone_id}"
   name    = "notebook.wecodev.com"
-  type    = "A"
+  type    = "CNAME"
   ttl     = "300"
-  records = ["${module.pepperami.public_ip}"]
-}
-
-resource "aws_route53_record" "notebook-ns" {
-  zone_id = "${aws_route53_zone.wecodev.zone_id}"
-  name    = "notebook.wecodev.com"
-  type    = "NS"
-  ttl     = "30"
-
-  records = [
-    "${aws_route53_zone.wecodev.name_servers.0}",
-    "${aws_route53_zone.wecodev.name_servers.1}",
-    "${aws_route53_zone.wecodev.name_servers.2}",
-    "${aws_route53_zone.wecodev.name_servers.3}",
-  ]
+  records = ["${module.pepperami.public_dns}"]
 }
 
 module "pepperami" {
