@@ -7,11 +7,11 @@ resource "aws_route53_record" "notebook" {
   name    = "notebook.wecodev.com"
   type    = "CNAME"
   ttl     = "300"
-  records = ["${module.pepperami.public_dns}"]
+  records = ["${module.dlami.public_dns}"]
 }
 
-module "pepperami" {
-  source = "../../modules/dlami-pepperami"
+module "dlami" {
+  source = "../../modules/dlami"
 
   key_name    = "${var.key_name}"
   bucket_name = "${var.s3_bucket_name}"

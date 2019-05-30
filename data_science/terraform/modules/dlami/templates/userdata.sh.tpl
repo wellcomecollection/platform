@@ -8,6 +8,7 @@ set -o xtrace
 # We're going to use the Message Of The Day (MOTD) to report the progress
 # of this bootstrap script.  First remove a bunch of stuff from the default
 # MOTD to make it a bit cleaner.
+
 rm -f /etc/update-motd.d/00-header
 rm -f /etc/update-motd.d/51-cloudguest
 rm -f /etc/update-motd.d/9*
@@ -57,55 +58,38 @@ EOF
 
 chmod +x /etc/update-motd.d/99-bootstrap-motd
 
-
-
-# Create jupyter user
-adduser ${notebook_user} --gecos "" --disabled-password
-
 # Write config file
-mkdir /home/${notebook_user}/.jupyter
-cat << EOF > /home/${notebook_user}/.jupyter/jupyter_notebook_config.py
+mkdir -p /home/ec2-user/.jupyter
+cat << EOF > /home/ec2-user/.jupyter/jupyter_notebook_config.py
 ${jupyter_notebook_config}
 EOF
 
 # Select the version of pip for our default environment.
-PIP=/home/ubuntu/anaconda3/envs/${default_environment}/bin/pip
+PIP=${anaconda_path}/envs/${default_environment}/bin/pip
 
-cat << EOF > /home/${notebook_user}/requirements.txt
+cat << EOF > /home/ec2-user/requirements.txt
 ${requirements}
 EOF
 
 #$PIP install --upgrade pip
 # commenting out the pip upgrade for the reasons below as well
-# adding --ignore-installed to get around the preinstalled clashes
+# adding --ignore-installed to get around the pre-installed clashes
 # https://stackoverflow.com/questions/42020151/cannot-remove-entries-from-nonexistent-file
-$PIP install --requirement /home/${notebook_user}/requirements.txt --ignore-installed > /home/${notebook_user}/pip_install.log 2>&1
-
-# Install s3contents.  This needs to be installed in the top-level anaconda
-# environment, or it won't be available to Jupyter, and it will fail to start.
-/home/ubuntu/anaconda3/bin/pip install s3contents
+$PIP install --requirement /home/ec2-user/requirements.txt --ignore-installed > /home/ec2-user/pip_install.log 2>&1
 
 # Set up the EFS mount.
-#
-# Install utilities for creating an EFS mount on Ubuntu.
-# Based on README instructions https://github.com/aws/efs-utils
-git clone https://github.com/aws/efs-utils
-pushd efs-utils
-  git checkout 7ba8784
+yum install -y amazon-efs-utils
+mkdir -p /mnt/efs
+mount -t efs ${efs_mount_id}:/ /mnt/efs
 
-  sudo apt-get update
-  sudo apt-get --yes install binutils
-  ./build-deb.sh
-  sudo apt-get --yes install ./build/amazon-efs-utils*deb
+# Set up the EBS mount.
+mkdir -p /mnt/ebs
+mount /dev/sdh /mnt/ebs
+chown ec2-user:ec2-user /mnt/ebs
 
-  # See https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html
-  sudo mkdir -p /mnt/efs
-  sudo mount -t efs ${efs_mount_id}:/ /mnt/efs
-popd
+# Start notebook servercat
+sudo -u ec2-user nohup ${anaconda_path}/bin/jupyter notebook &
 
 # Mark this script as complete.
 touch "$BOOTSTRAP_COMPLETE_PATH"
 wall "*** BOOTSTRAP COMPLETE ***"
-
-# Start notebook server
-runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'
