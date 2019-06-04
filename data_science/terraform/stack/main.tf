@@ -1,5 +1,5 @@
-module "harrison_pim_notebook" {
-  source = "notebooks"
+module "notebook" {
+  source = "notebook"
 
   namespace = "${var.namespace}-notebook"
 
@@ -8,7 +8,6 @@ module "harrison_pim_notebook" {
 
   key_name = "${var.key_name}"
 
-  subnets = "${var.public_subnets}"
   vpc_id  = "${var.vpc_id}"
 
   controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
