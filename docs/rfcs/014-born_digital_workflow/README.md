@@ -46,7 +46,7 @@ During the appraisal stage, an archivist will determine which files are in scope
 
 ### Cataloguing
 
-Once an initial appraisal has been completed, the files in scope for archiving need to be arranged into archive items and catalogued in Calm. Items should be created in Calm to represent related groups of files, which will be submitted and stored as a single package in the storage service.
+Once an initial appraisal has been completed, the files in scope for archiving need to be arranged into archive items and catalogued in Calm. Items should be created in Calm to represent each related set of files, which will be submitted and stored as a single package in the storage service.
 
 This means that an item in Calm corresponds to a bag in the storage service, not an individual file. File-level description is fully automated and the metadata generated is stored in a METS file created by the Archivematica processing workflow.
 
@@ -54,30 +54,17 @@ This means that an item in Calm corresponds to a bag in the storage service, not
 |------------------------|-------------|
 | Find/create collection | Find, or create if necessary, the collection in Calm that the items will be part of. |
 | Find/create series     | Find, or create if necessary, the series and sub-series within the collection that the items will be part of. |
-| Create items           | For each group of related files, create an item in Calm that represents and describes them collectively in the catalogue. This should describe the files as a group, not list details of individual files. |
+| Create items           | For each set of related files, create an item in Calm that represents and describes them collectively in the catalogue. This should describe the files as a set, not list details of individual files. |
 
 ### Transfer
 
+Once each set of related files as been identified, they need to be assembled into a package that can be transferred into Archivematica for processing and storage. This package is a simple zip file, with the addition of a minimal set of descriptive metadata.
 
+This metadata is used for identification only. The canonical version of the metadata, which is also the data that will be displayed to end users, remains the data in Calm. Similarly, whilst Archivematica does have support for rights information, we will not be supplying this through the workflow. Calm will be the sole location for rights information.
 
+The package created for transfer into Archivematica should reflect the original order of the files, as this structure will be maintained in the storage service and in the file-level metadata presented to users.
 
-metadata for identification only, canonical in calm
-Whilst Archivematica does have support for PREMIS rights information, 
-Rights not supplied through workflow. We should treat calm as the only source of this.
-Also means the stored package does not need updated if rights info changes in calm
-
-
-Zip
-how things get to s3
-
-
-| Step                 | Description |
-|----------------------|-------------|
-| Create packages      |  |
-| Add package metadata |  |
-| Upload packages      |  |
-
-#### Package format
+The zip file should have the following structure:
 
 	PPABC_1234.zip
 	|-- file1.txt
@@ -91,10 +78,20 @@ how things get to s3
 	\-- metadata
 	    \-- metadata.csv
 
-#### Metadata
+ Note the addition of a `metadata` directory, with a single file named `metadata.csv`, which contains item level metadata from Calm. `metadata.csv` should have the following structure:
 
 	filename,dc.title,dc.creator,dc.date,dc.identifier
 	objects,<Title>,<CreatorName>,<Date>,<AltRefNo>
+
+Once the zip files have been created, they need to be uploaded to AWS S3. As soon as the upload of a zip completes, it should be picked up by Archivematica and a processing workflow started automatically.
+
+Access to S3 requires the installation of a client application. Until this can be made available more widely, zip files should be passed to the Digital Production team for upload to S3.
+
+| Step                 | Description |
+|----------------------|-------------|
+| Create packages      | Move the set of files for each item into its own directory, preserving the original order. |
+| Add package metadata | Add a `metadata.csv` file to each item, inside a directory called `metadata`. This file should include the appropriate item level metadata from Calm. |
+| Upload packages      | Create a separate zip file from the parent directory for each item and upload to AWS S3, via the Digital Production team. |
 
 ### Processing
 
