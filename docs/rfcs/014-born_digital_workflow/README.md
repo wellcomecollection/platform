@@ -95,24 +95,23 @@ Access to S3 requires the installation of a client application. Until this can b
 
 ### Processing
 
-- how transfers are started in archivematica
-- automation settings in archivematica
+Archivematica will be configured to perform all processing steps automatically. No manual intervention should be required once zip files created with the current manual appraisal process have been uploaded to S3.
+
+We will use the default format policies and tools that come pre-configured in Archivematica, ensuring ongoing best practice for format identification, metadata extraction and file normalisation. All files are virus checked by Archivematica before processing.
 
 | Step                  | Description |
 |-----------------------|-------------|
-| Virus check           |  |
-| Format identification |  |
-| Metadata extraction   |  |
+| Format identification | Determine the most reliable way to identify the format of each file, as described in PRONOM. |
+| Metadata extraction   | Run format-specific tools to extract as much metadata as possible from within each file. |
+| File normalisation    | Convert files into the formats best suited for preservation and access, in addition to keeping the original file. |
 
-#### Processing configuration
-
-This will be a fully automated workflow configured as follows:
+To achieve a fully automated workflow, we will use a pipeline with the following processing configuration:
 
 | Setting                                           | Value    |
 |---------------------------------------------------|----------|
 | Assign UUIDs to directories                       | No       |
-| Send transfer to quarantine.                      | No       |
-| Remove from quarantine after (days).              | 28       |
+| Send transfer to quarantine                       | No       |
+| Remove from quarantine after (days)               | 28       |
 | Generate transfer structure report                | No       |
 | Perform file identification (Transfer)            | Yes      |
 | Extract packages                                  | No       |
@@ -133,11 +132,11 @@ This will be a fully automated workflow configured as follows:
 | Perform file format identification command (Submission documentation & metadata) | No |
 | Select compression algorithm                      | Gzipped tar |
 | Select compression level                          | 5 - normal compression mode |
-| Store AIP | Yes |
-| Store AIP location | Wellcome AIP Storage |
-| Upload DIP | Do not upload |
-| Store DIP | Do not store |
-| Store DIP location | Default location |
+| Store AIP                                         | Yes      |
+| Store AIP location                                | Wellcome AIP Storage |
+| Upload DIP                                        | Do not upload |
+| Store DIP                                         | Do not store |
+| Store DIP location                                | Default location |
 
 ### Storage
 
@@ -148,6 +147,7 @@ Where things end up
 | Create SIP          |  |
 | Store AIP           |  |
 | Link from catalogue |  |
+
 
 ## Future enhancement
 
