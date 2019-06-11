@@ -140,14 +140,15 @@ To achieve a fully automated workflow, we will use a pipeline with the following
 
 ### Storage
 
-Where things end up
+The final stage of the workflow involves the creation of Archive Information Packages (AIPs) and safely moving them to long term storage. The parts of the process are handled automatically by Archivematica and the new storage service.
+
+Once an AIP has been successfully stored in the storage service,  its unique identifier should be added to the equivalent item record in Calm, so that it can be easily located using the catalogue. For now this addition needs to be a manual process, but we hope to be able to automate it in the future.
 
 | Step                | Description |
 |---------------------|-------------|
-| Create SIP          |  |
-| Store AIP           |  |
-| Link from catalogue |  |
-
+| Create SIP          | Archivematica automatically creates a Submission Information Package (SIP), that describes the files that will be stored as an Archive Information Package (AIP). |
+| Store AIP           | Archivematica automatically creates an AIP from the SIP and ensures it is correctly stored in the storage service. |
+| Link from catalogue | Add the unique identifier of the AIP to the associated item record in Calm, so that the catalogue can be used to find files in the storage service. |
 
 ## Future enhancement
 
@@ -155,6 +156,7 @@ Appraise in Archivematica
 Pull metdata from calm
 Pull rights from calm
 Create package in Archivematica
+Save package data back to calm
 
 ### Metadata
 
