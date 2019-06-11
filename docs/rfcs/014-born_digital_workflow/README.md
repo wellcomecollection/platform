@@ -152,16 +152,25 @@ Once an AIP has been successfully stored in the storage service,  its unique ide
 
 ## Future enhancement
 
-Appraise in Archivematica
-Pull metdata from calm
-Pull rights from calm
-Create package in Archivematica
-Save package data back to calm
+There are number of future enhancements that we intend to explore to improve the workflow outlined above. These include using Archivematica for appraisal and integration with Calm.
 
-### Metadata
+### Appraisal in Archivematica
 
-- annex: ideal way we will work towards to do metadata
+Whilst Archivematica does already include support for appraisal, we believe it's not currently easy enough to use or functional enough to replace the current manual process.
 
-### Appraisal
+By working to improve Archivematica, we could:
 
-- annex: how we will towards improving appraisal eg ML
+- Transfer all files into Archivematica on acquisition, providing automated generation of submission documentation and  increased safety against data loss.
+- Provide automated analysis of file formats and associated file metadata to help with appraisal tasks.
+- Use machine learning as part of this analysis, to make suggestions and increase the scope of sensitive checking.
+- Arrange files into SIPs within Archivematica, streamlining the creation of packages for ingest.
+
+### Integration with Calm
+
+Integration between Archivematica and Calm would allow for easier management of associated metadata, further streamlining the creation of packages for ingest.
+
+With full integration, we could:
+
+- Find and create associated records in Calm during SIP creation in Archivematica.
+- Automatically include metadata in SIPs from associated Calm records.
+- Automatically update associated Calm records with AIP identifiers and file-level description, e.g. extent.
