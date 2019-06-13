@@ -81,7 +81,7 @@ The zip file should have the following structure:
  Note the addition of a `metadata` directory, with a single file named `metadata.csv`, which contains item level metadata from Calm. `metadata.csv` should have the following structure:
 
 	filename,dc.title,dc.creator,dc.date,dc.identifier
-	objects,<Title>,<CreatorName>,<Date>,<AltRefNo>
+	objects,<Title>,<CreatorName>,<Date>,<RefNo>
 
 Once the zip files have been created, they need to be uploaded to AWS S3. As soon as the upload of a zip completes, it should be picked up by Archivematica and a processing workflow started automatically.
 
