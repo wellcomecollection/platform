@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.9"
 
   backend "s3" {
-    role_arn = "arn:aws:iam::760097843905:role/developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
 
     bucket         = "wellcomecollection-platform-infra"
     key            = "terraform/shared_infra.tfstate"
@@ -18,7 +18,7 @@ provider "aws" {
   version = "1.10.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
   }
 }
 
@@ -28,7 +28,7 @@ provider "aws" {
   version = "1.10.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::975596993436:role/developer"
+    role_arn = "arn:aws:iam::975596993436:role/storage-developer"
   }
 }
 
