@@ -157,7 +157,7 @@ Content-Type: application/json
     "type": "Bag",
     "info": {
       "type": "BagInfo",
-      "externalIdentifier": "{externalId}" 
+      "externalIdentifier": "{externalId}"
     }
   },
   "sourceLocation": {
@@ -209,7 +209,7 @@ Response:
     "type": "Bag",
     "info": {
       "type": "BagInfo",
-      "externalIdentifier": "{externalId}" 
+      "externalIdentifier": "{externalId}"
     },
     "version": "v1"
   },
@@ -236,7 +236,7 @@ Response:
   },
   "events": [
     {
-      "type": "ProgressEvent",
+      "type": "IngestEvent",
       "createdDate": "2018-10-10T10:00:00Z",
       "description": "Description of event"
     }
@@ -263,13 +263,11 @@ Content-Type: application/json
     "type": "Space"
   },
   "bag": {
-    "id": "{bagId}",
     "type": "Bag",
     "info": {
       "type": "BagInfo",
-      "externalIdentifier": "{externalId}" 
-    },
-    "version": "v1"
+      "externalIdentifier": "{externalId}"
+    }
   },
   "sourceLocation": {
     "type": "Location",
