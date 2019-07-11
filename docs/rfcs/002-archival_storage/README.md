@@ -308,7 +308,7 @@ Request:
 
 ```http
 GET /bags/{spaceId}/{externalId}[?version={version}]
-
+GET /versions[?before={version}]
 ```
 
 Response:
@@ -585,30 +585,51 @@ Response:
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
-  "version": "v3",
-  "versions": [
-    {
-      "type": "Bag",
-      "id": "digitised/b24923333",
-      "version": "v1",
-      "createdDate": "2016-08-07T00:00:00Z"
-    },
-    {
-      "type": "Bag",
-      "id": "digitised/b24923333",
-      "version": "v2",
-      "createdDate": "2016-08-07T00:00:00Z"
-    },
+  "version": "v3"
+}
+```
+
+Request:
+
+```http
+GET /bags/digitised/b24923333/versions
+```
+
+Response:
+
+```json
+{
+  "@context": "https://api.wellcomecollection.org/bags/v1/context.json",
+  "type": "ResultList",
+  "results": [
     {
       "type": "Bag",
       "id": "digitised/b24923333",
       "version": "v3",
       "createdDate": "2016-08-07T00:00:00Z",
+      "url": "https://api.wellcomecollection.org/bags/v1/digitised/b24923333?version=v3"
       "latest": true
+    },
+    {
+      "type": "Bag",
+      "id": "digitised/b24923333",
+      "version": "v2",
+      "createdDate": "2016-08-07T00:00:00Z",
+      "url": "https://api.wellcomecollection.org/bags/v1/digitised/b24923333?version=v2"
+    },
+    {
+      "type": "Bag",
+      "id": "digitised/b24923333",
+      "version": "v1",
+      "createdDate": "2016-08-07T00:00:00Z",
+      "url": "https://api.wellcomecollection.org/bags/v1/digitised/b24923333?version=v1"
     }
   ]
 }
 ```
+
+Versions will be listed in decreasing order, with newer versions listed first.
+Responses may be paginated -- use `?before=vN` to see versions before `vN`.
 
 ### Born-digital archives (AIPs)
 
