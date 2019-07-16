@@ -308,7 +308,7 @@ Request:
 
 ```http
 GET /bags/{spaceId}/{externalId}[?version={version}]
-GET /versions[?before={version}]
+GET /bags/{spaceId}/{externalId}/versions[?before={version}]
 ```
 
 Response:
