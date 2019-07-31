@@ -159,7 +159,7 @@ output "monitoring_vpc_delta_id" {
   value = "${module.monitoring_vpc_delta.vpc_id}"
 }
 
-# Data science VPC
+# Data science VPC (DEPRECATED)
 
 output "datascience_vpc_delta_private_subnets" {
   value = ["${module.datascience_vpc_delta.private_subnets}"]
@@ -171,6 +171,20 @@ output "datascience_vpc_delta_public_subnets" {
 
 output "datascience_vpc_delta_id" {
   value = "${module.datascience_vpc_delta.vpc_id}"
+}
+
+# Data science VPC
+
+output "datascience_vpc_private_subnets" {
+  value = ["${module.datascience_vpc.private_subnets}"]
+}
+
+output "datascience_vpc_public_subnets" {
+  value = ["${module.datascience_vpc.public_subnets}"]
+}
+
+output "datascience_vpc_id" {
+  value = "${module.datascience_vpc.vpc_id}"
 }
 
 # Endpoint Services
