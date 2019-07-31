@@ -28,6 +28,10 @@ locals {
   storage_cidr_block_vpc     = "172.30.0.0/16"
   storage_cidr_block_public  = "172.30.0.0/17"
   storage_cidr_block_private = "172.30.128.0/17"
+
+  datascience_cidr_block_vpc     = "172.17.0.0/16"
+  datascience_cidr_block_public  = "172.17.0.0/17"
+  datascience_cidr_block_private = "172.17.128.0/17"
 }
 
 module "storage_vpc" {
@@ -70,7 +74,7 @@ module "monitoring_vpc_delta" {
   cidrsubnet_newbits_private = "2"
 }
 
-# Used by:
+# (DEPRECATED) Used by:
 # - Data science service
 # - Labs apps & data scientist infra
 
@@ -88,4 +92,28 @@ module "datascience_vpc_delta" {
   private_az_count           = "3"
   cidr_block_private         = "172.27.128.0/17"
   cidrsubnet_newbits_private = "2"
+}
+
+# Used by:
+# - Data science service
+# - Labs apps & data scientist infra
+
+module "datascience_vpc" {
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v19.5.3"
+
+  name = "datascience-172-17-0-0-16"
+
+  cidr_block_vpc = "${local.datascience_cidr_block_vpc}"
+
+  public_az_count           = "3"
+  cidr_block_public         = "${local.datascience_cidr_block_public}"
+  cidrsubnet_newbits_public = "2"
+
+  private_az_count           = "3"
+  cidr_block_private         = "${local.datascience_cidr_block_private}"
+  cidrsubnet_newbits_private = "2"
+
+  providers = {
+    aws = "aws.datascience"
+  }
 }
