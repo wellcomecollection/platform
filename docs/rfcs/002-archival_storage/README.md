@@ -509,18 +509,21 @@ Response:
         "type": "File",
         "name": "data/b24923333.xml",
         "path": "v3/data/b24923333.xml",
+        "size": 1234,
         "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f"
       },
       {
         "type": "File",
         "name": "data/objects/b24923333_001.jp2",
         "path": "v1/data/objects/b24923333_001.jp2",
+        "size": 1234,
         "checksum": "e68c93a5170837420f63420bd626650b2e665434e520c4a619bf8f630bf56a7e"
       },
       {
         "type": "File",
         "name": "data/alto/b24923333_001.xml",
         "path": "v2/data/alto/b24923333_001.xml",
+        "size": 1234,
         "checksum": "17c0147413b0ba8099b000fc91f8bc4e67ce4f7d69fb5c2be632dfedb84aa502"
       }
     ]
@@ -533,18 +536,21 @@ Response:
         "type": "File",
         "name": "manifest-256.txt",
         "path": "v3/manifest-256.txt",
+        "size": 1234,
         "checksum": "791ea5eb5503f636b842cb1b1ac2bb578618d4e85d7b6716b4b496ded45cd44e"
       },
       {
         "type": "File",
         "name": "bag-info.txt",
         "path": "v3/bag-info.txt",
+        "size": 1234,
         "checksum": "13f83db60db65c72bf5077662bca91ed7f69405b86e5be4824bb94ca439d56e7"
       },
       {
         "type": "File",
         "name": "bagit.txt",
         "path": "v3/bagit.txt",
+        "size": 1234,
         "checksum": "a39e0c061a400a5488b57a81d877c3aff36d9edd8d811d66060f45f39bf76d37"
       }
     ]
