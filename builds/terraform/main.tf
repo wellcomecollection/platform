@@ -10,6 +10,8 @@ module "platform" {
     "${module.lambda_pushes_topic.arn}",
   ]
 
+  platform_read_only_role = "${var.platform_read_only_role}"
+
   providers = {
     aws = "aws.platform"
   }
@@ -26,6 +28,8 @@ module "catalogue_repo" {
     "${module.ecr_pushes_topic.arn}",
     "${module.lambda_pushes_topic.arn}",
   ]
+
+  platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
     aws = "aws.catalogue"
@@ -44,6 +48,8 @@ module "storage_repo" {
     "${module.lambda_pushes_topic.arn}",
   ]
 
+  platform_read_only_role = "${var.platform_read_only_role}"
+
   providers = {
     aws = "aws.storage"
   }
@@ -60,6 +66,8 @@ module "archivematica_repo" {
     "${module.ecr_pushes_topic.arn}",
     "${module.lambda_pushes_topic.arn}",
   ]
+
+  platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
     aws = "aws.workflow"
