@@ -3,7 +3,7 @@ provider "aws" {
   version = "1.27.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/admin"
+    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
   }
 }
 
@@ -14,7 +14,7 @@ provider "aws" {
   version = "1.27.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::975596993436:role/admin"
+    role_arn = "arn:aws:iam::975596993436:role/storage-admin"
   }
 }
 
@@ -25,7 +25,7 @@ provider "aws" {
   version = "1.27.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/admin"
+    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
   }
 }
 
@@ -36,7 +36,7 @@ provider "aws" {
   version = "1.27.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/admin"
+    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
   }
 }
 
@@ -47,7 +47,7 @@ provider "aws" {
   version = "1.27.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::299497370133:role/admin"
+    role_arn = "arn:aws:iam::299497370133:role/workflow-admin"
   }
 }
 
