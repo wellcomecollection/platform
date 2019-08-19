@@ -555,7 +555,7 @@ Response:
       }
     ]
   },
-  "primaryLocation": {
+  "location": {
     "type": "Location",
     "provider": {
       "type": "Provider",
@@ -742,7 +742,7 @@ Response:
       }
     ]
   },
-  "primaryLocation": {
+  "location": {
     "type": "Location",
     "provider": {
       "type": "Provider",
