@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 20 March 2019.**
+**Last updated: 16 August 2019.**
 
 ## Problem statement
 
@@ -52,9 +52,9 @@ In conjunction with workflow systems that provide only changed files, this model
 
 The storage service will use two AWS S3 buckets and one Azure Blob Storage container:
 
-- Warm primary storage (AWS S3 IA, Dublin)
-- Cold primary storage (AWS S3 Glacier, Dublin)
-- Cold disaster recovery (Azure Blob Storage Archive, Netherlands)
+- Warm primary storage: AWS S3 IA, Dublin
+- Cold replica storage, same provider: AWS S3 Glacier, Dublin
+- Cold replica storage, different provider: Azure Blob Storage Archive, Netherlands
 
 Within each location, assets will be grouped into related spaces of content and identified by source identifier e.g.:
 
@@ -555,18 +555,18 @@ Response:
       }
     ]
   },
-  "locations": [
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "aws-s3-ia",
-        "label": "AWS S3 - Infrequent Access"
-      },
-      "bucket": "bucketname-access",
-      "path": "digitised/b24923333",
-      "url": "http://bucketname-access.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+  "location": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-ia",
+      "label": "AWS S3 - Infrequent Access"
     },
+    "bucket": "bucketname",
+    "path": "digitised/b24923333",
+    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+  },
+  "replicaLocations": [
     {
       "type": "Location",
       "provider": {
@@ -574,9 +574,9 @@ Response:
         "id": "aws-s3-glacier",
         "label": "AWS S3 - Glacier"
       },
-      "bucket": "bucketname-archive",
+      "bucket": "bucketname-replica",
       "path": "digitised/b24923333",
-      "url": "http://bucketname-archive.s3-eu-west-1.amazonaws.com/digitised/b24923333"
+      "url": "http://bucketname-replica.s3-eu-west-1.amazonaws.com/digitised/b24923333"
     },
     {
       "type": "Location",
@@ -585,9 +585,9 @@ Response:
         "id": "azure-blob-archive",
         "label": "Azure Blob Storage - Archive"
       },
-      "bucket": "bucketname",
+      "bucket": "bucketname-replica",
       "path": "digitised/b24923333",
-      "url": "https://accountname.blob.core.windows.net/bucketname/digitised/b24923333"
+      "url": "https://accountname.blob.core.windows.net/bucketname-replica/digitised/b24923333"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
@@ -742,18 +742,18 @@ Response:
       }
     ]
   },
-  "locations": [
-    {
-      "type": "Location",
-      "provider": {
-        "type": "Provider",
-        "id": "aws-s3-ia",
-        "label": "AWS S3 - Infrequent Access"
-      },
-      "bucket": "bucketname-access",
-      "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname-access.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+  "location": {
+    "type": "Location",
+    "provider": {
+      "type": "Provider",
+      "id": "aws-s3-ia",
+      "label": "AWS S3 - Infrequent Access"
     },
+    "bucket": "bucketname",
+    "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
+    "url": "http://bucketname.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+  },
+  "replicaLocations": [
     {
       "type": "Location",
       "provider": {
@@ -761,9 +761,9 @@ Response:
         "id": "aws-s3-glacier",
         "label": "AWS S3 - Glacier"
       },
-      "bucket": "bucketname-archive",
+      "bucket": "bucketname-replica",
       "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "http://bucketname-archive.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "url": "http://bucketname-replica.s3-eu-west-1.amazonaws.com/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Location",
@@ -772,9 +772,9 @@ Response:
         "id": "azure-blob-archive",
         "label": "Azure Blob Storage - Archive"
       },
-      "bucket": "bucketname",
+      "bucket": "bucketname-replica",
       "path": "born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476",
-      "url": "https://accountname.blob.core.windows.net/bucketname/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+      "url": "https://accountname.blob.core.windows.net/bucketname-replica/born-digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     }
   ],
   "createdDate": "2016-08-07T00:00:00Z",
