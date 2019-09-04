@@ -8,7 +8,7 @@ Code reviews should:
 - Require approval from:
    - **one** other developer in the case of project work
    - **two** developers (one of whom is from a different team) in the case of library changes.
-- Not block release, i.e. changes can be requested in later PRs where that change is not critical to the purpose of the existing PR.
+- Not block merging, i.e. changes can be requested in later PRs where that change is not critical to the purpose of the existing PR.
 - Ask for clarification where code or purpose is unclear.
 - Be polite: assume the good intent of the person making the change.
 
