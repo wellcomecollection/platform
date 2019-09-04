@@ -10,11 +10,12 @@ Code reviews should:
    - **two** developers (one of whom is from a different team) in the case of library changes.
 - Not block release, i.e. changes can be requested in later PRs where that change is not critical to the purpose of the existing PR.
 - Ask for clarification where code or purpose is unclear.
-- Be polite.
+- Be polite: assume the good intent of the person making the change.
 
 Some guidelines:
 
 - Nit picking is okay but should be labelled as such.
+- Code style, indentation, etc is better handled by automated linting than by code review.
 - Developers from any team can comment on any PR that they feel qualified to (it is expected that this happen).
 - The developer who opened a PR should be the one to merge it.
 - Examples of how to structure code or links to resources that clarify are helpful.
