@@ -1,2 +1,0 @@
-# DeViSE search
-An MVP flask app, hosted on AWS. Demonstrates the principle of combining sentence embeddings with DeViSE (deep visual semantic embeddings) to run text-based searches on images with no associated text/metadata.
