@@ -12,7 +12,6 @@ The purpose of creating shared libraries is to:
 
 When adding functionality to existing libraries we:
 
-Add Scaladocs
-examples api changes in changedoc
-scaladocs for new api
-cross team review of libs (2 folk)
+- Add documentation as appropriate. See https://docs.scala-lang.org/style/scaladoc.html
+- Release documentation should carry examples of API changes where they occur.
+- Code reviews for shared libraries require approval from 2 developers one of whom is from a different project team.
