@@ -8,7 +8,6 @@ include infrastructure/Makefile
 include assets/Makefile
 include builds/Makefile
 include loris/Makefile
-include data_science/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include nginx/Makefile
