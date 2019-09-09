@@ -60,7 +60,7 @@ def download_from_preservica(preservica_guid):
     sess.auth = HTTPBasicAuth(getpass.getuser(), password)
 
     # Get the initial deliverable unit
-    du_xml = get_xml(sess, url=f"{API_URL}/deliverableUnits/{preservica_guid}")
+    du_xml = get_xml(sess, url="%s/deliverableUnits/%s" % (API_URL, preservica_guid))
     print_message("*** Fetched deliverable XML for:", preservica_guid)
 
     manifestation_links = [
@@ -73,7 +73,7 @@ def download_from_preservica(preservica_guid):
         manifest_guid = manifest_link.split("/")[-1]
         print_message("*** Detected manifestation ID:", manifest_guid)
     else:
-        sys.exit(f"*** Could not detect a manifestation link: {manifestation_links}")
+        sys.exit("*** Could not detect a manifestation link: %s" % manifestation_links)
 
     manifest_xml = get_xml(sess, url=manifest_link)
     print_message("*** Fetched manifestation XML for:", manifest_guid)
@@ -84,7 +84,7 @@ def download_from_preservica(preservica_guid):
     jp2_names = [entry.find("title").text for entry in all_entries]
     common_prefix = os.path.commonprefix(jp2_names).split("_")[0]
     assert len(common_prefix) > 0
-    print(f"*** Using common prefix {common_prefix} for working directory")
+    print("*** Using common prefix %s for working directory" % common_prefix)
 
     exclude_from_git(common_prefix)
 
@@ -101,13 +101,13 @@ def download_from_preservica(preservica_guid):
 
         if (working_dir / entry_title).exists():
             print_message(
-                f"··· {str(i).rjust(len(str(entry_count)))}/{entry_count} Already downloaded asset:",
+                "··· %s/%s Already downloaded asset:" % (str(i).rjust(len(str(entry_count))), entry_count),
                 entry_guid,
             )
             continue
         else:
             print_message(
-                f"*** {str(i).rjust(len(str(entry_count)))}/{entry_count} Fetching asset:",
+                "*** %s/%s Fetching asset:" % (str(i).rjust(len(str(entry_count))), entry_count),
                 entry_guid,
             )
             download_file(sess, entry_url, path=working_dir / entry_title)
