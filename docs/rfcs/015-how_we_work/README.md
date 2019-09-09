@@ -4,7 +4,7 @@
 
 ## Background
 
-In order to work together effectively it is useful to have some guiding principals that underpin work.
+In order to work together effectively it is useful to have some guiding principles that underpin work.
 
 This is intended to be a living document and will not represent _everything all the time_.
 
