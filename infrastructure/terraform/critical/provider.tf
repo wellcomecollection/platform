@@ -3,7 +3,7 @@ provider "aws" {
   version = "1.46.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/admin"
+    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
   }
 }
 
@@ -15,7 +15,7 @@ provider "aws" {
   version = "1.46.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/admin"
+    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
   }
 }
 
