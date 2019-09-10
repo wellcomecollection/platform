@@ -74,7 +74,7 @@ resource "aws_cloudfront_distribution" "api_root" {
       }
     }
 
-    viewer_protocol_policy = "https-only"
+    viewer_protocol_policy = "redirect-to-https"
 
     min_ttl     = 0
     default_ttl = 0
