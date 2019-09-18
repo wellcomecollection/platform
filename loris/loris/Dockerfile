@@ -31,13 +31,13 @@ COPY sRGB2014.icc /usr/share/color/icc/colord/sRGB2014.icc
 ENV LORIS_CONF_FILE /opt/loris/etc/loris2.conf
 
 COPY loris2.conf /opt/loris/etc/loris2.conf
+COPY setup_directories.py /loris-$LORIS_COMMIT/bin/setup_directories.py
+RUN python3 /loris-$LORIS_COMMIT/bin/setup_directories.py
+
 COPY loris2.wsgi /var/www/loris2/loris2.wsgi
 COPY uwsgi.ini /etc/uwsgi
 
 COPY wellcome_loris.py /usr/local/lib/python3.5/dist-packages
-
-COPY setup_directories.py /loris-$LORIS_COMMIT/bin/setup_directories.py
-RUN python3 /loris-$LORIS_COMMIT/bin/setup_directories.py
 
 EXPOSE 8888
 
