@@ -36,6 +36,9 @@ COPY uwsgi.ini /etc/uwsgi
 
 COPY wellcome_loris.py /usr/local/lib/python3.5/dist-packages
 
+COPY setup_directories.py /loris-$LORIS_COMMIT/bin/setup_directories.py
+RUN python3 /loris-$LORIS_COMMIT/bin/setup_directories.py
+
 EXPOSE 8888
 
 CMD ["/usr/bin/uwsgi", "--ini", "/etc/uwsgi/uwsgi.ini"]
