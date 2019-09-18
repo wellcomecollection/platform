@@ -19,3 +19,15 @@ $(ROOT)/loris/loris/requirements.txt: $(ROOT)/loris/loris/requirements.in
 
 loris-run: loris-build
 	$(ROOT)/docker_run.py -- --publish 8888:8888 loris
+
+loris-publish:
+	$(ROOT)/docker_run.py \
+	    --aws --dind -- \
+	    wellcome/publish_service:86 \
+	    	--service_id="loris" \
+	        --project_id="loris" \
+	        --account_id="760097843905" \
+	        --region_id=eu-west-1 \
+	        --namespace=uk.ac.wellcome \
+	        --role_arn="$(DEV_ROLE_ARN)" \
+	        --label=latest

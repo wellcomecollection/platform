@@ -22,5 +22,6 @@ pip3 install -r /requirements.txt
 echo "*** Installing Loris itself"
 cd "loris-$LORIS_COMMIT"
 python3 setup.py install
+python3 loris/bin/setup_directories.py
 
 apt-get clean

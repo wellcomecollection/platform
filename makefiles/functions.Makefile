@@ -1,6 +1,10 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 INFRA_BUCKET = wellcomecollection-platform-infra
 
+ifneq ($(TRAVIS),true)
+DEV_ROLE_ARN := arn:aws:iam::760097843905:role/platform-developer
+endif
+
 # Publish a ZIP file containing a Lambda definition to S3.
 #
 # Args:
@@ -73,13 +77,14 @@ endef
 define publish_service_ssm
 	$(ROOT)/docker_run.py \
 	    --aws --dind -- \
-	    wellcome/publish_service:51 \
-	        --project_name=$(2) \
-	        --registry_id=$(4) \
-	        --label=latest \
-	        --image_name="$(1)" \
-	        --repo_uri="$(3)" \
-
+    	    wellcome/publish_service:86 \
+    	    	--service_id="$(1)" \
+    	        --project_id=$(2) \
+    	        --account_id=$(3) \
+    	        --region_id=eu-west-1 \
+    	        --namespace=uk.ac.wellcome \
+    	        --role_arn="$(DEV_ROLE_ARN)" \
+    	        --label=latest
 endef
 
 
@@ -159,6 +164,6 @@ define stack_setup
 # whitespace, but that's the general idea.
 
 $(foreach task,$(PYTHON_APPS),$(eval $(call __python_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
-$(foreach task,$(PYTHON_SSM_APPS),$(eval $(call __python_ssm_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile,$(STACK_ROOT),$(ECR_BASE_URI),$(REGISTRY_ID))))
+$(foreach task,$(PYTHON_SSM_APPS),$(eval $(call __python_ssm_target,$(task),$(STACK_ROOT)/$(task)/Dockerfile,$(STACK_ROOT),$(PROJECT_ID),$(ACCOUNT_ID))))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 endef
