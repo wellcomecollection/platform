@@ -3,12 +3,6 @@ include $(ROOT)/makefiles/functions.Makefile
 
 STACK_ROOT  = monitoring
 
-SBT_APPS 	 =
-SBT_SSM_APPS =
-
-SBT_DOCKER_LIBRARIES    =
-SBT_NO_DOCKER_LIBRARIES =
-
 PYTHON_APPS     = slack_budget_bot
 PYTHON_SSM_APPS =
 LAMBDAS 	    =   post_to_slack terraform_tracker \
