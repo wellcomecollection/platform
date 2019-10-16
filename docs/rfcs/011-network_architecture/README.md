@@ -36,7 +36,7 @@ The services we are currently resonsible for are as follows:
   - [Grafana](https://monitoring.wellcomecollection.org): Grafana service with visibility on AWS accounts, osted in AWS.
   - [ECS Dashboard](https://wellcomecollection-platform-dashboard.s3.amazonaws.com/index.html): Dashboard providing visibility on ECS services and deployments.
 
-## Proposed network infrastructure
+## Network infrastructure
 
 Networks should be split along project lines, using a consistent IP CIDR scheme that is non-overlapping with other Wellcome infrastructure. Network access to 3rd parties should be made available via a transit VPC.
 
@@ -45,5 +45,9 @@ Networks should be split along project lines, using a consistent IP CIDR scheme 
 - `monitoring-172-28-0-0-16`: 172.28.0.0/16 - Monitoring infrastructure (owned by Platform AWS account)
 - `datascience-172-27-0-0-16`: 172.26.0.0/16 - Data science infrastructure & Labs (owned by Collection Data AWS account)
 - `catalogue-172-31-0-0-16`: 172.31.0.0/16 - Catalogue service infrastructure (owned by Catalogue AWS account)
+
+Older VPCs:
+- `wellcomecollection`: 172.20.0.0/16 - wellcomecollection.org infra
+- `workflow`: 10.50.0.0/16 - Workflow infrastructure
 
 The default VPC has been removed.
