@@ -14,8 +14,7 @@ cryptography==2.1
 idna==2.6                 # via cryptography, requests
 monotonic==1.4            # via tenacity
 netaddr==0.7.19
-olefile==0.44             # via pillow
-pillow==4.3.0
+pillow==6.2.0
 pycparser==2.18           # via cffi
 pyjwt==1.5.3
 requests==2.18.4
