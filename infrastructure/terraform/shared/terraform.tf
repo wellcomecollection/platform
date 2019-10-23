@@ -41,5 +41,3 @@ provider "aws" {
     role_arn = "arn:aws:iam::964279923020:role/data-developer"
   }
 }
-
-data "aws_caller_identity" "current" {}
