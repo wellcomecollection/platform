@@ -1,0 +1,51 @@
+<svg
+    viewBox="0 0 30 10"
+    xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Node A -->
+    <circle cx="5" cy="2" r="0.5"/>
+    <text x="5" y="3" font-size="1.8px"
+          text-anchor="middle"
+          font-family="serif"
+          dominant-baseline="hanging">A</text>
+
+    <!-- Node B -->
+    <circle cx="15" cy="2" r="0.5"/>
+    <text x="15" y="3" font-size="1.8px"
+          text-anchor="middle"
+          font-family="serif"
+          dominant-baseline="hanging">B</text>
+
+    <!-- Node C -->
+    <circle cx="25" cy="2" r="0.5"/>
+    <text x="25" y="3" font-size="1.8px"
+          text-anchor="middle"
+          font-family="serif"
+          dominant-baseline="hanging">C</text>
+
+    <!-- Define an arrowhead -->
+    <marker id="arrowhead"
+            markerWidth="5"
+            markerHeight="3.5"
+            refX="0"
+            refY="1.75"
+            orient="auto">
+        <polygon points="0 0, 5 1.75, 0 3.5"/>
+    </marker>
+
+    <!-- A-B arrow -->
+    <line x1="6.5" y1="2" x2="13.5" y2="2"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+    <line x1="13.5" y1="2" x2="6.5" y2="2"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+
+    <!-- B-C arrow -->
+    <line x1="24" y1="2" x2="16.5" y2="2"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+
+    <!-- red cross -->
+    <text x="19.5" y="2.5" fill="red" font-size="4px" dominant-baseline="middle">✗</text>
+</svg>

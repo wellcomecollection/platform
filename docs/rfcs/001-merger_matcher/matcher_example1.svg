@@ -1,0 +1,94 @@
+<svg
+    viewBox="0 0 30 15"
+    xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Node A -->
+    <circle cx="5" cy="2" r="0.5"/>
+    <text x="4" y="2" font-size="1.8px"
+          text-anchor="end"
+          font-family="serif"
+          dominant-baseline="baseline">A</text>
+
+    <!-- Node B -->
+    <circle cx="10" cy="7" r="0.5"/>
+    <text x="8.5" y="7" font-size="1.8px"
+          text-anchor="end"
+          font-family="serif"
+          dominant-baseline="middle">B</text>
+
+    <!-- Node C -->
+    <circle cx="5" cy="12" r="0.5"/>
+    <text x="4" y="12" font-size="1.8px"
+          text-anchor="end"
+          font-family="serif"
+          dominant-baseline="hanging">C</text>
+
+    <!-- Node D -->
+    <circle cx="20" cy="7" r="0.5"/>
+    <text x="21.5" y="7" font-size="1.8px"
+          text-anchor="start"
+          font-family="serif"
+          dominant-baseline="middle">D</text>
+
+    <!-- Node E -->
+    <circle cx="25" cy="2" r="0.5"/>
+    <text x="26" y="2" font-size="1.8px"
+          text-anchor="start"
+          font-family="serif"
+          dominant-baseline="baseline">E</text>
+
+    <!-- Node F -->
+    <circle cx="25" cy="12" r="0.5"/>
+    <text x="26" y="12" font-size="1.8px"
+          text-anchor="start"
+          font-family="serif"
+          dominant-baseline="hanging">F</text>
+
+    <!-- Define an arrowhead -->
+    <marker id="arrowhead"
+            markerWidth="5"
+            markerHeight="3.5"
+            refX="0"
+            refY="1.75"
+            orient="auto">
+        <polygon points="0 0, 5 1.75, 0 3.5"/>
+    </marker>
+
+    <marker id="arrowhead-green"
+            markerWidth="5"
+            markerHeight="3.5"
+            refX="0"
+            refY="1.75"
+            orient="auto">
+        <polygon points="0 0, 5 1.75, 0 3.5" fill="green"/>
+    </marker>
+
+    <!-- A-B arrow -->
+    <line x1="5.8" y1="2.8" x2="8.85" y2="5.85"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+    <line x1="8.75" y1="5.75" x2="6.2" y2="3.2"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+
+    <!-- B-C arrow -->
+    <line x1="5.8" y1="11.2" x2="8.85" y2="8.15"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+
+    <!-- B-D arrow -->
+    <line x1="10.75" y1="7" x2="18.4" y2="7"
+        stroke-width="0.15" stroke="green"
+        marker-end="url(#arrowhead-green)"
+        stroke-dasharray="0.25,0.25"/>
+
+    <!-- D-E arrow -->
+    <line x1="24.2" y1="2.8" x2="21.2" y2="5.85"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+
+    <!-- D-F arrow -->
+    <line x1="21" y1="7.95" x2="23.8" y2="10.8"
+        stroke-width="0.15" stroke="black"
+        marker-end="url(#arrowhead)"/>
+</svg>

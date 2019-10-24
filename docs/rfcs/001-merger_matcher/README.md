@@ -190,7 +190,7 @@ The matcher is best understood with examples.
 
 Suppose we have the following graph:
 
-![](matcher_example1.png)
+![](matcher_example1.svg)
 
 We have two existing works: ABC and DEF.
 We receive an update to B telling us it now has edges B→A and B→D.
@@ -276,7 +276,7 @@ But let's suppose we have the following graph, and receive two updates that
 overlap (deliberately not numbered as there's no ordering on updates to
 different vertices).
 
-![](matcher_example2.png)
+![](matcher_example2.svg)
 
 0.  The existing DB is as follows:
 
@@ -289,11 +289,11 @@ different vertices).
             F         | -     | DEF              | 4
             G         | -     | G                | 1
 
-1.  Update (*) is processed, and it affects nodes B and E.
-    So the worker handling (*) acquires a row-level lock on those two nodes.
+1.  Update (✻) is processed, and it affects nodes B and E.
+    So the worker handling (✻) acquires a row-level lock on those two nodes.
 
-    Meanwhile update (**) is also being processed, and it affects F and G.
-    So the worker handling (**) F and G acquires a lock on those two rows.
+    Meanwhile update (✻✻) is also being processed, and it affects F and G.
+    So the worker handling (✻✻) F and G acquires a lock on those two rows.
 
             work_id   | links | linked_works_set | version
             A         | B     | ABC              | 2
@@ -303,9 +303,9 @@ different vertices).
         **  E         | D     | DEF              | 2
         **  F         | -     | DEF              | 4
             G         | -     | G                | 1
-2.  Process (*) discovers that it affects vertices ABCDEF.
+2.  Process (✻) discovers that it affects vertices ABCDEF.
 
-    Process (**) discovers that it affects vertices DEFG.
+    Process (✻✻) discovers that it affects vertices DEFG.
 
     Both of them attempt to expand to lock all the vertices they affect -- and
     whoever tries first will hit the other's lock.  They then release their
@@ -362,7 +362,7 @@ guarantee.
 
 What happens if we remove a link?
 
-![](matcher_example3.png)
+![](matcher_example3.svg)
 
 In this example A, B and C are connected into a component called ABC. We receive an update to C that causes ABC to be split.
 
