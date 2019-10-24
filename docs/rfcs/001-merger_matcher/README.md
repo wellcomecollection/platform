@@ -6,7 +6,7 @@
 
 Items can be closely related, for example a book may be both a printed book and an eBook, or a painting can include a physical painting and photographs or xray
 imagery of the painting.
-Where works are so closely related that they represent or refer to the same 'thing' we wish to 
+Where works are so closely related that they represent or refer to the same 'thing' we wish to
 merge them into combined works to aid understanding and searching.
 
 ## Problem Statement
@@ -20,7 +20,7 @@ The merging of works is broken into two phases
 
  * a linking phase that identifies linked works to be merged.
  * a merging phase that merges works to form new combined works.
-   
+
 The matcher receives a transformed work and determines how it links to other works.
 
 The merger receives the identifiers from the matcher and reads the transformed works from the recorder table.
@@ -43,7 +43,7 @@ The merger will use the identifiers to read the works from the recorder VHS and 
 the message to ensure that the versions are still the most up to date ones. If so, it will combine the works. If not, it will discard the message.
 
 Example:
-```[json]
+```json
     {
        "linked-works-sets" : [
             {
@@ -91,11 +91,11 @@ The id used for combined works is created by concatenating the sorted, namespace
 For example if a work A is edited to include work B this will be identified in the 'identifiers' field of A.
 
 For example creating a combined work 'A-B' when processing work 'A' could give as input:
-```[json]
+```json
 {
   "identifiers" : [
     // A
-    { 
+    {
       "identifierScheme": "sierra-system-number",
       "ontologyType": "Work",
       "value": "A"
@@ -119,7 +119,7 @@ For example creating a combined work 'A-B' when processing work 'A' could give a
 Note that `A.identifiers` includes the source identifier for  `A` itself.
 In the case that neither A or B has previously been identified as a part of a combined work the matcher
 will output (assuming that B is stored as version 1 in the matcher database):
-```[json]
+```json
     {
        "linked-works-sets" : [
             {
@@ -138,9 +138,9 @@ will output (assuming that B is stored as version 1 in the matcher database):
     }
 ```
 
-For example, suppose works `A`, `B`, and `A-B` have been previously created and `A` is 
+For example, suppose works `A`, `B`, and `A-B` have been previously created and `A` is
 edited to link to `C`, then the output from the matcher would be:
-```[json]
+```json
     {
        "linked-works-sets" : [
             {
@@ -166,7 +166,7 @@ edited to link to `C`, then the output from the matcher would be:
 
 ## Concurrent updates and locking
 
-While the required updates for a merged work are being found there cannot be changes to the records for participating 
+While the required updates for a merged work are being found there cannot be changes to the records for participating
 works.
 A locking mechanism is used to achieve this, with all participating works being locked for editing.
 
@@ -230,35 +230,35 @@ We receive an update to B telling us it now has edges B→A and B→D.
         F         | -     | ABCDEF           | 4
 
 4.  The output JSON is:
-```[json]
+```json
 {
   "linked-works-sets":[
     {
       "linked-works": [
         {
-          "identifier": "A", 
+          "identifier": "A",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "B", 
+          "identifier": "B",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "C", 
+          "identifier": "C",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "D", 
+          "identifier": "D",
           "version": 3
         },
         {
-          "identifier": "E", 
+          "identifier": "E",
           "version": 2
         },
         {
-          "identifier": "F", 
+          "identifier": "F",
           "version": 4
-        } 
+        }
       ]
     }
   ]
@@ -281,12 +281,12 @@ different vertices).
 0.  The existing DB is as follows:
 
             work_id   | links | linked_works_set | version
-            A         | B     | ABC              | 2      
-            B         | A     | ABC              | 2      
-            C         | B     | ABC              | 2      
-            D         | F     | DEF              | 3      
-            E         | D     | DEF              | 2      
-            F         | -     | DEF              | 4      
+            A         | B     | ABC              | 2
+            B         | A     | ABC              | 2
+            C         | B     | ABC              | 2
+            D         | F     | DEF              | 3
+            E         | D     | DEF              | 2
+            F         | -     | DEF              | 4
             G         | -     | G                | 1
 
 1.  Update (*) is processed, and it affects nodes B and E.
@@ -295,14 +295,14 @@ different vertices).
     Meanwhile update (**) is also being processed, and it affects F and G.
     So the worker handling (**) F and G acquires a lock on those two rows.
 
-            work_id   | links | linked_works_set | version   
-            A         | B     | ABC              | 2         
-        *   B         | A     | ABC              | 2         
-            C         | B     | ABC              | 2         
-        *   D         | F     | DEF              | 3         
-        **  E         | D     | DEF              | 2         
-        **  F         | -     | DEF              | 4         
-            G         | -     | G                | 1         
+            work_id   | links | linked_works_set | version
+            A         | B     | ABC              | 2
+        *   B         | A     | ABC              | 2
+            C         | B     | ABC              | 2
+        *   D         | F     | DEF              | 3
+        **  E         | D     | DEF              | 2
+        **  F         | -     | DEF              | 4
+            G         | -     | G                | 1
 2.  Process (*) discovers that it affects vertices ABCDEF.
 
     Process (**) discovers that it affects vertices DEFG.
@@ -319,37 +319,37 @@ guarantee.
 
 3. Eventually the output JSON is:
 
-```[json]
+```json
 {
   "linked-works-sets": [
     {
-      "linked-works":[  
+      "linked-works":[
         {
-          "identifier": "A", 
+          "identifier": "A",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "B", 
+          "identifier": "B",
           "version": 3
-        }, 
+        },
         {
-          "identifier": "C", 
+          "identifier": "C",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "D", 
+          "identifier": "D",
           "version": 3
-        }, 
+        },
         {
-          "identifier": "E", 
+          "identifier": "E",
           "version": 2
-        }, 
+        },
         {
-          "identifier": "F", 
+          "identifier": "F",
           "version": 5
-        }, 
+        },
         {
-          "identifier": "G", 
+          "identifier": "G",
           "version": 1
         }
       ]
@@ -368,58 +368,58 @@ In this example A, B and C are connected into a component called ABC. We receive
 
 0.  The existing DB is as follows:
 
-            work_id   | links | linked_works_set | version   
-            A         | B     | ABC              | 5         
-            B         | A     | ABC              | 3         
-            C         | B     | ABC              | 1         
+            work_id   | links | linked_works_set | version
+            A         | B     | ABC              | 5
+            B         | A     | ABC              | 3
+            C         | B     | ABC              | 1
 
 1.  Because we have an update that affects C, we read and acquire a lock on C from the database first:
 
-            work_id   | links | linked_works_set | version  
-            C         | B     | ABC              | 1        
+            work_id   | links | linked_works_set | version
+            C         | B     | ABC              | 1
 
 2.  By looking at their connected components, we acquire a lock on all other vertices affected: A and B.
 3.  We update C to not belong to ABC:
 
-            work_id   | links | linked_works_set | version  
-            C         | _     | C                | 2        
+            work_id   | links | linked_works_set | version
+            C         | _     | C                | 2
 
 4.  We assign A and B to linked_works_set AB:
 
-            work_id   | links | linked_works_set | version  
-            A         | B     | AB               | 5        
+            work_id   | links | linked_works_set | version
+            A         | B     | AB               | 5
             B         | A     | AB               | 3
 
 5.  The database ends up looking like this:
 
-            work_id   | links | linked_works_set | version 
-            A         | B     | AB               | 5       
-            B         | A     | AB               | 3       
-            C         | _     | C                | 2       
+            work_id   | links | linked_works_set | version
+            A         | B     | AB               | 5
+            B         | A     | AB               | 3
+            C         | _     | C                | 2
 
 7.  The output JSON is:
 
-```[json]
+```json
 {
   "linked-works-sets": [
     {
-      "linked-works":[  
+      "linked-works":[
         {
-          "identifier": "A", 
+          "identifier": "A",
           "version": 5
-        },  
+        },
         {
-          "identifier": "B", 
+          "identifier": "B",
           "version": 3
         }
       ]
     },
     {
-      "linked-works": [  
+      "linked-works": [
         {
-          "identifier": "C", 
+          "identifier": "C",
           "version": 2
-        } 
+        }
       ]
     }
   ]
