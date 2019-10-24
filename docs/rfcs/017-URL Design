@@ -12,7 +12,7 @@ d. subject unless the URL is about that subject
 
 2. If a URL changes we SHOULD redirect to a new URL and maintain that redirect forever where a semantically equivalent resource exists;
 
-3. When content is removed and there is no equivalent resource we SHOULD return 410 (http gone) with a link to an archived copy of the resource.
+3. When content is removed and there is no equivalent resource we SHOULD return 410 (HTTP Gone) with a link to an archived copy of the resource.
 
 4. URLs SHOULD be as short as possible but no shorter. Deeply nested URLs have an impact on SEO and long URLs can cause problems when used in emails etc. short URLs are therefore preferable while maintaining sufficient entropy to support future growth.
 
