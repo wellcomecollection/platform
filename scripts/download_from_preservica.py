@@ -101,13 +101,15 @@ def download_from_preservica(preservica_guid):
 
         if (working_dir / entry_title).exists():
             print_message(
-                "··· %s/%s Already downloaded asset:" % (str(i).rjust(len(str(entry_count))), entry_count),
+                "··· %s/%s Already downloaded asset:"
+                % (str(i).rjust(len(str(entry_count))), entry_count),
                 entry_guid,
             )
             continue
         else:
             print_message(
-                "*** %s/%s Fetching asset:" % (str(i).rjust(len(str(entry_count))), entry_count),
+                "*** %s/%s Fetching asset:"
+                % (str(i).rjust(len(str(entry_count))), entry_count),
                 entry_guid,
             )
             download_file(sess, entry_url, path=working_dir / entry_title)
