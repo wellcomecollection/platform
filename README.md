@@ -31,7 +31,6 @@ Developers who want to create projects within the platform should refer to our [
 - [Build status](https://travis-ci.org/wellcometrust)
 - [Infrastructure Status](https://wellcomecollection-platform-dashboard.s3.amazonaws.com/index.html)
 - Uptime reports & current status:
-    - [api.wellcomecollection.org/v1/works (api)](https://updown.io/hj6w)
     - [api.wellcomecollection.org/v2/works (api)](https://updown.io/qqek)
     - [iiif.wellcomecollection.org/image (api)](https://updown.io/dt4b)
     - [www.wellcomecollection.org (frontend)](https://updown.io/2cep)
