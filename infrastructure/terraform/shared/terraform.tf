@@ -33,6 +33,17 @@ provider "aws" {
 }
 
 provider "aws" {
+  alias   = "catalogue"
+  region  = "${local.aws_region}"
+  version = "1.10.0"
+
+  assume_role {
+    role_arn = "arn:aws:iam::975596993436:role/catalogue-developer"
+  }
+}
+
+
+provider "aws" {
   alias   = "datascience"
   region  = "${local.aws_region}"
   version = "1.10.0"
