@@ -187,6 +187,20 @@ output "datascience_vpc_id" {
   value = "${module.datascience_vpc.vpc_id}"
 }
 
+# Catalogue VPC
+
+output "catalogue_vpc_private_subnets" {
+  value = ["${module.catalogue_vpc.private_subnets}"]
+}
+
+output "catalogue_vpc_public_subnets" {
+  value = ["${module.catalogue_vpc.public_subnets}"]
+}
+
+output "catalogue_vpc_id" {
+  value = "${module.catalogue_vpc.vpc_id}"
+}
+
 # Endpoint Services
 
 output "service-pl-winslow" {
