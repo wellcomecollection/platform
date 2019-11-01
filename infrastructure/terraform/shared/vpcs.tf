@@ -32,6 +32,10 @@ locals {
   datascience_cidr_block_vpc     = "172.17.0.0/16"
   datascience_cidr_block_public  = "172.17.0.0/17"
   datascience_cidr_block_private = "172.17.128.0/17"
+
+  catalogue_cidr_block_vpc     = "172.18.0.0/16"
+  catalogue_cidr_block_public  = "172.18.0.0/17"
+  catalogue_cidr_block_private = "172.18.128.0/17"
 }
 
 module "storage_vpc" {
@@ -115,5 +119,29 @@ module "datascience_vpc" {
 
   providers = {
     aws = "aws.datascience"
+  }
+}
+
+# Used by:
+# - Item requesting service
+# TODO: Move all catalogue services into this VPC
+
+module "catalogue_vpc" {
+  source = "github.com/wellcometrust/terraform//network/prebuilt/vpc/public-private-igw?ref=v19.5.3"
+
+  name = "catalogue-172-18-0-0-16"
+
+  cidr_block_vpc = "${local.catalogue_cidr_block_vpc}"
+
+  public_az_count           = "3"
+  cidr_block_public         = "${local.catalogue_cidr_block_public}"
+  cidrsubnet_newbits_public = "2"
+
+  private_az_count           = "3"
+  cidr_block_private         = "${local.catalogue_cidr_block_private}"
+  cidrsubnet_newbits_private = "2"
+
+  providers = {
+    aws = "aws.catalogue"
   }
 }
