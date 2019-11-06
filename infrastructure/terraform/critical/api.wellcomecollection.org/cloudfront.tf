@@ -7,6 +7,7 @@ data "aws_acm_certificate" "api_wc_org" {
 locals {
   catalogue_domain_name = "catalogue.${var.subdomain}.wellcomecollection.org"
   storage_domain_name   = "storage.${var.subdomain}.wellcomecollection.org"
+  stacks_domain_name    = "stacks.${var.subdomain}.wellcomecollection.org"
 }
 
 resource "aws_cloudfront_distribution" "api_root" {
@@ -80,9 +81,7 @@ resource "aws_cloudfront_distribution" "api_root" {
     default_ttl = 0
     max_ttl     = 0
   }
-
   // storage
-
   origin {
     domain_name = "${local.storage_domain_name}"
     origin_id   = "storage_api"
@@ -106,6 +105,47 @@ resource "aws_cloudfront_distribution" "api_root" {
     cached_methods  = ["GET", "HEAD"]
 
     target_origin_id = "storage_api"
+
+    forwarded_values {
+      query_string = true
+
+      headers = ["Authorization"]
+
+      cookies {
+        forward = "all"
+      }
+    }
+
+    viewer_protocol_policy = "https-only"
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
+  }
+  // stacks
+  origin {
+    domain_name = "${local.stacks_domain_name}"
+    origin_id   = "stacks_api"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+
+      origin_ssl_protocols = [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2",
+      ]
+    }
+  }
+  ordered_cache_behavior {
+    path_pattern = "/stacks/*"
+
+    allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods  = ["GET", "HEAD"]
+
+    target_origin_id = "stacks_api"
 
     forwarded_values {
       query_string = true
