@@ -23,6 +23,24 @@ resource "aws_cognito_user_pool_domain" "domain" {
   user_pool_id    = "${aws_cognito_user_pool.pool.id}"
 }
 
+resource "aws_cognito_resource_server" "stacks_api" {
+  identifier = "https://api.wellcomecollection.org/stacks/v1"
+  name       = "Stacks API V1"
+
+  scope = [
+    {
+      scope_name        = "requests_readwrite"
+      scope_description = "Read and write requests"
+    },
+    {
+      scope_name        = "items_readonly"
+      scope_description = "Read the status of items"
+    },
+  ]
+
+  user_pool_id = "${aws_cognito_user_pool.pool.id}"
+}
+
 resource "aws_cognito_resource_server" "storage_api" {
   identifier = "https://api.wellcomecollection.org/storage/v1"
   name       = "Storage API V1"
