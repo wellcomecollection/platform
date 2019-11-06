@@ -29,11 +29,11 @@ resource "aws_cognito_resource_server" "stacks_api" {
 
   scope = [
     {
-      scope_name        = "requests"
+      scope_name        = "requests_readwrite"
       scope_description = "Read and write requests"
     },
     {
-      scope_name        = "items"
+      scope_name        = "items_readonly"
       scope_description = "Read the status of items"
     },
   ]
