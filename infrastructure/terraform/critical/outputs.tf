@@ -8,6 +8,10 @@ output "cognito_storage_api_identifier" {
   value = "${aws_cognito_resource_server.storage_api.identifier}"
 }
 
+output "cognito_stacks_api_identifier" {
+  value = "${aws_cognito_resource_server.stacks_api.identifier}"
+}
+
 # Misc
 
 output "admin_cidr_ingress" {

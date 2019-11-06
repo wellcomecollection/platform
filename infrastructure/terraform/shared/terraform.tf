@@ -42,7 +42,6 @@ provider "aws" {
   }
 }
 
-
 provider "aws" {
   alias   = "datascience"
   region  = "${local.aws_region}"
