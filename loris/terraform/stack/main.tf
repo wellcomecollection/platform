@@ -98,17 +98,27 @@ module "cache_cleaner_task" {
   env_vars_length = 3
 }
 
-module "cache_cleaner_service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/daemon?ref=v17.0.0"
+resource "aws_ecs_service" "cache_cleaner_service" {
+  name            = "${var.namespace}_cache_cleaner_daemon"
+  cluster         = "${aws_ecs_cluster.cluster.id}"
+  task_definition = "${module.cache_cleaner_task.task_definition_arn}"
 
-  service_name   = "${var.namespace}_cache_cleaner"
-  ecs_cluster_id = "${aws_ecs_cluster.cluster.id}"
+  launch_type         = "EC2"
+  scheduling_strategy = "DAEMON"
 
-  vpc_id = "${var.vpc_id}"
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 100
 
-  subnets = [
-    "${var.private_subnets}",
-  ]
+  network_configuration = {
+    subnets          = ["${var.private_subnets}"]
+    security_groups  = []
+    assign_public_ip = false
+  }
+}
 
-  task_definition_arn = "${module.cache_cleaner_task.task_definition_arn}"
+module "iam" {
+  source = "git::github.com/wellcometrust/terraform.git//ecs/modules/service/modules/iam?ref=v17.0.0"
+  source = "../../modules/iam"
+
+  service_name = "${aws_ecs_service.cache_cleaner_service.name}"
 }
