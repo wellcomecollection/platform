@@ -22,7 +22,7 @@ locals {
   admin_cidr_ingress = "${data.terraform_remote_state.infra_critical.admin_cidr_ingress}"
 
   grafana_anonymous_enabled = true
-  grafana_anonymous_role    = "Viewer"
+  grafana_anonymous_role    = "Editor"
   grafana_admin_user        = "admin"
   grafana_admin_password    = "${data.aws_ssm_parameter.grafana_admin_password.value}"
 

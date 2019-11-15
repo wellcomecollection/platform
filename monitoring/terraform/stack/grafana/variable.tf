@@ -24,7 +24,7 @@ variable "cluster_id" {}
 variable "namespace_id" {}
 
 variable "grafana_version" {
-  default = "5.2.0"
+  default = "6.4.4"
 }
 
 variable "grafana_anonymous_enabled" {}
