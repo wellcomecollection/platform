@@ -1,6 +1,5 @@
 # Used by:
 # - Catalogue Pipeline
-# - Catalogue API
 # - IIIF Image server (Loris)
 # - Reindexer
 # - Sierra Adapter
@@ -124,6 +123,7 @@ module "datascience_vpc" {
 
 # Used by:
 # - Item requesting service
+# - Catalogue API
 # TODO: Move all catalogue services into this VPC
 
 module "catalogue_vpc" {

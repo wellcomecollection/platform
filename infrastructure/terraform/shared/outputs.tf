@@ -210,3 +210,37 @@ output "service-pl-winslow" {
 output "service-wt-winnipeg" {
   value = "${aws_vpc_endpoint_service.wt-winnipeg.service_name}"
 }
+
+# Cloud health roles
+
+output "cloudhealth_catalogue_role_arn" {
+  value = "${module.cloudhealth-catalogue.role_arn}"
+}
+
+output "cloudhealth_datascience_role_arn" {
+  value = "${module.cloudhealth-datascience.role_arn}"
+}
+
+output "cloudhealth_storage_role_arn" {
+  value = "${module.cloudhealth-storage.role_arn}"
+}
+
+output "cloudhealth_platform_role_arn" {
+  value = "${module.cloudhealth-platform.role_arn}"
+}
+
+output "cloudhealth_experience_role_arn" {
+  value = "${module.cloudhealth-experience.role_arn}"
+}
+
+output "cloudhealth_digitisation_role_arn" {
+  value = "${module.cloudhealth-digitisation.role_arn}"
+}
+
+output "cloudhealth_workflow_role_arn" {
+  value = "${module.cloudhealth-workflow.role_arn}"
+}
+
+output "cloudhealth_reporting_role_arn" {
+  value = "${module.cloudhealth-reporting.role_arn}"
+}
