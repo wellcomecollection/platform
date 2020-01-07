@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "assume-elasticcloud-snapshot-readonly" {
   statement {
     actions = ["sts:AssumeRole"]
     principals {
-      identifiers = "${var.principals}"
+      identifiers = ["${var.principals}"]
       type = "AWS"
     }
   }
