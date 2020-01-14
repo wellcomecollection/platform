@@ -11,8 +11,9 @@ module "dlq_alarm" {
 }
 
 module "gateway_server_error_alarm" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v19.13.2"
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v19.18.0"
   name   = "shared_gateway_server_error_alarm"
+  cross_account_publication_ids = ["756629837203"]
 }
 
 module "terraform_apply_topic" {
