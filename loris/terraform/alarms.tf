@@ -28,6 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_alarm" {
 
   // This alarm action is disabled for now (2020-01-15) as it is being noisy
   // and drowning out our other alarms.
+  // It should be re-enabled eventually: https://github.com/wellcometrust/platform/issues/4170
   actions_enabled = false
 
   provider = "aws.us_east_1"
