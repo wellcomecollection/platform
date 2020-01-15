@@ -26,6 +26,10 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_alarm" {
   alarm_description = "Monitors 4xx errors from the Loris CloudFront distro"
   alarm_actions     = ["${aws_sns_topic.cloudfront_errors.arn}"]
 
+  // This alarm action is disabled for now (2020-01-15) as it is being noisy
+  // and drowning out our other alarms.
+  actions_enabled = false
+
   provider = "aws.us_east_1"
 }
 
