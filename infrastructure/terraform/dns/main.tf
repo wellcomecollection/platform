@@ -1,5 +1,10 @@
+data "aws_route53_zone" "weco_zone" {
+  provider = "aws.routemaster"
+  name     = "wellcomecollection.org."
+}
+
 locals {
-  weco_hosted_zone_id = "Z3THRVQ5VDYDMC"
+  weco_hosted_zone_id = "${data.aws_route53_zone.weco_zone.id}"
 }
 
 # Third-party services
