@@ -5,7 +5,7 @@ username=$${pypi_username}
 password=$${pypi_password}
 EOF
 
-  vars {
+  vars = {
     pypi_username = "${var.pypi_username}"
     pypi_password = "${var.pypi_password}"
   }

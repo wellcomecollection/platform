@@ -74,14 +74,6 @@ module "archivematica_repo" {
   }
 }
 
-module "platform_cli" {
-  source = "./python_library"
-
-  repo_name     = "platform-cli"
-  pypi_username = "${local.pypi_username}"
-  pypi_password = "${local.pypi_password}"
-}
-
 module "scala_fixtures" {
   source = "./scala_library"
 

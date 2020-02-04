@@ -14,7 +14,7 @@ terraform {
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
-  config {
+  config = {
     role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
