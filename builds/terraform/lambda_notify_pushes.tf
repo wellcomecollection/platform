@@ -1,13 +1,3 @@
-module "ecr_pushes_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "ecr_pushes"
-}
-
-module "lambda_pushes_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "lambda_pushes"
-}
-
 module "lambda_notify_pushes" {
   source = "./lambda"
 
@@ -32,7 +22,7 @@ module "trigger_ecr_pushes" {
 
   lambda_function_name = module.lambda_notify_pushes.function_name
   lambda_function_arn  = module.lambda_notify_pushes.arn
-  sns_trigger_arn      = module.ecr_pushes_topic.arn
+  sns_trigger_arn      = aws_sns_topic.ecr_pushes.arn
 }
 
 module "trigger_lambda_pushes" {
@@ -40,5 +30,5 @@ module "trigger_lambda_pushes" {
 
   lambda_function_name = module.lambda_notify_pushes.function_name
   lambda_function_arn  = module.lambda_notify_pushes.arn
-  sns_trigger_arn      = module.lambda_pushes_topic.arn
+  sns_trigger_arn      = aws_sns_topic.lambda_pushes.arn
 }

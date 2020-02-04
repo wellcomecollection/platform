@@ -6,8 +6,8 @@ module "platform" {
   infra_bucket_arn        = local.infra_bucket_arn
 
   publish_topics = [
-    module.ecr_pushes_topic.arn,
-    module.lambda_pushes_topic.arn,
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
   ]
 
   platform_read_only_role = var.platform_read_only_role
@@ -25,8 +25,8 @@ module "catalogue_repo" {
   infra_bucket_arn        = local.infra_bucket_arn
 
   publish_topics = [
-    module.ecr_pushes_topic.arn,
-    module.lambda_pushes_topic.arn,
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
   ]
 
   platform_read_only_role = var.platform_read_only_role
@@ -44,8 +44,8 @@ module "storage_repo" {
   infra_bucket_arn        = local.infra_bucket_arn
 
   publish_topics = [
-    module.ecr_pushes_topic.arn,
-    module.lambda_pushes_topic.arn,
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
   ]
 
   platform_read_only_role = var.platform_read_only_role
@@ -63,8 +63,8 @@ module "archivematica_repo" {
   infra_bucket_arn        = local.infra_bucket_arn
 
   publish_topics = [
-    module.ecr_pushes_topic.arn,
-    module.lambda_pushes_topic.arn,
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
   ]
 
   platform_read_only_role = var.platform_read_only_role
