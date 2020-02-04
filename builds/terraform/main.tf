@@ -13,7 +13,7 @@ module "platform" {
   platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
-    aws = "aws.platform"
+    aws = aws.platform
   }
 }
 
@@ -32,7 +32,7 @@ module "catalogue_repo" {
   platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
-    aws = "aws.catalogue"
+    aws = aws.catalogue
   }
 }
 
@@ -51,7 +51,7 @@ module "storage_repo" {
   platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
-    aws = "aws.storage"
+    aws = aws.storage
   }
 }
 
@@ -70,7 +70,7 @@ module "archivematica_repo" {
   platform_read_only_role = "${var.platform_read_only_role}"
 
   providers = {
-    aws = "aws.workflow"
+    aws = aws.workflow
   }
 }
 
