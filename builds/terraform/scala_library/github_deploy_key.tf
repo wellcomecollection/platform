@@ -11,12 +11,12 @@ resource "tls_private_key" "github_key" {
 
 locals {
   default_repo_name = "scala-${var.name}"
-  repo_name         = "${var.repo_name == "" ? local.default_repo_name : var.repo_name}"
+  repo_name         = var.repo_name == "" ? local.default_repo_name : var.repo_name
 }
 
 resource "github_repository_deploy_key" "deploy_key" {
   title      = "deploy_key from terraform"
-  repository = "${local.repo_name}"
-  key        = "${tls_private_key.github_key.public_key_openssh}"
+  repository = local.repo_name
+  key        = tls_private_key.github_key.public_key_openssh
   read_only  = false
 }

@@ -27,8 +27,8 @@ resource "aws_s3_bucket" "releases" {
 }
 
 resource "aws_s3_bucket_policy" "releases" {
-  bucket = "${aws_s3_bucket.releases.id}"
-  policy = "${data.aws_iam_policy_document.releases.json}"
+  bucket = aws_s3_bucket.releases.id
+  policy = data.aws_iam_policy_document.releases.json
 }
 
 data "aws_iam_policy_document" "releases" {
@@ -39,20 +39,20 @@ data "aws_iam_policy_document" "releases" {
     ]
 
     principals {
-      identifiers = "${local.principals}"
+      identifiers = local.principals
       type        = "AWS"
     }
 
     resources = [
-      "${aws_s3_bucket.releases.arn}",
+      aws_s3_bucket.releases.arn,
       "${aws_s3_bucket.releases.arn}/*",
     ]
   }
 }
 
 resource "aws_s3_bucket_policy" "infra" {
-  bucket = "${local.infra_bucket_id}"
-  policy = "${data.aws_iam_policy_document.infra.json}"
+  bucket = local.infra_bucket_id
+  policy = data.aws_iam_policy_document.infra.json
 }
 
 data "aws_iam_policy_document" "infra" {
@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "infra" {
     ]
 
     principals {
-      identifiers = "${local.principals}"
+      identifiers = local.principals
       type        = "AWS"
     }
 

@@ -3,18 +3,18 @@
 # more than one repo!
 locals {
   name     = "travis_ci_${var.repo_name}"
-  username = "${var.repo_name == "platform" ? "travis_ci" : local.name}"
+  username = var.repo_name == "platform" ? "travis_ci" : local.name
 }
 
 resource "aws_iam_user" "travis_ci" {
-  name = "${local.username}"
+  name = local.username
 }
 
 resource "aws_iam_access_key" "travis_ci" {
-  user = "${aws_iam_user.travis_ci.name}"
+  user = aws_iam_user.travis_ci.name
 }
 
 resource "aws_iam_user_policy" "travis_ci" {
-  user   = "${aws_iam_user.travis_ci.name}"
-  policy = "${data.aws_iam_policy_document.travis_permissions.json}"
+  user   = aws_iam_user.travis_ci.name
+  policy = data.aws_iam_policy_document.travis_permissions.json
 }

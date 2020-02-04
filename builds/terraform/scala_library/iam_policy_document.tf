@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${var.bucket_arn}",
+      var.bucket_arn,
     ]
   }
 
@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "travis_permissions" {
 }
 
 locals {
-  account_id = "${data.aws_caller_identity.current.account_id}"
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 data "aws_caller_identity" "current" {}
