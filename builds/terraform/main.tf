@@ -55,6 +55,25 @@ module "storage_repo" {
   }
 }
 
+module "stacks_service_repo" {
+  source    = "./platform"
+  repo_name = "stacks-service"
+
+  sbt_releases_bucket_arn = aws_s3_bucket.releases.arn
+  infra_bucket_arn        = local.infra_bucket_arn
+
+  publish_topics = [
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
+  ]
+
+  platform_read_only_role = var.platform_read_only_role
+
+  providers = {
+    aws = aws.catalogue
+  }
+}
+
 module "archivematica_repo" {
   source    = "./platform"
   repo_name = "archivematica-infra"
