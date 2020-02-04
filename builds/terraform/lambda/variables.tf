@@ -13,7 +13,7 @@ variable "description" {
 
 variable "environment_variables" {
   description = "Environment variables to pass to the Lambda"
-  type        = "map"
+  type        = map(string)
 
   # environment cannot be empty so we need to pass at least one value
   default = {

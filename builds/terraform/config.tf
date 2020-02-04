@@ -15,10 +15,10 @@ data "aws_ssm_parameter" "non_critical_slack_webhook" {
 }
 
 locals {
-  pypi_username = "${data.aws_ssm_parameter.pypi_username.value}"
-  pypi_password = "${data.aws_ssm_parameter.pypi_password.value}"
+  pypi_username = data.aws_ssm_parameter.pypi_username.value
+  pypi_password = data.aws_ssm_parameter.pypi_password.value
 
-  github_oauth_token = "${data.aws_ssm_parameter.github_oauth_token.value}"
+  github_oauth_token = data.aws_ssm_parameter.github_oauth_token.value
 
-  non_critical_slack_webhook = "${data.aws_ssm_parameter.non_critical_slack_webhook.value}"
+  non_critical_slack_webhook = data.aws_ssm_parameter.non_critical_slack_webhook.value
 }

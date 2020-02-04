@@ -6,8 +6,8 @@ aws_secret_access_key=$${secret_access_key}
 EOF
 
   vars = {
-    access_key_id     = "${aws_iam_access_key.travis_ci.id}"
-    secret_access_key = "${aws_iam_access_key.travis_ci.secret}"
+    access_key_id     = aws_iam_access_key.travis_ci.id
+    secret_access_key = aws_iam_access_key.travis_ci.secret
   }
 }
 
@@ -16,7 +16,7 @@ data "archive_file" "secrets" {
   output_path = "${path.module}/../../secrets_${var.repo_name}.zip"
 
   source {
-    content  = "${data.template_file.aws_credentials.rendered}"
+    content  = data.template_file.aws_credentials.rendered
     filename = "credentials"
   }
 
@@ -26,12 +26,12 @@ data "archive_file" "secrets" {
   }
 
   source {
-    content  = "${tls_private_key.github_key.private_key_pem}"
+    content  = tls_private_key.github_key.private_key_pem
     filename = "id_rsa"
   }
 
   source {
-    content  = "${tls_private_key.github_key.public_key_openssh}"
+    content  = tls_private_key.github_key.public_key_openssh
     filename = "id_rsa.pub"
   }
 }

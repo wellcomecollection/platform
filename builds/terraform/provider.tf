@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = "~> 2.47.0"
 
   assume_role {
@@ -10,7 +10,7 @@ provider "aws" {
 provider "aws" {
   alias = "storage"
 
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = "~> 2.47.0"
 
   assume_role {
@@ -21,7 +21,7 @@ provider "aws" {
 provider "aws" {
   alias = "catalogue"
 
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = "~> 2.47.0"
 
   assume_role {
@@ -32,7 +32,7 @@ provider "aws" {
 provider "aws" {
   alias = "platform"
 
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = "~> 2.47.0"
 
   assume_role {
@@ -43,7 +43,7 @@ provider "aws" {
 provider "aws" {
   alias = "workflow"
 
-  region  = "${var.aws_region}"
+  region  = var.aws_region
   version = "~> 2.47.0"
 
   assume_role {
@@ -52,6 +52,6 @@ provider "aws" {
 }
 
 provider "github" {
-  token        = "${var.github_oauth_token}"
+  token        = var.github_oauth_token
   organization = "wellcometrust"
 }

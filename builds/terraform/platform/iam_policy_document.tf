@@ -1,7 +1,7 @@
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
     actions   = ["sts:AssumeRole"]
-    resources = ["${var.platform_read_only_role}"]
+    resources = [var.platform_read_only_role]
   }
 
   statement {
@@ -20,7 +20,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${var.infra_bucket_arn}",
+      var.infra_bucket_arn,
       "${var.infra_bucket_arn}/*",
     ]
   }
@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${var.sbt_releases_bucket_arn}",
+      var.sbt_releases_bucket_arn,
       "${var.sbt_releases_bucket_arn}/*",
     ]
   }
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "travis_permissions" {
 }
 
 locals {
-  account_id = "${data.aws_caller_identity.current.account_id}"
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 data "aws_caller_identity" "current" {}

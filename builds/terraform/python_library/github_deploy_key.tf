@@ -11,7 +11,7 @@ resource "tls_private_key" "github_key" {
 
 resource "github_repository_deploy_key" "deploy_key" {
   title      = "deploy_key from terraform"
-  repository = "${var.repo_name}"
-  key        = "${tls_private_key.github_key.public_key_openssh}"
+  repository = var.repo_name
+  key        = tls_private_key.github_key.public_key_openssh
   read_only  = false
 }
