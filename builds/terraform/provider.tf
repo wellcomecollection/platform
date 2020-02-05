@@ -25,7 +25,7 @@ provider "aws" {
   version = "~> 2.47.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/platform-admin"
+    role_arn = "arn:aws:iam::756629837203:role/catalogue-admin"
   }
 }
 
@@ -54,4 +54,11 @@ provider "aws" {
 provider "github" {
   token        = var.github_oauth_token
   organization = "wellcometrust"
+}
+
+provider "github" {
+  alias = "collection"
+
+  token        = var.github_oauth_token
+  organization = "wellcomecollection"
 }
