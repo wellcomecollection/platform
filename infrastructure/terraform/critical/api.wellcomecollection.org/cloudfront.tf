@@ -184,4 +184,9 @@ resource "aws_cloudfront_distribution" "api_root" {
       restriction_type = "none"
     }
   }
+  logging_config {
+    include_cookies = false
+    bucket          = "${var.cf_logging_bucket}"
+    prefix          = "api_root"
+  }
 }

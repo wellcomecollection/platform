@@ -9,3 +9,5 @@ variable "cert_domain" {
 variable "public_api_bucket_domain_name" {}
 
 variable "description" {}
+
+variable "cf_logging_bucket" {}
