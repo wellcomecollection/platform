@@ -7,6 +7,8 @@ module "api-stage" {
   public_api_bucket_domain_name = "${aws_s3_bucket.public_api.bucket_domain_name}"
 
   description = "Collection APIs staging"
+
+  cf_logging_bucket = "${aws_s3_bucket.api_root_cf_logs.bucket_domain_name}"
 }
 
 module "api" {
@@ -18,6 +20,8 @@ module "api" {
   public_api_bucket_domain_name = "${aws_s3_bucket.public_api.bucket_domain_name}"
 
   description = "Collection APIs production"
+
+  cf_logging_bucket = "${aws_s3_bucket.api_root_cf_logs.bucket_domain_name}"
 }
 
 // S3 origin for redirect to developers.wellcomecollection.org
