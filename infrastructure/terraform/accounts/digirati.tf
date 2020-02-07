@@ -27,7 +27,7 @@ data "aws_iam_policy_document" "dds_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "allow_external_export-bagit_access" {
+data "aws_iam_policy_document" "allow_intranda_export_bucket_access" {
   statement {
     actions = [
       "s3:ListBucket",
