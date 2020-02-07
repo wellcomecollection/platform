@@ -1,0 +1,124 @@
+[platform-read_only]
+role_arn = arn:aws:iam::760097843905:role/platform-read_only
+region = eu-west-1
+color = 00ff00
+
+[platform-developer]
+role_arn = arn:aws:iam::760097843905:role/platform-developer
+region = eu-west-1
+color = d98000
+
+[platform-admin]
+role_arn = arn:aws:iam::760097843905:role/platform-admin
+region = eu-west-1
+color = FF2200
+
+[catalogue-read_only]
+role_arn = arn:aws:iam::756629837203:role/catalogue-read_only
+region = eu-west-1
+color = 00ff00
+
+[catalogue-developer]
+role_arn = arn:aws:iam::756629837203:role/catalogue-developer
+region = eu-west-1
+color = d98000
+
+[catalogue-admin]
+role_arn = arn:aws:iam::756629837203:role/catalogue-admin
+region = eu-west-1
+color = FF2200
+
+[workflow-read_only]
+role_arn = arn:aws:iam::299497370133:role/workflow-read_only
+region = eu-west-1
+color = 00ACB6
+
+[workflow-developer]
+role_arn = arn:aws:iam::299497370133:role/workflow-developer
+region = eu-west-1
+color = 00ACB6
+
+[workflow-admin]
+role_arn = arn:aws:iam::299497370133:role/workflow-admin
+region = eu-west-1
+color = 0000ff
+
+[storage-read_only]
+role_arn = arn:aws:iam::975596993436:role/storage-read_only
+region = eu-west-1
+color = d3ec00
+
+[storage-developer]
+role_arn = arn:aws:iam::975596993436:role/storage-developer
+region = eu-west-1
+color = d3ec00
+
+[storage-admin]
+role_arn = arn:aws:iam::975596993436:role/storage-admin
+region = eu-west-1
+color = 00ff00
+
+[experience-read_only]
+role_arn = arn:aws:iam::130871440101:role/experience-read_only
+region = eu-west-1
+color = d900cd
+
+[experience-developer]
+role_arn = arn:aws:iam::130871440101:role/experience-developer
+region = eu-west-1
+color = 00d9d9
+
+[experience-admin]
+role_arn = arn:aws:iam::130871440101:role/experience-admin
+region = eu-west-1
+color = 00d9d9
+
+[data-read_only]
+role_arn = arn:aws:iam::964279923020:role/data-read_only
+region = eu-west-1
+color = d99e0b
+
+[data-developer]
+role_arn = arn:aws:iam::964279923020:role/data-developer
+region = eu-west-1
+color = 00d9d9
+
+[data-admin]
+role_arn = arn:aws:iam::964279923020:role/data-admin
+region = eu-west-1
+color = 960e1e
+
+[digitisation-read_only]
+role_arn = arn:aws:iam::404315009621:role/digitisation-read_only
+region = eu-west-1
+color = d99e0b
+
+[digitisation-developer]
+role_arn = arn:aws:iam::404315009621:role/digitisation-developer
+region = eu-west-1
+color = 00d9d9
+
+[digitisation-admin]
+role_arn = arn:aws:iam::404315009621:role/digitisation-admin
+region = eu-west-1
+color = 960e1e
+
+[reporting-read_only]
+role_arn = arn:aws:iam::269807742353:role/reporting-read_only
+region = eu-west-1
+color = d900cd
+
+[reporting-dev]
+role_arn = arn:aws:iam::269807742353:role/reporting-developer
+region = eu-west-1
+color = 00d9d9
+
+[reporting-admin]
+role_arn = arn:aws:iam::269807742353:role/reporting-admin
+region = eu-west-1
+color = 00d9d9
+
+[routemaster]
+role_arn = arn:aws:iam::250790015188:role/wellcomecollection-assume_role_hosted_zone_update
+region = eu-west-1
+color = #dc241f
