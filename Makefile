@@ -5,7 +5,6 @@ include makefiles/functions.Makefile
 include makefiles/formatting.Makefile
 
 include builds/Makefile
-include loris/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include nginx/Makefile

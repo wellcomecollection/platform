@@ -1,8 +1,0 @@
-app:
-  build: .
-  ports:
-   - "8888:8888"
-nginx:
-  image: "nginx_loris:${NGINX_TAG}"
-  ports:
-   - "9000:9000"
