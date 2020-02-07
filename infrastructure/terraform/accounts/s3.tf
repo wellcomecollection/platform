@@ -37,10 +37,10 @@ resource "aws_s3_bucket" "editorial_photography" {
 
 resource "aws_s3_bucket_policy" "editorial_photography" {
   bucket = aws_s3_bucket.editorial_photography.id
-  policy = data.aws_iam_policy_document.ep_bucket_policy.json
+  policy = data.aws_iam_policy_document.editorial_photography_bucket_policy.json
 }
 
-data "aws_iam_policy_document" "ep_bucket_policy" {
+data "aws_iam_policy_document" "editorial_photography_bucket_policy" {
   statement {
     actions = [
       "s3:ListBucket",
