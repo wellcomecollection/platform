@@ -4,7 +4,7 @@ module "aws_account" {
   source = "./modules/account/aws"
 
   # 4 hours
-  max_session_duration_in_seconds = "14400"
+  max_session_duration_in_seconds = 4 * 60 * 60
 
   prefix = "platform"
 
