@@ -10,7 +10,7 @@ module "platform" {
     aws_sns_topic.lambda_pushes.arn,
   ]
 
-  platform_read_only_role = var.platform_read_only_role
+  platform_read_only_role = local.platform_read_only_role
 
   providers = {
     aws = aws.platform
@@ -29,7 +29,7 @@ module "catalogue_repo" {
     aws_sns_topic.lambda_pushes.arn,
   ]
 
-  platform_read_only_role = var.platform_read_only_role
+  platform_read_only_role = local.platform_read_only_role
 
   providers = {
     aws = aws.platform
@@ -48,7 +48,7 @@ module "storage_repo" {
     aws_sns_topic.lambda_pushes.arn,
   ]
 
-  platform_read_only_role = var.platform_read_only_role
+  platform_read_only_role = local.platform_read_only_role
 
   providers = {
     aws    = aws.storage
@@ -68,7 +68,7 @@ module "stacks_service_repo" {
     aws_sns_topic.lambda_pushes.arn,
   ]
 
-  platform_read_only_role = var.platform_read_only_role
+  platform_read_only_role = local.platform_read_only_role
 
   providers = {
     aws    = aws.catalogue
@@ -88,7 +88,7 @@ module "archivematica_repo" {
     aws_sns_topic.lambda_pushes.arn,
   ]
 
-  platform_read_only_role = var.platform_read_only_role
+  platform_read_only_role = local.platform_read_only_role
 
   providers = {
     aws = aws.workflow

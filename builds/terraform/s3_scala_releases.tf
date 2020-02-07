@@ -1,9 +1,5 @@
 locals {
-  principals = [
-    "arn:aws:iam::760097843905:root",
-    "arn:aws:iam::975596993436:root",
-    "arn:aws:iam::299497370133:root",
-  ]
+  principals = formatlist("arn:aws:iam::%s:root", local.account_ids)
 }
 
 resource "aws_s3_bucket" "releases" {
