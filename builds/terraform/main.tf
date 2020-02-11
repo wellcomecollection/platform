@@ -76,9 +76,9 @@ module "stacks_service_repo" {
   }
 }
 
-module "archivematica_repo" {
+module "archivematica_infrastructure_repo" {
   source    = "./platform"
-  repo_name = "archivematica-infra"
+  repo_name = "archivematica-infrastructure"
 
   sbt_releases_bucket_arn = aws_s3_bucket.releases.arn
   infra_bucket_arn        = local.infra_bucket_arn
@@ -92,6 +92,7 @@ module "archivematica_repo" {
 
   providers = {
     aws = aws.workflow
+    github = github.collection
   }
 }
 
@@ -115,17 +116,22 @@ module "loris_infrastructure_repo" {
   }
 }
 
-module "scala_fixtures" {
-  source = "./scala_library"
-
-  name       = "fixtures"
-  bucket_arn = aws_s3_bucket.releases.arn
-}
-
 module "scala_json" {
   source = "./scala_library"
 
   name       = "json"
+  bucket_arn = aws_s3_bucket.releases.arn
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
+}
+
+module "scala_storage" {
+  source = "./scala_library"
+
+  name       = "storage"
   bucket_arn = aws_s3_bucket.releases.arn
 
   providers = {
@@ -139,13 +145,11 @@ module "scala_monitoring" {
 
   name       = "monitoring"
   bucket_arn = aws_s3_bucket.releases.arn
-}
 
-module "scala_storage" {
-  source = "./scala_library"
-
-  name       = "storage"
-  bucket_arn = aws_s3_bucket.releases.arn
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
 }
 
 module "scala_messaging" {
@@ -160,5 +164,12 @@ module "scala_typesafe" {
 
   name       = "typesafe-app"
   repo_name  = "wellcome-typesafe-app"
+  bucket_arn = aws_s3_bucket.releases.arn
+}
+
+module "scala_fixtures" {
+  source = "./scala_library"
+
+  name       = "fixtures"
   bucket_arn = aws_s3_bucket.releases.arn
 }
