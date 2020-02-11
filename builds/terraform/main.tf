@@ -157,6 +157,11 @@ module "scala_messaging" {
 
   name       = "messaging"
   bucket_arn = aws_s3_bucket.releases.arn
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
 }
 
 module "scala_typesafe" {
@@ -165,6 +170,11 @@ module "scala_typesafe" {
   name       = "typesafe-app"
   repo_name  = "wellcome-typesafe-app"
   bucket_arn = aws_s3_bucket.releases.arn
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
 }
 
 module "scala_fixtures" {
