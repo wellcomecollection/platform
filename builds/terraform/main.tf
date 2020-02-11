@@ -182,4 +182,9 @@ module "scala_fixtures" {
 
   name       = "fixtures"
   bucket_arn = aws_s3_bucket.releases.arn
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
 }
