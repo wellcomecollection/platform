@@ -7,5 +7,4 @@ variable "aws_region" {
 # Your token needs the "repo" scopes.
 #
 # Don't commit it to the repository -- pass it when terraform asks for it.
-variable "github_oauth_token" {
-}
+variable "github_oauth_token" {}

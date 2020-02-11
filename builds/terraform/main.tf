@@ -95,6 +95,26 @@ module "archivematica_repo" {
   }
 }
 
+module "loris_infrastructure_repo" {
+  source    = "./platform"
+  repo_name = "loris-infrastructure"
+
+  sbt_releases_bucket_arn = aws_s3_bucket.releases.arn
+  infra_bucket_arn        = local.infra_bucket_arn
+
+  publish_topics = [
+    aws_sns_topic.ecr_pushes.arn,
+    aws_sns_topic.lambda_pushes.arn,
+  ]
+
+  platform_read_only_role = local.platform_read_only_role
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
+}
+
 module "scala_fixtures" {
   source = "./scala_library"
 
@@ -107,6 +127,11 @@ module "scala_json" {
 
   name       = "json"
   bucket_arn = aws_s3_bucket.releases.arn
+
+  providers = {
+    aws = aws.platform
+    github = github.collection
+  }
 }
 
 module "scala_monitoring" {
