@@ -9,3 +9,5 @@ variable "bucket_arn" {
 variable "repo_name" {
   default = ""
 }
+
+variable "platform_read_only_role" {}

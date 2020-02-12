@@ -1,5 +1,10 @@
 data "aws_iam_policy_document" "travis_permissions" {
   statement {
+    actions   = ["sts:AssumeRole"]
+    resources = [var.platform_read_only_role]
+  }
+
+  statement {
     actions = [
       "s3:*",
     ]
