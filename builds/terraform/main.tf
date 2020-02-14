@@ -1,22 +1,3 @@
-module "platform" {
-  source    = "./platform"
-  repo_name = "platform"
-
-  sbt_releases_bucket_arn = aws_s3_bucket.releases.arn
-  infra_bucket_arn        = local.infra_bucket_arn
-
-  publish_topics = [
-    aws_sns_topic.ecr_pushes.arn,
-    aws_sns_topic.lambda_pushes.arn,
-  ]
-
-  platform_read_only_role = local.platform_read_only_role
-
-  providers = {
-    aws = aws.platform
-  }
-}
-
 module "catalogue_repo" {
   source    = "./platform"
   repo_name = "catalogue"
@@ -33,6 +14,7 @@ module "catalogue_repo" {
 
   providers = {
     aws = aws.platform
+    github = github.collection
   }
 }
 
