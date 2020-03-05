@@ -1,24 +1,27 @@
-module "ecr_repository_nginx_loris" {
-  source    = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v19.5.1"
-  id        = "nginx_loris"
+locals {
   namespace = "uk.ac.wellcome"
 }
 
-module "ecr_repository_nginx_grafana" {
-  source    = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v19.5.1"
-  id        = "nginx_grafana"
-  namespace = "uk.ac.wellcome"
+// TODO: Ensure this is accessible from experience!
+resource "aws_ecr_repository" "nginx_experience" {
+  name = "${local.namespace}/nginx_experience"
 }
 
-module "ecr_repository_nginx_apigw" {
-  source    = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v19.5.1"
-  id        = "nginx_apigw"
-  namespace = "uk.ac.wellcome"
+resource "aws_ecr_repository" "nginx_loris" {
+  name = "${local.namespace}/nginx_loris"
+}
+
+resource "aws_ecr_repository" "nginx_grafana" {
+  name = "${local.namespace}/nginx_grafana"
+}
+
+resource "aws_ecr_repository" "nginx_apigw" {
+  name = "${local.namespace}/nginx_apigw"
 }
 
 resource "aws_ecr_repository_policy" "callback_stub_server" {
-  repository = "${module.ecr_repository_nginx_apigw.name}"
-  policy     = "${data.aws_iam_policy_document.storage_get_images.json}"
+  repository = aws_ecr_repository.nginx_apigw.id
+  policy = data.aws_iam_policy_document.storage_get_images.json
 }
 
 data "aws_iam_policy_document" "storage_get_images" {
@@ -30,8 +33,25 @@ data "aws_iam_policy_document" "storage_get_images" {
     ]
 
     principals {
-      identifiers = ["arn:aws:iam::975596993436:root"]
-      type        = "AWS"
+      identifiers = [
+        "arn:aws:iam::975596993436:root"]
+      type = "AWS"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "storage_get_images" {
+  statement {
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+      "ecr:BatchCheckLayerAvailability",
+    ]
+
+    principals {
+      identifiers = [
+        "arn:aws:iam::975596993436:root"]
+      type = "AWS"
     }
   }
 }
