@@ -1,10 +1,8 @@
 # Terraform config
 
 terraform {
-  required_version = ">= 0.10"
-
   backend "s3" {
-    role_arn = "arn:aws:iam::760097843905:role/developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
 
     bucket         = "wellcomecollection-platform-infra"
     key            = "terraform/nginx.tfstate"
@@ -18,10 +16,10 @@ data "aws_caller_identity" "current" {}
 #Providers
 
 provider "aws" {
-  region  = "eu-west-1"
-  version = "1.42.0"
+  region  = var.aws_region
+  version = "~> 2.47.0"
 
   assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
   }
 }
