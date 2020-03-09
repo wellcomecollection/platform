@@ -1,8 +1,3 @@
-locals {
-  namespace = "uk.ac.wellcome"
-}
-
-// TODO: Ensure this is accessible from experience!
 resource "aws_ecr_repository" "nginx_experience" {
   name = "${local.namespace}/nginx_experience"
 }
@@ -19,39 +14,18 @@ resource "aws_ecr_repository" "nginx_apigw" {
   name = "${local.namespace}/nginx_apigw"
 }
 
-resource "aws_ecr_repository_policy" "callback_stub_server" {
-  repository = aws_ecr_repository.nginx_apigw.id
-  policy = data.aws_iam_policy_document.storage_get_images.json
+// Cross account access policies
+
+module "storage_repo_policy" {
+  source = "./repo_policy"
+
+  account_id = local.storage_account_id
+  repo_name  = aws_ecr_repository.nginx_apigw.name
 }
 
-data "aws_iam_policy_document" "storage_get_images" {
-  statement {
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability",
-    ]
+module "experience_repo_policy" {
+  source = "./repo_policy"
 
-    principals {
-      identifiers = [
-        "arn:aws:iam::975596993436:root"]
-      type = "AWS"
-    }
-  }
-}
-
-data "aws_iam_policy_document" "storage_get_images" {
-  statement {
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability",
-    ]
-
-    principals {
-      identifiers = [
-        "arn:aws:iam::975596993436:root"]
-      type = "AWS"
-    }
-  }
+  account_id = local.experience_account_id
+  repo_name  = aws_ecr_repository.nginx_experience.name
 }
