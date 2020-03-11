@@ -3,24 +3,26 @@ module "cloudformation_stack" {
 
   subnet_list        = "${var.subnet_list}"
   asg_name           = "${var.name}"
-  launch_config_name = "${module.launch_config.name}"
+  launch_config_name = aws_launch_configuration.launch_config.name
 
   asg_max     = "${var.asg_max}"
   asg_desired = "${var.asg_desired}"
   asg_min     = "${var.asg_min}"
 }
 
-module "launch_config" {
-  source = "../launch_config"
+resource "aws_launch_configuration" "launch_config" {
+  security_groups = module.security_groups.instance_security_groups
 
-  key_name              = "${var.key_name}"
-  image_id              = "${var.image_id}"
-  instance_type         = "${var.instance_type}"
-  instance_profile_name = "${module.instance_profile.name}"
-  user_data             = "${var.user_data}"
+  key_name                    = var.key_name
+  image_id                    = var.image_id
+  instance_type               = var.instance_type
+  iam_instance_profile        = module.instance_profile.name
+  user_data                   = var.user_data
+  associate_public_ip_address = var.associate_public_ip_address
 
-  associate_public_ip_address = "${var.associate_public_ip_address}"
-  instance_security_groups    = module.security_groups.instance_security_groups
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 module "security_groups" {

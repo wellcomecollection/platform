@@ -11,11 +11,11 @@ variable "efs_security_group_id" {}
 variable "domain" {}
 
 variable "public_subnets" {
-  type = "list"
+  type = list(string)
 }
 
 variable "private_subnets" {
-  type = "list"
+  type = list(string)
 }
 
 variable "infra_bucket" {}
