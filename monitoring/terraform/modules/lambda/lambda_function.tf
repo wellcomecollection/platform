@@ -37,7 +37,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_alarm" {
   statistic           = "Sum"
   threshold           = "1"
 
-  dimensions {
+  dimensions = {
     FunctionName = "${var.name}"
   }
 

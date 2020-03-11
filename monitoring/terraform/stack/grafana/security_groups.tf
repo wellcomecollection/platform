@@ -10,7 +10,7 @@ resource "aws_security_group" "service_egress_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.namespace}-egress"
   }
 }
@@ -34,7 +34,7 @@ resource "aws_security_group" "service_lb_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.namespace}-service-lb"
   }
 }
@@ -59,7 +59,7 @@ resource "aws_security_group" "external_lb_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${var.namespace}-external-lb"
   }
 }
