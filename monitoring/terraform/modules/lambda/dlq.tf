@@ -4,8 +4,8 @@ resource "aws_sqs_queue" "lambda_dlq" {
 
 resource "aws_iam_role_policy" "lambda_dlq" {
   name   = "${aws_iam_role.iam_role.name}_lambda_dlq"
-  role   = "${aws_iam_role.iam_role.name}"
-  policy = "${data.aws_iam_policy_document.lambda_dlq.json}"
+  role   = aws_iam_role.iam_role.name
+  policy = data.aws_iam_policy_document.lambda_dlq.json
 }
 
 data "aws_iam_policy_document" "lambda_dlq" {
@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "lambda_dlq" {
     ]
 
     resources = [
-      "${aws_sqs_queue.lambda_dlq.arn}",
+      aws_sqs_queue.lambda_dlq.arn,
     ]
   }
 }

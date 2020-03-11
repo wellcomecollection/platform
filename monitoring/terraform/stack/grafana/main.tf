@@ -3,20 +3,20 @@
 module "ec2_efs_host" {
   source = "../../modules/efs_host"
 
-  cluster_name = "${var.cluster_name}"
-  vpc_id       = "${var.vpc_id}"
+  cluster_name = var.cluster_name
+  vpc_id       = var.vpc_id
 
-  asg_name = "${var.namespace}"
+  asg_name = var.namespace
 
   custom_security_groups = [
-    "${var.efs_security_group_id}",
+    var.efs_security_group_id,
   ]
 
-  subnets  = "${var.private_subnets}"
-  key_name = "${var.key_name}"
+  subnets  = var.private_subnets
+  key_name = var.key_name
 
-  efs_fs_id = "${var.efs_id}"
-  region    = "${var.aws_region}"
+  efs_fs_id = var.efs_id
+  region    = var.aws_region
 }
 
 # Service

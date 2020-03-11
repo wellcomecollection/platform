@@ -11,7 +11,7 @@ resource "aws_security_group" "full_egress" {
   # TODO: This description has been copy/pasted from a previous security group.
   # Don't let it propogate to new stacks!
   description = "controls direct access to application instances"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = var.vpc_id
   name        = "${var.name}_full_egress_${random_id.sg_append.hex}"
 
   egress {
@@ -28,7 +28,7 @@ resource "aws_security_group" "full_egress" {
 
 resource "random_id" "sg_append" {
   keepers = {
-    sg_id = "${var.name}"
+    sg_id = var.name
   }
 
   byte_length = 8
