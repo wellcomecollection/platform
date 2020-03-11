@@ -32,7 +32,6 @@ variable "alarm_topic_arn" {
 
 variable "s3_bucket" {
   description = "The S3 bucket containing the function's deployment package"
-  default     = "platform-infra"
 }
 
 variable "s3_key" {
@@ -45,5 +44,5 @@ variable "memory_size" {
 
 variable "log_retention_in_days" {
   description = "The number of days to keep CloudWatch logs"
-  default     = ""
+  type        = number
 }

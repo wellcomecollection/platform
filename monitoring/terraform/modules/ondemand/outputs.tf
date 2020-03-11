@@ -1,7 +1,3 @@
-output "asg_name" {
-  value = "${module.cloudformation_stack.asg_name}"
-}
-
 output "instance_profile_name" {
   value = "${module.instance_profile.name}"
 }

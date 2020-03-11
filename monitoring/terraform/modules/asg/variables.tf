@@ -15,7 +15,7 @@ variable "asg_max" {
 }
 
 variable "subnet_list" {
-  type = "list"
+  type = list(string)
 }
 
 variable "launch_config_name" {}
