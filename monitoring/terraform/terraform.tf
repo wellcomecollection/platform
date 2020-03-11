@@ -19,7 +19,7 @@ data "terraform_remote_state" "loris" {
   backend = "s3"
 
   config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
     key    = "terraform/loris.tfstate"
@@ -31,7 +31,7 @@ data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
   config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
     key    = "terraform/shared_infra.tfstate"
@@ -43,7 +43,7 @@ data "terraform_remote_state" "infra_critical" {
   backend = "s3"
 
   config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
     key    = "terraform/catalogue_pipeline_data.tfstate"
