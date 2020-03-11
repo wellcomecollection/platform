@@ -8,8 +8,6 @@ module "ec2_efs_host" {
 
   asg_name = "${var.namespace}"
 
-  ssh_ingress_security_groups = []
-
   custom_security_groups = [
     "${var.efs_security_group_id}",
   ]

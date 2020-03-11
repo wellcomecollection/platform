@@ -38,18 +38,7 @@ variable "image_id" {
   default = "ami-c91624b0"
 }
 
-variable "controlled_access_cidr_ingress" {
-  type        = list(string)
-  default     = []
-  description = "CIDR for SSH access to EC2 instances"
-}
-
 variable "custom_security_groups" {
-  type    = list(string)
-  default = []
-}
-
-variable "ssh_ingress_security_groups" {
   type    = list(string)
   default = []
 }

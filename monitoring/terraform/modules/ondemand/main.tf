@@ -31,9 +31,7 @@ module "security_groups" {
   name   = "${var.name}"
   vpc_id = "${var.vpc_id}"
 
-  controlled_access_cidr_ingress    = var.controlled_access_cidr_ingress
-  controlled_access_security_groups = var.ssh_ingress_security_groups
-  custom_security_groups            = var.custom_security_groups
+  custom_security_groups = var.custom_security_groups
 }
 
 module "instance_profile" {
