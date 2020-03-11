@@ -12,7 +12,7 @@ resource "aws_launch_configuration" "launch_config" {
   key_name                    = var.key_name
   image_id                    = var.image_id
   instance_type               = var.instance_type
-  iam_instance_profile        = module.instance_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.instance_profile.name
   user_data                   = var.user_data
   associate_public_ip_address = var.associate_public_ip_address
 
@@ -28,9 +28,4 @@ module "security_groups" {
   vpc_id = "${var.vpc_id}"
 
   custom_security_groups = var.custom_security_groups
-}
-
-module "instance_profile" {
-  source = "../instance_profile"
-  name   = "${var.name}"
 }

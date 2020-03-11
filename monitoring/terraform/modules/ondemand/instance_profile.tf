@@ -1,6 +1,6 @@
 resource "aws_iam_instance_profile" "instance_profile" {
   name = "${var.name}_instance_profile"
-  role = "${aws_iam_role.role.name}"
+  role = aws_iam_role.instance_role.name
 }
 
 data "aws_iam_policy_document" "instance_policy" {
@@ -21,8 +21,8 @@ data "aws_iam_policy_document" "instance_policy" {
 resource "aws_iam_role_policy" "instance" {
   name = "${var.name}_instance_role_policy"
 
-  role   = "${aws_iam_role.role.name}"
-  policy = "${data.aws_iam_policy_document.instance_policy.json}"
+  role   = aws_iam_role.instance_role.name
+  policy = data.aws_iam_policy_document.instance_policy.json
 }
 
 data "aws_iam_policy_document" "assume_ec2_role" {
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "assume_ec2_role" {
   }
 }
 
-resource "aws_iam_role" "role" {
+resource "aws_iam_role" "instance_role" {
   name               = "${var.name}_instance_role"
-  assume_role_policy = "${data.aws_iam_policy_document.assume_ec2_role.json}"
+  assume_role_policy = data.aws_iam_policy_document.assume_ec2_role.json
 }
