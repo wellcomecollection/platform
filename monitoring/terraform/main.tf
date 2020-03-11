@@ -4,7 +4,6 @@ module "monitoring-271118" {
   namespace = "monitoring-271118"
 
   monitoring_bucket = "${aws_s3_bucket.monitoring.bucket}"
-  account_id        = "${data.aws_caller_identity.current.account_id}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   vpc_id       = "${local.vpc_id}"
@@ -24,13 +23,8 @@ module "monitoring-271118" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  every_day_at_8am_rule_name = "${aws_cloudwatch_event_rule.every_day_at_8am.name}"
   every_minute_rule_arn      = "${aws_cloudwatch_event_rule.every_minute.arn}"
   every_minute_rule_name     = "${aws_cloudwatch_event_rule.every_minute.name}"
-
-  # slack_budget_bot
-
-  slack_budget_bot_container_uri = "${local.slack_budget_bot_container_uri}"
 
   # grafana
 
@@ -75,8 +69,6 @@ module "monitoring-271118" {
   describe_services_policy_json             = "${data.aws_iam_policy_document.describe_services.json}"
   assume_roles_policy_json                  = "${data.aws_iam_policy_document.assume_roles.json}"
   cloudwatch_allow_filterlogs_policy_json   = "${data.aws_iam_policy_document.cloudwatch_allow_filterlogs.json}"
-  allow_s3_write_policy_json                = "${data.aws_iam_policy_document.allow_s3_write.json}"
-  allow_describe_budgets_policy_json        = "${data.aws_iam_policy_document.allow_describe_budgets.json}"
   s3_put_dashboard_status_policy_json       = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 
   providers = {

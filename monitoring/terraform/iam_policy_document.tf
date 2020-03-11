@@ -75,29 +75,3 @@ data "aws_iam_policy_document" "cloudwatch_allow_filterlogs" {
     ]
   }
 }
-
-# slack_budget_bot
-
-data "aws_iam_policy_document" "allow_s3_write" {
-  statement {
-    actions = [
-      "s3:Put*",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.monitoring.arn}/budget_graphs/*",
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "allow_describe_budgets" {
-  statement {
-    actions = [
-      "budgets:ViewBudget",
-    ]
-
-    resources = [
-      "*",
-    ]
-  }
-}

@@ -9,8 +9,3 @@ resource "aws_cloudwatch_event_rule" "every_minute" {
   description         = "Fires every minute"
   schedule_expression = "rate(1 minute)"
 }
-
-resource "aws_cloudwatch_event_rule" "every_day_at_8am" {
-  name                = "every_day_at_8am"
-  schedule_expression = "cron(0 8 * * ? *)"
-}

@@ -30,15 +30,3 @@ resource "aws_iam_role_policy" "post_to_slack_get_cloudwatch" {
   role   = "${module.lambda_post_to_slack.role_name}"
   policy = "${var.cloudwatch_allow_filterlogs_policy_json}"
 }
-
-# slack_budget_bot
-
-resource "aws_iam_role_policy" "allow_s3_write" {
-  role   = "${module.ecs_slack_budget_bot_iam.task_role_name}"
-  policy = "${var.allow_s3_write_policy_json}"
-}
-
-resource "aws_iam_role_policy" "allow_describe_budgets" {
-  role   = "${module.ecs_slack_budget_bot_iam.task_role_name}"
-  policy = "${var.allow_describe_budgets_policy_json}"
-}

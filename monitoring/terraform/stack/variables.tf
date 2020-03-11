@@ -1,7 +1,6 @@
 variable "namespace" {}
 
 variable "monitoring_bucket" {}
-variable "account_id" {}
 variable "non_critical_slack_webhook" {}
 
 variable "namespace_id" {}
@@ -27,13 +26,8 @@ variable "admin_cidr_ingress" {}
 
 variable "lambda_error_alarm_arn" {}
 
-variable "every_day_at_8am_rule_name" {}
 variable "every_minute_rule_arn" {}
 variable "every_minute_rule_name" {}
-
-#slack_budget_bot
-
-variable "slack_budget_bot_container_uri" {}
 
 # Grafana
 
@@ -68,5 +62,3 @@ variable "allow_cloudwatch_read_metrics_policy_json" {}
 variable "describe_services_policy_json" {}
 variable "assume_roles_policy_json" {}
 variable "cloudwatch_allow_filterlogs_policy_json" {}
-variable "allow_s3_write_policy_json" {}
-variable "allow_describe_budgets_policy_json" {}
