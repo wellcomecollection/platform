@@ -25,10 +25,3 @@ data "template_file" "userdata" {
     region        = var.region
   }
 }
-
-module "instance_policy" {
-  source = "../instance_role_policy"
-
-  cluster_name               = var.cluster_name
-  instance_profile_role_name = module.asg.instance_profile_role_name
-}
