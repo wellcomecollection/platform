@@ -25,23 +25,12 @@ variable "admin_cidr_ingress" {}
 
 variable "lambda_error_alarm_arn" {}
 
-variable "every_minute_rule_arn" {}
-variable "every_minute_rule_name" {}
-
 # Grafana
 
 variable "grafana_admin_user" {}
 variable "grafana_anonymous_role" {}
 variable "grafana_admin_password" {}
 variable "grafana_anonymous_enabled" {}
-
-# update_service_list
-
-variable "dashboard_bucket" {}
-
-variable "dashboard_assumable_roles" {
-  type = "list"
-}
 
 # post_to_slack
 
@@ -54,6 +43,4 @@ variable "bitly_access_token" {}
 # IAM
 
 variable "allow_cloudwatch_read_metrics_policy_json" {}
-variable "describe_services_policy_json" {}
-variable "assume_roles_policy_json" {}
 variable "cloudwatch_allow_filterlogs_policy_json" {}

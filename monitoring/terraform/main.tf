@@ -21,32 +21,12 @@ module "monitoring-271118" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 
-  every_minute_rule_arn      = "${aws_cloudwatch_event_rule.every_minute.arn}"
-  every_minute_rule_name     = "${aws_cloudwatch_event_rule.every_minute.name}"
-
   # grafana
 
   grafana_admin_user        = "${local.grafana_admin_user}"
   grafana_anonymous_role    = "${local.grafana_anonymous_role}"
   grafana_admin_password    = "${local.grafana_admin_password}"
   grafana_anonymous_enabled = "${local.grafana_anonymous_enabled}"
-
-  # update_service_list
-
-  dashboard_bucket = "${aws_s3_bucket.dashboard.bucket}"
-  dashboard_assumable_roles = [
-    // Experience
-    "arn:aws:iam::130871440101:role/platform-team-assume-role",
-
-    // Workflow
-    "arn:aws:iam::299497370133:role/monitoring",
-
-    // Storage
-    "arn:aws:iam::975596993436:role/monitoring",
-
-    // Platform
-    "arn:aws:iam::760097843905:role/monitoring",
-  ]
 
   # post_to_slack
 
@@ -60,10 +40,7 @@ module "monitoring-271118" {
   # IAM
 
   allow_cloudwatch_read_metrics_policy_json = "${data.aws_iam_policy_document.allow_cloudwatch_read_metrics.json}"
-  describe_services_policy_json             = "${data.aws_iam_policy_document.describe_services.json}"
-  assume_roles_policy_json                  = "${data.aws_iam_policy_document.assume_roles.json}"
   cloudwatch_allow_filterlogs_policy_json   = "${data.aws_iam_policy_document.cloudwatch_allow_filterlogs.json}"
-  s3_put_dashboard_status_policy_json       = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
 
   providers = {
     aws.us_east_1 = aws.us_east_1
