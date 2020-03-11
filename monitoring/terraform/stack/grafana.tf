@@ -1,5 +1,5 @@
 module "grafana" {
-  source = "grafana"
+  source = "./grafana"
 
   namespace = "${var.namespace}-grafana"
 

@@ -1,5 +1,5 @@
 module "monitoring-271118" {
-  source = "stack"
+  source = "./stack"
 
   namespace = "monitoring-271118"
 
