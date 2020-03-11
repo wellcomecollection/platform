@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "launch_config" {
-  security_groups = module.security_groups.instance_security_groups
+  security_groups = local.instance_security_groups
 
   key_name                    = var.key_name
   image_id                    = var.image_id
@@ -11,13 +11,4 @@ resource "aws_launch_configuration" "launch_config" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-module "security_groups" {
-  source = "../security_groups"
-
-  name   = "${var.name}"
-  vpc_id = "${var.vpc_id}"
-
-  custom_security_groups = var.custom_security_groups
 }
