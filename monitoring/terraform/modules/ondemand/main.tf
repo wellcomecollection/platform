@@ -4,10 +4,6 @@ module "cloudformation_stack" {
   subnet_list        = "${var.subnet_list}"
   asg_name           = "${var.name}"
   launch_config_name = aws_launch_configuration.launch_config.name
-
-  asg_max     = "${var.asg_max}"
-  asg_desired = "${var.asg_desired}"
-  asg_min     = "${var.asg_min}"
 }
 
 resource "aws_launch_configuration" "launch_config" {

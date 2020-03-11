@@ -12,10 +12,6 @@ module "asg" {
   key_name    = var.key_name
   user_data   = data.template_file.userdata.rendered
 
-  asg_max     = var.asg_max
-  asg_desired = var.asg_desired
-  asg_min     = var.asg_min
-
   instance_type = var.instance_type
 }
 

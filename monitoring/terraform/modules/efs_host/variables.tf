@@ -4,24 +4,6 @@ variable "asg_name" {
   description = "Name of the ASG"
 }
 
-variable "asg_min" {
-  description = "Minimum number of instances"
-  type        = number
-  default     = 1
-}
-
-variable "asg_desired" {
-  description = "Desired number of instances"
-  type        = number
-  default     = 1
-}
-
-variable "asg_max" {
-  description = "Max number of instances"
-  type        = number
-  default     = 2
-}
-
 variable "instance_type" {
   default     = "t2.small"
   description = "AWS instance type"
