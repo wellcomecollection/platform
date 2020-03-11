@@ -1,11 +1,3 @@
-module "cloudformation_stack" {
-  source = "../asg"
-
-  subnet_list        = "${var.subnet_list}"
-  asg_name           = "${var.name}"
-  launch_config_name = aws_launch_configuration.launch_config.name
-}
-
 resource "aws_launch_configuration" "launch_config" {
   security_groups = module.security_groups.instance_security_groups
 
