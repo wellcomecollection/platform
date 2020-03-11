@@ -24,27 +24,40 @@ module "ec2_efs_host" {
 # Service
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/efs?ref=v11.0.0"
+  source = "github.com/wellcomecollection/terraform-aws-ecs-service.git//task_definition/single_container?ref=ca0c2dc9c3604a2776b9ba1fa6866ba5cf2b826b"
 
-  aws_region = "${var.aws_region}"
-  task_name  = "${var.namespace}"
-
-  container_image = "grafana/grafana:${var.grafana_version}"
-  container_port  = "3000"
-
-  // If creating a new volume, note that the grafana folder on the volume will be owned by the root user.
-  // Grafana runs as user 472 so be sure to ssh into the EC2 instance and change the owner of the directory to 472.
-  efs_host_path      = "${module.ec2_efs_host.efs_host_path}/grafana"
-  efs_container_path = "/var/lib/grafana"
+  task_name = var.namespace
 
   cpu    = 256
   memory = 512
 
+  container_image = "grafana/grafana:${var.grafana_version}"
+
+  aws_region = var.aws_region
+
+  container_port  = "3000"
+
+  # You need to run as EC2 if you're using EFS volumes
+  launch_type = "EC2"
+
+  # If creating a new volume, note that the grafana folder on the volume
+  # will be owned by the root user.  Grafana runs as user 472 so be sure to ssh
+  # into the EC2 instance and change the owner of the directory to 472.
+  efs_volume_name    = "efs"
+  efs_host_path      = "${module.ec2_efs_host.efs_host_path}/grafana"
+
+  mount_points = [
+    {
+      sourceVolume  = "efs"
+      containerPath = "/var/lib/grafana"
+    },
+  ]
+
   env_vars = {
-    GF_AUTH_ANONYMOUS_ENABLED  = "${var.grafana_anonymous_enabled}"
-    GF_AUTH_ANONYMOUS_ORG_ROLE = "${var.grafana_anonymous_role}"
-    GF_SECURITY_ADMIN_USER     = "${var.grafana_admin_user}"
-    GF_SECURITY_ADMIN_PASSWORD = "${var.grafana_admin_password}"
+    GF_AUTH_ANONYMOUS_ENABLED  = var.grafana_anonymous_enabled
+    GF_AUTH_ANONYMOUS_ORG_ROLE = var.grafana_anonymous_role
+    GF_SECURITY_ADMIN_USER     = var.grafana_admin_user
+    GF_SECURITY_ADMIN_PASSWORD = var.grafana_admin_password
   }
 }
 
