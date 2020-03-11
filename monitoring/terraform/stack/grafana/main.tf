@@ -23,8 +23,13 @@ module "ec2_efs_host" {
 
 # Service
 
+locals {
+  container_port = 3000
+  container_name = "app"
+}
+
 module "task" {
-  source = "github.com/wellcomecollection/terraform-aws-ecs-service.git//task_definition/single_container?ref=ca0c2dc9c3604a2776b9ba1fa6866ba5cf2b826b"
+  source = "github.com/wellcomecollection/terraform-aws-ecs-service.git//task_definition/single_container?ref=efcfe187e57cb05083ca2f0898533f94f96e7b0b"
 
   task_name = var.namespace
 
@@ -35,7 +40,8 @@ module "task" {
 
   aws_region = var.aws_region
 
-  container_port  = "3000"
+  container_port = local.container_port
+  container_name = local.container_name
 
   # You need to run as EC2 if you're using EFS volumes
   launch_type = "EC2"
@@ -85,10 +91,10 @@ module "service" {
 
   namespace_id = "${var.namespace_id}"
 
-  container_port = "${module.task.container_port}"
-  container_name = "${module.task.container_name}"
+  container_port = local.container_port
+  container_name = local.container_name
 
-  task_definition_arn = "${module.task.task_definition_arn}"
+  task_definition_arn = "${module.task.arn}"
 
   healthcheck_path = "/api/health"
 
