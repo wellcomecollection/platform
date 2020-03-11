@@ -18,7 +18,7 @@ terraform {
 data "terraform_remote_state" "loris" {
   backend = "s3"
 
-  config {
+  config = {
     role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
@@ -30,7 +30,7 @@ data "terraform_remote_state" "loris" {
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
-  config {
+  config = {
     role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
@@ -42,7 +42,7 @@ data "terraform_remote_state" "shared_infra" {
 data "terraform_remote_state" "infra_critical" {
   backend = "s3"
 
-  config {
+  config = {
     role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"

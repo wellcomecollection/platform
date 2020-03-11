@@ -10,7 +10,7 @@ resource "aws_cloudformation_stack" "ecs_asg" {
 data "template_file" "cluster_ecs_asg" {
   template = "${file("${path.module}/asg.json.template")}"
 
-  vars {
+  vars = {
     launch_config_name  = "${var.launch_config_name}"
     vpc_zone_identifier = "${jsonencode(var.subnet_list)}"
     asg_min_size        = "${var.asg_min}"
