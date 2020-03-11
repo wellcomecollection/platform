@@ -1,5 +1,5 @@
 module "lambda_post_to_slack" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
+  source = "../modules/lambda"
 
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/monitoring/post_to_slack.zip"
