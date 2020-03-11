@@ -67,24 +67,6 @@ module "task" {
   }
 }
 
-resource "aws_alb_target_group" "ecs_service" {
-  # We use snake case in a lot of places, but ALB Target Group names can
-  # only contain alphanumerics and hyphens.
-  name = replace(var.namespace, "_", "-")
-
-  target_type = "ip"
-
-  protocol = "HTTP"
-  port     = local.container_port
-  vpc_id   = var.vpc_id
-
-  health_check {
-    protocol = "HTTP"
-    path     = "/api/health"
-    matcher  = "200"
-  }
-}
-
 module "service" {
   source = "github.com/wellcomecollection/terraform-aws-ecs-service.git//service?ref=v1.4.0"
 

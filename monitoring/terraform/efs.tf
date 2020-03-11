@@ -25,7 +25,7 @@ resource "aws_security_group" "efs_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags {
+  tags = {
     Name = "${local.namespace}-efs"
   }
 }

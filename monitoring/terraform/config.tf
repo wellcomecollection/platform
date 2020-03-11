@@ -19,8 +19,6 @@ locals {
 
   key_name = "wellcomedigitalplatform"
 
-  admin_cidr_ingress = "${data.terraform_remote_state.infra_critical.admin_cidr_ingress}"
-
   grafana_anonymous_enabled = true
   grafana_anonymous_role    = "Editor"
   grafana_admin_user        = "admin"

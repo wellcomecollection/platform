@@ -1,5 +1,5 @@
 resource "aws_launch_configuration" "launch_config" {
-  security_groups = ["${var.instance_security_groups}"]
+  security_groups = var.instance_security_groups
 
   key_name                    = "${var.key_name}"
   image_id                    = "${var.image_id}"

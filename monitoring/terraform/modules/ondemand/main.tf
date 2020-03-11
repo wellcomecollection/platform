@@ -20,7 +20,7 @@ module "launch_config" {
   user_data             = "${var.user_data}"
 
   associate_public_ip_address = "${var.associate_public_ip_address}"
-  instance_security_groups    = ["${module.security_groups.instance_security_groups}"]
+  instance_security_groups    = module.security_groups.instance_security_groups
 }
 
 module "security_groups" {
@@ -29,9 +29,9 @@ module "security_groups" {
   name   = "${var.name}"
   vpc_id = "${var.vpc_id}"
 
-  controlled_access_cidr_ingress    = ["${var.controlled_access_cidr_ingress}"]
-  controlled_access_security_groups = ["${var.ssh_ingress_security_groups}"]
-  custom_security_groups            = ["${var.custom_security_groups}"]
+  controlled_access_cidr_ingress    = var.controlled_access_cidr_ingress
+  controlled_access_security_groups = var.ssh_ingress_security_groups
+  custom_security_groups            = var.custom_security_groups
 }
 
 module "instance_profile" {
