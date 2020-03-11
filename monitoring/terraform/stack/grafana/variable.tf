@@ -8,11 +8,11 @@ variable "efs_security_group_id" {}
 variable "domain" {}
 
 variable "public_subnets" {
-  type = "list"
+  type = list(string)
 }
 
 variable "private_subnets" {
-  type = "list"
+  type = list(string)
 }
 
 variable "key_name" {}
@@ -20,7 +20,7 @@ variable "aws_region" {}
 variable "admin_cidr_ingress" {}
 
 variable "cluster_name" {}
-variable "cluster_id" {}
+variable "cluster_arn" {}
 variable "namespace_id" {}
 
 variable "grafana_version" {

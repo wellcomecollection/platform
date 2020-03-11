@@ -67,36 +67,50 @@ module "task" {
   }
 }
 
-module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.0.0"
+resource "aws_alb_target_group" "ecs_service" {
+  # We use snake case in a lot of places, but ALB Target Group names can
+  # only contain alphanumerics and hyphens.
+  name = replace(var.namespace, "_", "-")
 
-  service_name       = "${var.namespace}"
-  task_desired_count = "1"
+  target_type = "ip"
+
+  protocol = "HTTP"
+  port     = local.container_port
+  vpc_id   = var.vpc_id
+
+  health_check {
+    protocol = "HTTP"
+    path     = "/api/health"
+    matcher  = "200"
+  }
+}
+
+module "service" {
+  source = "github.com/wellcomecollection/terraform-aws-ecs-service.git//service?ref=v1.4.0"
+
+  service_name = var.namespace
+  cluster_arn  = var.cluster_arn
+
+  desired_task_count = 1
+
+  task_definition_arn = module.task.arn
+
+  namespace_id = var.namespace_id
+
+  subnets = var.private_subnets
 
   security_group_ids = [
-    "${aws_security_group.service_lb_security_group.id}",
-    "${aws_security_group.service_egress_security_group.id}",
+    aws_security_group.service_lb_security_group.id,
+    aws_security_group.service_egress_security_group.id,
   ]
 
-  deployment_minimum_healthy_percent = "0"
-  deployment_maximum_percent         = "200"
-
-  ecs_cluster_id = "${var.cluster_id}"
-
-  vpc_id = "${var.vpc_id}"
-
-  subnets = [
-    "${var.private_subnets}",
-  ]
-
-  namespace_id = "${var.namespace_id}"
-
-  container_port = local.container_port
-  container_name = local.container_name
-
-  task_definition_arn = "${module.task.arn}"
-
-  healthcheck_path = "/api/health"
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 200
 
   launch_type = "EC2"
+
+  target_group_arn = aws_alb_target_group.ecs_service.arn
+
+  container_name = local.container_name
+  container_port = local.container_port
 }
