@@ -5,7 +5,6 @@ locals {
 
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
-  terraform_apply_topic_name  = "${data.terraform_remote_state.shared_infra.terraform_apply_topic_name}"
   cloudfront_errors_topic_arn = "${data.terraform_remote_state.loris.cloudfront_errors_topic_arn}"
 
   namespace  = "monitoring"

@@ -1,6 +1,5 @@
 variable "namespace" {}
 
-variable "monitoring_bucket" {}
 variable "non_critical_slack_webhook" {}
 
 variable "namespace_id" {}
@@ -51,10 +50,6 @@ variable "gateway_server_error_alarm_arn" {}
 variable "cloudfront_errors_topic_arn" {}
 variable "critical_slack_webhook" {}
 variable "bitly_access_token" {}
-
-# terraform_tracker
-
-variable "terraform_apply_topic_name" {}
 
 # IAM
 

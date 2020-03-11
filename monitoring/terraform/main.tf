@@ -3,8 +3,6 @@ module "monitoring-271118" {
 
   namespace = "monitoring-271118"
 
-  monitoring_bucket = "${aws_s3_bucket.monitoring.bucket}"
-
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   vpc_id       = "${local.vpc_id}"
 
@@ -58,10 +56,6 @@ module "monitoring-271118" {
   critical_slack_webhook         = "${local.critical_slack_webhook}"
   non_critical_slack_webhook     = "${local.noncritical_slack_webhook}"
   bitly_access_token             = "${local.bitly_access_token}"
-
-  # terraform_tracker
-
-  terraform_apply_topic_name = "${local.terraform_apply_topic_name}"
 
   # IAM
 
