@@ -6,7 +6,7 @@ module "monitoring-271118" {
   namespace_id = aws_service_discovery_private_dns_namespace.namespace.id
   vpc_id       = local.vpc_id
 
-  efs_id                = module.grafana_efs.efs_id
+  efs_id                = aws_efs_file_system.efs.id
   efs_security_group_id = aws_security_group.efs_security_group.id
 
   domain = "monitoring.wellcomecollection.org"
