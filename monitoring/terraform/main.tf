@@ -78,4 +78,8 @@ module "monitoring-271118" {
   allow_s3_write_policy_json                = "${data.aws_iam_policy_document.allow_s3_write.json}"
   allow_describe_budgets_policy_json        = "${data.aws_iam_policy_document.allow_describe_budgets.json}"
   s3_put_dashboard_status_policy_json       = "${data.aws_iam_policy_document.s3_put_dashboard_status.json}"
+
+  providers = {
+    aws.us_east_1 = aws.us_east_1
+  }
 }
