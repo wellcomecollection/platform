@@ -29,3 +29,10 @@ module "experience_repo_policy" {
   account_id = local.experience_account_id
   repo_name  = aws_ecr_repository.nginx_experience.name
 }
+
+module "catalogue_repo_policy" {
+  source = "./repo_policy"
+
+  account_id = local.catalogue_account_id
+  repo_name  = aws_ecr_repository.nginx_apigw.name
+}
