@@ -7,6 +7,13 @@ DEV_ROLE_ARN=${1:-}
 ROOT=$(git rev-parse --show-toplevel)
 SERVICE_IDS=$(find "$ROOT"/nginx/*.Dockerfile  -type f -exec basename {} \; |  cut -d '.' -f 1)
 
+echo "*** WARNING! ***"
+echo "Updating these images will result in downstream updates!"
+echo "This will affect multiple public facing products (including wc.org)"
+echo "*** WARNING! ***"
+echo""
+read -p "Press enter to continue."
+
 for SERVICE_ID in $SERVICE_IDS
 do
 "$ROOT"/docker_run.py \
