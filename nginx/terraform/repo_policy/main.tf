@@ -1,4 +1,4 @@
-resource "aws_ecr_repository_policy" "callback_stub_server" {
+resource "aws_ecr_repository_policy" "cross_account_policy" {
   repository = var.repo_name
   policy = data.aws_iam_policy_document.get_images.json
 }
