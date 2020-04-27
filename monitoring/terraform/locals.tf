@@ -1,20 +1,17 @@
 locals {
-  gateway_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.gateway_server_error_alarm_arn}"
-  lambda_error_alarm_arn         = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
-  dlq_alarm_arn                  = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  gateway_server_error_alarm_arn = data.terraform_remote_state.shared_infra.outputs.gateway_server_error_alarm_arn
+  lambda_error_alarm_arn         = data.terraform_remote_state.shared_infra.outputs.lambda_error_alarm_arn
+  dlq_alarm_arn                  = data.terraform_remote_state.shared_infra.outputs.dlq_alarm_arn
 
-  bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
+  admin_cidr_ingress = data.terraform_remote_state.infra_critical.outputs.admin_cidr_ingress
 
-  terraform_apply_topic_name  = "${data.terraform_remote_state.shared_infra.terraform_apply_topic_name}"
-  cloudfront_errors_topic_arn = "${data.terraform_remote_state.loris.cloudfront_errors_topic_arn}"
+  bucket_alb_logs_id = data.terraform_remote_state.shared_infra.outputs.bucket_alb_logs_id
+
+  cloudfront_errors_topic_arn = data.terraform_remote_state.loris.outputs.cloudfront_errors_topic_arn
 
   namespace  = "monitoring"
-  account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vpc_id          = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_id}"
-  private_subnets = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_private_subnets}"
-  public_subnets  = "${data.terraform_remote_state.shared_infra.monitoring_vpc_delta_public_subnets}"
-
-  # TODO: Update the budget bot to use SSM
-  slack_budget_bot_container_uri = "${module.ecr_repository_slack_budget_bot.repository_url}:6a0141109bbfda0380aeeb0223b161b291533631"
+  vpc_id          = data.terraform_remote_state.shared_infra.outputs.monitoring_vpc_delta_id
+  private_subnets = data.terraform_remote_state.shared_infra.outputs.monitoring_vpc_delta_private_subnets
+  public_subnets  = data.terraform_remote_state.shared_infra.outputs.monitoring_vpc_delta_public_subnets
 }

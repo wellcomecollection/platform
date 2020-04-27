@@ -18,8 +18,8 @@ terraform {
 data "terraform_remote_state" "loris" {
   backend = "s3"
 
-  config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+  config = {
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
     key    = "terraform/loris.tfstate"
@@ -30,11 +30,11 @@ data "terraform_remote_state" "loris" {
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
-  config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+  config = {
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
-    key    = "terraform/shared_infra.tfstate"
+    key    = "terraform/platform-infrastructure/shared.tfstate"
     region = "eu-west-1"
   }
 }
@@ -42,33 +42,11 @@ data "terraform_remote_state" "shared_infra" {
 data "terraform_remote_state" "infra_critical" {
   backend = "s3"
 
-  config {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
+  config = {
+    role_arn = "arn:aws:iam::760097843905:role/platform-read_only"
 
     bucket = "wellcomecollection-platform-infra"
     key    = "terraform/catalogue_pipeline_data.tfstate"
     region = "eu-west-1"
-  }
-}
-
-data "aws_caller_identity" "current" {}
-
-#Providers
-
-provider "aws" {
-  region  = "${var.aws_region}"
-  version = "1.22.0"
-
-  assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
-  }
-}
-
-provider "aws" {
-  region = "us-east-1"
-  alias  = "us_east_1"
-
-  assume_role {
-    role_arn = "arn:aws:iam::760097843905:role/platform-developer"
   }
 }
