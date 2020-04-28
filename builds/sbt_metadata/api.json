@@ -1,9 +1,0 @@
-{
-  "id" : "api",
-  "folder" : "catalogue_api/api",
-  "dependencyIds" : [
-    "internal_model",
-    "display",
-    "elasticsearch"
-  ]
-}

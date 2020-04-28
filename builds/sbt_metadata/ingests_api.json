@@ -1,8 +1,0 @@
-{
-  "id" : "ingests_api",
-  "folder" : "storage/ingests_api",
-  "dependencyIds" : [
-    "ingests_common",
-    "storage_display"
-  ]
-}

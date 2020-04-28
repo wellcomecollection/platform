@@ -1,7 +1,0 @@
-{
-  "id" : "sierra_reader",
-  "folder" : "sierra_adapter/sierra_reader",
-  "dependencyIds" : [
-    "sierra_adapter_common"
-  ]
-}

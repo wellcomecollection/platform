@@ -1,6 +1,0 @@
-{
-  "id" : "reindex_worker",
-  "folder" : "reindexer/reindex_worker",
-  "dependencyIds" : [
-  ]
-}

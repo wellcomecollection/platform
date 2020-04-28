@@ -1,7 +1,0 @@
-{
-  "id" : "archivist",
-  "folder" : "storage/archivist",
-  "dependencyIds" : [
-    "storage_common"
-  ]
-}

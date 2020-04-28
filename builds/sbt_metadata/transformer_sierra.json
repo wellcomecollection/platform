@@ -1,7 +1,0 @@
-{
-  "id" : "transformer_sierra",
-  "folder" : "catalogue_pipeline/transformer/transformer_sierra",
-  "dependencyIds" : [
-    "internal_model"
-  ]
-}

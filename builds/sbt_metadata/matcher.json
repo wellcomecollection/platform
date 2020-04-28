@@ -1,7 +1,0 @@
-{
-  "id" : "matcher",
-  "folder" : "catalogue_pipeline/matcher",
-  "dependencyIds" : [
-    "internal_model"
-  ]
-}

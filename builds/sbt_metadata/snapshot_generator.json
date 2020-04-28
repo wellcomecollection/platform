@@ -1,9 +1,0 @@
-{
-  "id" : "snapshot_generator",
-  "folder" : "data_api/snapshot_generator",
-  "dependencyIds" : [
-    "internal_model",
-    "display",
-    "config_elasticsearch"
-  ]
-}

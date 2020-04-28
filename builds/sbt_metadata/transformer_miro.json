@@ -1,7 +1,0 @@
-{
-  "id" : "transformer_miro",
-  "folder" : "catalogue_pipeline/transformer/transformer_miro",
-  "dependencyIds" : [
-    "internal_model"
-  ]
-}
