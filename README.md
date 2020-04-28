@@ -17,9 +17,9 @@ We intend to develop in the open, so that others can learn from our mistakes and
 
 Everything we create will be open-source, under an MIT license. We will package things that are useful to others as standalone components, so that they can be easily re-used outside of our platform.
 
-## Wellcome Collection platform developers
+## Platform infrastructure
 
-Developers who want to create projects within the platform should refer to our [developer docs](docs/README.md).
+This repo used to house some of the shared infrastructure for the platform, that has now been consolidated into https://github.com/wellcomecollection/platform-infrastructure.
 
 ## Runbook
 
@@ -29,7 +29,6 @@ Developers who want to create projects within the platform should refer to our [
 
 - [Repository list](docs/repositories.md)
 - [Build status](https://travis-ci.org/wellcomecollection)
-- [Infrastructure Status](https://wellcomecollection-platform-dashboard.s3.amazonaws.com/index.html)
 - Uptime reports & current status:
     - [api.wellcomecollection.org/v2/works (api)](https://updown.io/qqek)
     - [iiif.wellcomecollection.org/image (api)](https://updown.io/dt4b)
