@@ -27,7 +27,7 @@ This repo used to house some of the shared infrastructure for the platform, that
 
 ### Platform Status
 
-- [Repository list](docs/repositories.md)
+- [Repository list](https://github.com/wellcomecollection/docs/tree/master/projects)
 - [Build status](https://travis-ci.org/wellcomecollection)
 - Uptime reports & current status:
     - [api.wellcomecollection.org/v2/works (api)](https://updown.io/qqek)
