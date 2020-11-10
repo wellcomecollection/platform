@@ -2,7 +2,7 @@
 $	"Lost and paid"
 %	"ILL returned"
 -	Available
-6	"DUE TEMP6"
+6	Restricted
 9	"DUE 25-09-15"
 b	"As above"
 c	"As above"
@@ -15,7 +15,7 @@ n	Billed
 o	"Library use only"
 p	"In cataloguing"
 q	"Test record"
-r	Restricted
+r	Unavailable
 s	"On search"
 t	"In transit"
 v	"With Conservation"
