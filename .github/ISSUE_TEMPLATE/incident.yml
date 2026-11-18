@@ -1,0 +1,53 @@
+name: Incident
+description: Record a user-facing incident. Open it during or after the incident, not instead of the playbook.
+title: "Incident: "
+type: Bug
+labels: ["incident"]
+body:
+  - type: markdown
+    attributes:
+      value: Work the incident in #wc-incident-response first, following the [incident comms and escalation playbook](https://github.com/wellcomecollection/developer-handbook/blob/main/incident-management/incident-comms-and-escalation.md). Security incidents go to a private channel and do not get a public issue.
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      options:
+        - Major incident
+        - Incident
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Backplane Component
+      description: The affected service's Component, as named in its manifest.yml. Separate several with commas.
+    validations:
+      required: true
+  - type: dropdown
+    id: statuspage
+    attributes:
+      label: Statuspage components
+      multiple: true
+      options:
+        - Collections Search
+        - Requesting & Sign-in
+        - Image Services
+        - Website & Content
+        - None
+  - type: textarea
+    id: impact
+    attributes:
+      label: What users saw
+      description: The effect on users, and from when until when (UTC).
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Links
+      description: Slack incident thread, Statuspage incident, alarm, retro write-up when it exists.
+  - type: textarea
+    id: follow-up
+    attributes:
+      label: Follow-up
+      description: Retro date and retro-action issues, added as they are known.

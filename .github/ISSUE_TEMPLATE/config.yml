@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Something is down right now
+    url: https://github.com/wellcomecollection/developer-handbook/blob/main/incident-management/incident-comms-and-escalation.md
+    about: Follow the major incident playbook in Slack first. Open an Incident issue once the incident is under way or closed.
+  - name: Security issue or exposed secret
+    url: https://github.com/wellcomecollection/developer-handbook/blob/main/incident-management/incident-response-process.md
+    about: Do not open a public issue. Use a private channel and the incident response process.
+  - name: An alert fired
+    url: https://github.com/wellcomecollection/developer-handbook/blob/main/incident-management/bug-nurse.md
+    about: The bug nurse handles alerts in #wc-platform-alerts and tickets them if work is needed.

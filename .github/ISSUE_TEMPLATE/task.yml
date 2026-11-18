@@ -1,0 +1,29 @@
+name: Task or improvement
+description: A piece of work to build, change, upgrade or find out
+type: Task
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What we want and why. Link the issue or conversation it came from.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope of work
+      description: The changes or questions to answer, as a checklist if that helps.
+      placeholder: "- [ ] "
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Related work this issue does not cover.
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: How we will know it is finished.
+    validations:
+      required: true
