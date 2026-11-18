@@ -1,0 +1,47 @@
+name: Tracking issue
+description: A larger piece of work split into sub-issues, with an outcome and a point where it is done
+type: Epic
+labels: ["Tracking Issue"]
+body:
+  - type: markdown
+    attributes:
+      value: Add each slice of work as a sub-issue of this one rather than a checklist, so progress shows on the issue and the board. Estimate the sub-issues, not this issue.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: The outcome, who benefits and why now.
+    validations:
+      required: true
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Prerequisites and dependencies
+      description: What must land or be agreed first, in this or other repositories.
+  - type: textarea
+    id: stages
+    attributes:
+      label: Stages
+      description: The order the sub-issues should go in, if it matters.
+  - type: textarea
+    id: to-decide
+    attributes:
+      label: To decide
+      description: Open questions that affect more than one sub-issue.
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Related work this does not cover.
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: The point at which this is finished, which may be more than every sub-issue being closed.
+    validations:
+      required: true
+  - type: textarea
+    id: links
+    attributes:
+      label: Links
+      description: RFC, ADR, parent issue or OKR this belongs to.
