@@ -1,0 +1,27 @@
+name: Bug or data problem
+description: Something behaves wrongly, or records or data are wrong
+type: Bug
+labels: ["🐛 Bug"]
+body:
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: What is wrong, where you saw it, and what should happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Scale and evidence
+      description: How many records or requests are affected, example ids, log lines or queries.
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce
+      description: Steps, a query or a URL that shows the problem.
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: The fix, plus any clean-up of data already affected.

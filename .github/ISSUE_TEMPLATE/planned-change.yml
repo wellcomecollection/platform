@@ -1,0 +1,34 @@
+name: Planned change
+description: An operational change done in steps, such as a switchover, pause, reindex or decommission
+type: Task
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is changing, why, and when it is planned for.
+    validations:
+      required: true
+  - type: textarea
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: What must be true or agreed before starting, and with whom.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      description: The steps in order, with commands or links where they help.
+      placeholder: "- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback or fallback
+      description: How to undo it, or what we do if a step fails.
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
+      description: The checks that show the change worked.

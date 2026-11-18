@@ -1,0 +1,28 @@
+name: Retro action
+description: An action agreed in an incident retro
+type: Task
+labels: ["retro-action"]
+body:
+  - type: input
+    id: retro
+    attributes:
+      label: Retro
+      description: Link to the write-up in docs/incident_retros, or say it is private.
+    validations:
+      required: true
+  - type: input
+    id: incident
+    attributes:
+      label: Incident issue
+      description: The issue labelled incident, if there is one.
+  - type: textarea
+    id: action
+    attributes:
+      label: Action
+      description: What was agreed and what it prevents or shortens next time.
+    validations:
+      required: true
+  - type: textarea
+    id: done-when
+    attributes:
+      label: Done when
